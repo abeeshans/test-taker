@@ -1,0 +1,315 @@
+/* Custom Styles */
+:root {
+  --brand-blue: #005a9e;
+  --brand-blue-light: #e6f0f7;
+}
+
+/* Webkit-specific styles for scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+/* Main layout scroll */
+.main-layout {
+  height: calc(100vh - 4rem);
+  /* Full height minus header */
+}
+
+/* Custom Radio Button */
+.custom-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--brand-blue);
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  margin-right: 12px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.custom-radio:checked {
+  background-color: var(--brand-blue);
+}
+
+.custom-radio:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+/* Custom label for review */
+.review-label {
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.8rem;
+  margin-left: 8px;
+}
+
+.review-correct {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.review-incorrect {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.review-unanswered {
+  background-color: #fef9c3;
+  color: #854d0e;
+}
+
+/* Strikethrough style */
+.strikethrough {
+  text-decoration: line-through;
+  color: #777;
+}
+
+/* Phosphor icon fill */
+.ph-star-fill {
+  color: #facc15;
+  /* yellow-400 */
+}
+
+/* Ensure app hides elements correctly */
+.hidden {
+  display: none;
+}
+
+/* Drag and Drop styles */
+.drag-over {
+  background-color: var(--brand-blue-light);
+  border: 2px dashed var(--brand-blue);
+}
+
+.card-menu-container {
+  position: relative;
+}
+
+/* Toast styles removed (toasts disabled) */
+
+/* Load summary minimize styles inside Help modal */
+#load-summary {
+  transition: max-height 0.25s ease, padding 0.2s ease;
+  overflow: hidden;
+}
+#load-summary {
+  /* Match horizontal padding with the modal content (p-6 = 24px) so text aligns */
+  padding: 12px 24px;
+  border-radius: 8px;
+  background: #f8fafc; /* subtle background to separate from modal */
+  box-sizing: border-box;
+}
+#load-summary.minimized {
+  max-height: 56px; /* show only header row comfortably */
+  padding: 8px 12px;
+}
+#load-summary .load-summary-body {
+  margin-top: 8px;
+}
+#load-summary.minimized .load-summary-body {
+  display: none;
+}
+#load-summary .load-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* vertical center header items */
+  gap: 12px;
+}
+#load-summary .load-summary-header .left {
+  display: flex;
+  flex-direction: row; /* keep timestamp and source on the same baseline */
+  gap: 8px;
+  align-items: center;
+}
+#load-summary .load-summary-header .right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#load-summary .load-summary-toggle {
+  background: transparent;
+  border: none;
+  color: #374151; /* gray-700 */
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Icon-only style for the load summary toggle */
+#load-summary .load-summary-toggle {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  line-height: 1;
+}
+#load-summary .load-summary-toggle:hover {
+  background: rgba(15, 23, 42, 0.04); /* subtle hover */
+}
+/* Ensure the Phosphor icon inside the toggle is visible and centered */
+/* Icon sizing and visibility */
+#load-summary .load-summary-toggle {
+  color: #1f2937; /* darker gray for visibility */
+  font-size: 18px; /* affects embedded icon size */
+}
+#load-summary .load-summary-toggle svg,
+#load-summary .load-summary-toggle i.ph {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+}
+#load-summary .load-summary-toggle svg {
+  /* Phosphor icons use currentColor for strokes/fills */
+  color: inherit;
+}
+
+/* -------------------- Animations & Transitions -------------------- */
+
+/* Modal panel enter/exit: target the direct child panel inside modals */
+[id$="-modal"] > div {
+  transform: translateY(10px) scale(0.992);
+  opacity: 0;
+  transition: transform 260ms cubic-bezier(0.22, 0.9, 0.28, 1), opacity 260ms ease;
+}
+[id$="-modal"]:not(.hidden) > div {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  transition-timing-function: cubic-bezier(0.18, 0.9, 0.3, 1);
+}
+
+/* Slight backdrop fade for overlays (already handled by bg-opacity classes but smoothen it) */
+[id$="-modal"] {
+  transition: background-color 220ms ease;
+}
+
+/* Card entrance and subtle hover lift */
+.test-card {
+  will-change: transform, opacity;
+  animation: fadeInUp 340ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+  transition: transform 200ms cubic-bezier(0.2, 0.9, 0.25, 1), box-shadow 200ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.test-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(2, 6, 23, 0.14);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  60% {
+    opacity: 0.9;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Buttons: smooth color and transform transitions for better feel */
+button,
+.card-menu-button,
+.card-menu-dropdown a {
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease;
+}
+button:active {
+  transform: translateY(1px) scale(0.998);
+}
+
+/* Load summary toggle rotation when minimized */
+#load-summary.minimized .load-summary-toggle i.ph,
+#load-summary.minimized .load-summary-toggle svg {
+  transform: rotate(180deg);
+  transition: transform 220ms ease;
+}
+#load-summary .load-summary-toggle i.ph,
+#load-summary .load-summary-toggle svg {
+  transition: transform 220ms ease;
+}
+
+/* Confirm modal: give primary action a pulse on open to hint affordance */
+#confirm-modal:not(.hidden) #confirm-modal-confirm {
+  animation: popIn 300ms cubic-bezier(0.18, 0.9, 0.2, 1);
+}
+@keyframes popIn {
+  0% {
+    transform: scale(0.94);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Reduce motion for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  [id$="-modal"] > div,
+  .test-card,
+  button,
+  #load-summary .load-summary-toggle svg {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* Star shimmer/pulse for starred tests */
+.test-card .starred {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f59e0b; /* amber-500 */
+  animation: starPulse 2000ms ease-in-out infinite;
+}
+.test-card .starred svg,
+.test-card .starred i {
+  display: inline-block;
+}
+@keyframes starPulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 8px 18px rgba(2, 6, 23, 0.08));
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(0, 0, 0, 0));
+  }
+}
