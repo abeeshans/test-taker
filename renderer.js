@@ -26,6 +26,8 @@ let currentTest = {
 };
 // Which folder is currently being viewed in the dashboard (null => root view)
 let currentFolderId = null;
+// Currently selected card id in the dashboard. Format: "test:<testId>" or "folder:<folderId>"
+let selectedCardId = null;
 // Temporary holder for creating nested folders via the Create Folder modal
 let folderCreateParentId = null;
 // Pointer-tracking: last folder id seen under the pointer during drag operations.
@@ -33,6 +35,8 @@ let folderCreateParentId = null;
 let lastDragOverFolderId = undefined;
 // Element currently outlined as the visual drop target
 let _lastDropHighlightEl = null;
+// Track which folder summaries are expanded (showing full list)
+const expandedFolderSummaries = new Set();
 
 function setDropHighlight(el) {
   try {
@@ -58,6 +62,7 @@ function clearDropHighlight() {
 }
 const METADATA_STORAGE_KEY = "customTestAppMetadata";
 const LAYOUT_STORAGE_KEY = "customTestDashboardLayout";
+const EXPANDED_SUMMARIES_KEY = "expandedFolderSummaries";
 
 // Ensure we only auto-load initial files once per session
 let initialLoadDone = false;
@@ -85,6 +90,80 @@ const modals = {
   confirm: document.getElementById("confirm-modal"),
 };
 
+// Common test-screen elements (queried once for performance). These correspond to
+// IDs defined in index.html. Declaring them here avoids runtime ReferenceErrors
+// later in test flows (startTest, renderQuestion, timers, etc.). Using
+// getElementById returns null if the element is missing; callers should guard
+// where appropriate but most flows expect these to exist in a normal app run.
+const testTitleHeaderEl = document.getElementById("test-title-header");
+const progressBarEl = document.getElementById("progress-bar");
+const timerEl = document.getElementById("timer");
+const awayClicksCounterEl = document.getElementById("away-clicks-counter");
+const awayClicksCounterContainerEl = document.getElementById("away-clicks-counter-container");
+const reviewDashboardBtn = document.getElementById("review-dashboard-btn");
+const finishBtnHeader = document.getElementById("finish-btn-header");
+const pauseBtn = document.getElementById("pause-btn");
+const pauseBtnText = document.getElementById("pause-btn-text");
+const flagBtn = document.getElementById("flag-btn");
+const questionCounterEl = document.getElementById("question-counter");
+const passageContainerEl = document.getElementById("passage-container");
+const questionNumberEl = document.getElementById("question-number");
+const questionTextEl = document.getElementById("question-text");
+const optionsContainerEl = document.getElementById("options-container");
+const navGridEl = document.getElementById("nav-grid");
+const prevBtn = document.getElementById("prev-btn");
+const nextBtn = document.getElementById("next-btn");
+const resultsScoreEl = document.getElementById("results-score");
+const resultsPercentageEl = document.getElementById("results-percentage");
+const resultsAwayClicksEl = document.getElementById("results-away-clicks");
+
+// Helper: persist/restore expanded folder summaries so Show more state survives reload
+function saveExpandedFolderSummaries() {
+  try {
+    const arr = Array.from(expandedFolderSummaries.values());
+    localStorage.setItem(EXPANDED_SUMMARIES_KEY, JSON.stringify(arr));
+  } catch (e) {
+    console.warn("Failed to save expandedFolderSummaries:", e);
+  }
+}
+
+function loadExpandedFolderSummaries() {
+  try {
+    const raw = localStorage.getItem(EXPANDED_SUMMARIES_KEY);
+    if (!raw) return;
+    const arr = JSON.parse(raw);
+    if (Array.isArray(arr)) {
+      arr.forEach((id) => {
+        if (id) expandedFolderSummaries.add(id);
+      });
+    }
+  } catch (e) {
+    console.warn("Failed to load expandedFolderSummaries:", e);
+  }
+}
+
+// Sanity check for important test UI elements to provide clearer warnings
+function checkTestUiElements() {
+  try {
+    const required = [
+      { el: testTitleHeaderEl, id: "test-title-header" },
+      { el: progressBarEl, id: "progress-bar" },
+      { el: timerEl, id: "timer" },
+      { el: awayClicksCounterEl, id: "away-clicks-counter" },
+      { el: passageContainerEl, id: "passage-container" },
+      { el: questionNumberEl, id: "question-number" },
+      { el: questionTextEl, id: "question-text" },
+      { el: optionsContainerEl, id: "options-container" },
+    ];
+    const missing = required.filter((r) => !r.el).map((r) => r.id);
+    if (missing.length > 0) {
+      console.warn("Some test UI elements were not found in the DOM:", missing.join(", "), "— test flows may behave unexpectedly.");
+    }
+  } catch (e) {
+    /* ignore */
+  }
+}
+
 // Context for modals that act on a specific test
 let modalActionContext = null; // { action: 'rename'|'reset'|'delete', testId }
 
@@ -101,6 +180,8 @@ async function init() {
   // Load persisted state
   loadMetadata();
   loadLayout();
+  // Restore persisted expanded folder summaries
+  loadExpandedFolderSummaries();
 
   // Remove any auto-created test folder from previous automated tests
   try {
@@ -139,6 +220,9 @@ async function init() {
 
   // Add optimized event listeners
   addEventListeners();
+
+  // Sanity-check important test UI elements to avoid runtime ReferenceErrors
+  checkTestUiElements();
 
   // Ensure create-folder button clicks are handled even if delegation fails
   // (some environments or DOM changes can prevent delegated listeners from firing)
@@ -602,6 +686,47 @@ function addEventListeners() {
   screens.dashboard.addEventListener("click", (e) => {
     const target = e.target;
 
+    // Apply a transient click feedback to cards and summary items.
+    try {
+      (function applyClickFeedback(t) {
+        const card = t.closest(".test-card, .folder-card");
+        if (card) {
+          card.classList.add("card-clicked");
+          setTimeout(() => card.classList.remove("card-clicked"), 180);
+        }
+        const summary = t.closest(".folder-summary-line");
+        if (summary) {
+          summary.classList.add("clicked");
+          setTimeout(() => summary.classList.remove("clicked"), 180);
+        }
+      })(target);
+    } catch (err) {
+      /* ignore click feedback errors */
+    }
+
+    // Persistent selection: single click selects the card (but does not open folders)
+    try {
+      const selCard = target.closest("[data-select-id]");
+      if (selCard) {
+        const sid = selCard.dataset.selectId;
+        setSelectedCard(sid);
+      } else {
+        // If clicking a folder summary line, select the underlying item
+        const sum = target.closest(".folder-summary-line");
+        if (sum) {
+          if (sum.dataset.testid) setSelectedCard("test:" + sum.dataset.testid);
+          else if (sum.dataset.folderId) setSelectedCard("folder:" + sum.dataset.folderId);
+        } else {
+          // Clicked somewhere else in the dashboard (not a selectable item).
+          // If the click wasn't inside the breadcrumb/navigation line, clear selection.
+          const inBreadcrumb = !!target.closest(".breadcrumb");
+          if (!inBreadcrumb) setSelectedCard(null);
+        }
+      }
+    } catch (e) {
+      /* ignore */
+    }
+
     // --- Buttons ---
     if (target.closest("#create-folder-btn")) {
       createFolder();
@@ -729,11 +854,19 @@ function addEventListeners() {
     } else if (target.closest("#help-btn")) {
       showHelp();
     } else if (target.closest("[data-folder-id]")) {
-      // Click on a breadcrumb/folder-link/back item. data-folder-id may be "" for root.
+      // Only treat clicks on data-folder-id as navigation when the click
+      // originates from breadcrumb links or the Back button. Folder cards
+      // themselves should NOT open on single click (only on double-click).
       const el = target.closest("[data-folder-id]");
-      const fid = el.dataset.folderId;
-      currentFolderId = fid && fid !== "" ? fid : null;
-      renderDashboard();
+      const clickedInBreadcrumb = !!target.closest(".breadcrumb") || !!el.closest(".breadcrumb");
+      const clickedLeaveBtn = !!target.closest("#leave-folder-btn") || el.id === "leave-folder-btn";
+      if (clickedInBreadcrumb || clickedLeaveBtn) {
+        const fid = el.dataset.folderId;
+        currentFolderId = fid && fid !== "" ? fid : null;
+        renderDashboard();
+      } else {
+        // Click was on a folder card or other non-navigation element; ignore single click
+      }
     } else if (target.closest("#leave-folder-btn")) {
       // Back button: respect its data-folder-id to go only one level up
       const el = target.closest("#leave-folder-btn");
@@ -785,6 +918,8 @@ function addEventListeners() {
     renderDashboard(e.target.value);
   });
   document.addEventListener("keydown", handleKeyDown);
+  // Dashboard keyboard navigation (arrow keys and Enter to act on selected card)
+  document.addEventListener("keydown", handleDashboardNavKey);
   document.addEventListener("visibilitychange", handleVisibilityChange);
   // Delegate dragstart so summary inline handlers aren't the only source of drag events
   document.addEventListener("dragstart", (e) => {
@@ -857,6 +992,117 @@ function addEventListeners() {
     lastDragOverFolderId = undefined;
     clearDropHighlight();
   });
+
+  // --- Global tooltip manager for action buttons (prevents clipping by card decorations)
+  // Use a single tooltip element appended to document.body and position it near the target.
+  let _globalTooltipEl = null;
+  let _globalTooltipTimeout = null;
+
+  function createGlobalTooltip() {
+    if (_globalTooltipEl) return _globalTooltipEl;
+    const d = document.createElement("div");
+    d.className = "global-action-tooltip";
+    d.style.position = "fixed";
+    d.style.pointerEvents = "none";
+    d.style.padding = "6px 10px";
+    d.style.background = "rgba(15,23,42,0.98)";
+    d.style.color = "#fff";
+    d.style.borderRadius = "6px";
+    d.style.fontSize = "13px";
+    d.style.lineHeight = "1.2";
+    d.style.maxWidth = "260px";
+    d.style.boxShadow = "0 10px 36px rgba(2,6,23,0.18)";
+    d.style.zIndex = 999999;
+    d.style.transition = "opacity 160ms ease, transform 160ms ease";
+    d.style.opacity = "0";
+    d.style.transform = "translateY(4px)";
+    document.body.appendChild(d);
+    _globalTooltipEl = d;
+    return d;
+  }
+
+  function showGlobalTooltipFor(target) {
+    try {
+      if (!target) return;
+      const text = target.getAttribute("data-tooltip");
+      if (!text) return;
+      const el = createGlobalTooltip();
+      el.textContent = text;
+      // measure then position
+      el.style.opacity = "0";
+      el.style.transform = "translateY(4px)";
+      // small debounce so quick pointer moves don't flash tooltip
+      if (_globalTooltipTimeout) clearTimeout(_globalTooltipTimeout);
+      _globalTooltipTimeout = setTimeout(() => {
+        const rect = target.getBoundingClientRect();
+        const margin = 8;
+        // Ensure the tooltip is positioned offscreen first so we can measure its natural size
+        el.style.left = "-9999px";
+        el.style.top = "-9999px";
+        el.style.opacity = "0";
+        el.style.transform = "translateY(4px)";
+        const tooltipRect = el.getBoundingClientRect();
+        // Calculate horizontal center (clamped to viewport with 8px padding)
+        const left = Math.min(Math.max(rect.left + rect.width / 2 - tooltipRect.width / 2, 8), Math.max(8, window.innerWidth - tooltipRect.width - 8));
+        // Prefer placing above the target to match UX preference; fall back to below if not enough space
+        let top = rect.top - tooltipRect.height - margin;
+        if (top < 8) {
+          top = rect.bottom + margin;
+        }
+        // Apply final position
+        el.style.left = Math.round(left) + "px";
+        el.style.top = Math.round(top) + "px";
+        // show
+        requestAnimationFrame(() => {
+          el.style.opacity = "1";
+          el.style.transform = "translateY(0)";
+        });
+      }, 80);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function hideGlobalTooltip() {
+    try {
+      if (_globalTooltipTimeout) {
+        clearTimeout(_globalTooltipTimeout);
+        _globalTooltipTimeout = null;
+      }
+      if (!_globalTooltipEl) return;
+      _globalTooltipEl.style.opacity = "0";
+      _globalTooltipEl.style.transform = "translateY(4px)";
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  // Pointer delegation for showing/hiding the tooltip
+  document.addEventListener("pointerover", (ev) => {
+    try {
+      const btn = ev.target.closest && ev.target.closest(".folder-open-hint, .folder-card-actions > button[data-tooltip]");
+      if (btn) showGlobalTooltipFor(btn);
+    } catch (e) {}
+  });
+  document.addEventListener("pointerout", (ev) => {
+    try {
+      const btn = ev.target.closest && ev.target.closest(".folder-open-hint, .folder-card-actions > button[data-tooltip]");
+      if (btn) hideGlobalTooltip();
+    } catch (e) {}
+  });
+  // Keyboard accessibility: show tooltip on focus and hide on blur
+  document.addEventListener("focusin", (ev) => {
+    try {
+      const btn = ev.target.closest && ev.target.closest(".folder-open-hint, .folder-card-actions > button[data-tooltip]");
+      if (btn) showGlobalTooltipFor(btn);
+    } catch (e) {}
+  });
+  document.addEventListener("focusout", (ev) => {
+    try {
+      const btn = ev.target.closest && ev.target.closest(".folder-open-hint, .folder-card-actions > button[data-tooltip]");
+      if (btn) hideGlobalTooltip();
+    } catch (e) {}
+  });
 }
 
 /**
@@ -889,6 +1135,195 @@ function handleKeyDown(e) {
   } else if (e.key.toLowerCase() === "p") {
     e.preventDefault();
     togglePause();
+  }
+}
+
+/**
+ * Handle keyboard navigation inside the dashboard: arrow keys move selection; Enter activates.
+ */
+function handleDashboardNavKey(e) {
+  try {
+    if (screens.dashboard.classList.contains("hidden")) return;
+    // Don't handle when modals are open or user is typing
+    if (!Object.values(modals).every((m) => m.classList.contains("hidden"))) return;
+    const activeTag = document.activeElement && document.activeElement.tagName;
+    if (activeTag === "INPUT" || activeTag === "TEXTAREA" || (document.activeElement && document.activeElement.isContentEditable)) return;
+
+    const keys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"];
+    if (!keys.includes(e.key)) return;
+
+    // If focus is inside the breadcrumb/navigation line, let Left/Right move among crumbs
+    const activeEl = document.activeElement;
+    // If nothing important is focused (body/dashboard), allow arrow keys to jump into the breadcrumb
+    const breadcrumbRoot = document.querySelector(".breadcrumb");
+    if (breadcrumbRoot && (activeEl === document.body || activeEl === screens.dashboard || !activeEl)) {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        const linksRoot = Array.from(breadcrumbRoot.querySelectorAll("a[data-folder-id]"));
+        if (linksRoot.length > 0) {
+          const target = e.key === "ArrowLeft" ? linksRoot[linksRoot.length - 1] : linksRoot[0];
+          try {
+            target.focus();
+          } catch (err) {}
+          const fid = target.dataset.folderId || "";
+          const selId = "folder:" + fid;
+          if (document.querySelector('#test-list [data-select-id="' + selId + '"]')) {
+            setSelectedCard(selId);
+          }
+          e.preventDefault();
+          return;
+        }
+      }
+    }
+    const breadcrumbContainer = activeEl && activeEl.closest ? activeEl.closest(".breadcrumb") : null;
+    if (breadcrumbContainer) {
+      const links = Array.from(breadcrumbContainer.querySelectorAll("a[data-folder-id]"));
+      if (links.length > 0) {
+        const idx = links.indexOf(activeEl);
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+          let next = idx;
+          if (idx === -1) next = 0;
+          else if (e.key === "ArrowLeft") next = Math.max(0, idx - 1);
+          else if (e.key === "ArrowRight") next = Math.min(links.length - 1, idx + 1);
+          const nextLink = links[next];
+          if (nextLink) {
+            try {
+              nextLink.focus();
+            } catch (err) {}
+            // Also set selection to the folder if a corresponding selectable card exists
+            const fid = nextLink.dataset.folderId || "";
+            const selId = "folder:" + fid;
+            if (document.querySelector('#test-list [data-select-id="' + selId + '"]')) {
+              setSelectedCard(selId);
+            }
+          }
+          e.preventDefault();
+          return;
+        }
+        if (e.key === "Enter") {
+          const fid = activeEl.dataset.folderId || "";
+          currentFolderId = fid === "" ? null : fid;
+          renderDashboard();
+          e.preventDefault();
+          return;
+        }
+        // Allow ArrowDown from breadcrumb to move focus back to selected card or first selectable
+        if (e.key === "ArrowDown") {
+          const selectables = Array.from(document.querySelectorAll("#test-list [data-select-id]"));
+          if (selectables.length > 0) {
+            // Prefer focusing the previously selected card if present
+            const selIndex = selectables.findIndex((el) => el.dataset.selectId === selectedCardId);
+            const target = selIndex >= 0 ? selectables[selIndex] : selectables[0];
+            try {
+              target.focus();
+            } catch (err) {}
+            // Also set selection visually
+            if (target && target.dataset && target.dataset.selectId) setSelectedCard(target.dataset.selectId);
+          }
+          e.preventDefault();
+          return;
+        }
+      }
+    }
+
+    // If a card is selected, allow ArrowUp to move focus into the breadcrumb/navigation line
+    if (selectedCardId && e.key === "ArrowUp") {
+      const breadcrumbRoot = document.querySelector(".breadcrumb");
+      if (breadcrumbRoot) {
+        const links = Array.from(breadcrumbRoot.querySelectorAll("a[data-folder-id]"));
+        if (links.length > 0) {
+          const target = links[links.length - 1];
+          try {
+            target.focus();
+          } catch (err) {}
+          // Clear card selection when moving up to the breadcrumb so the outline is not duplicated
+          setSelectedCard(null);
+          e.preventDefault();
+          return;
+        }
+      }
+    }
+
+    const selectables = Array.from(document.querySelectorAll("#test-list [data-select-id]"));
+    if (selectables.length === 0) return;
+
+    const currentIndex = selectables.findIndex((el) => el.dataset.selectId === selectedCardId);
+    let nextIndex = currentIndex;
+
+    if (e.key === "Enter") {
+      // Activate the selected card
+      if (currentIndex >= 0) {
+        const el = selectables[currentIndex];
+        const sid = el.dataset.selectId;
+        if (sid && sid.startsWith("test:")) {
+          const testId = sid.substring(5);
+          handleDashboardAction("start", testId);
+        } else if (sid && sid.startsWith("folder:")) {
+          const fid = sid.substring(7);
+          // Open folder
+          currentFolderId = fid || null;
+          renderDashboard();
+        }
+      }
+      e.preventDefault();
+      return;
+    }
+
+    if (currentIndex === -1) {
+      // No selection yet: pick first
+      nextIndex = 0;
+    } else {
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") nextIndex = Math.min(selectables.length - 1, currentIndex + 1);
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") nextIndex = Math.max(0, currentIndex - 1);
+    }
+
+    if (nextIndex !== currentIndex) {
+      const sid = selectables[nextIndex].dataset.selectId;
+      setSelectedCard(sid);
+      // focus element for accessibility
+      try {
+        selectables[nextIndex].focus();
+      } catch (e) {}
+      e.preventDefault();
+    }
+  } catch (err) {
+    /* ignore */
+  }
+}
+
+/**
+ * Set the selected card by its selectId (format 'test:<id>' or 'folder:<id>').
+ */
+function setSelectedCard(selectId) {
+  try {
+    // Clear previous selection if any
+    const prev = document.querySelector('#test-list [data-select-id="' + (selectedCardId || "") + '"]');
+    if (prev) {
+      prev.classList.remove("card-selected");
+      prev.setAttribute("tabindex", "-1");
+      prev.removeAttribute("aria-selected");
+    }
+
+    // If selectId is falsy, clear selection and return
+    if (!selectId) {
+      selectedCardId = null;
+      return;
+    }
+
+    // If already selected, no-op
+    if (selectedCardId && selectedCardId === selectId) return;
+
+    selectedCardId = selectId;
+    const el = document.querySelector('#test-list [data-select-id="' + selectId + '"]');
+    if (el) {
+      el.classList.add("card-selected");
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("aria-selected", "true");
+      try {
+        el.focus();
+      } catch (e) {}
+    }
+  } catch (e) {
+    /* ignore */
   }
 }
 
@@ -1059,6 +1494,20 @@ function handleDashboardAction(action, testId) {
       if (dashboardLayout.folders.find((f) => f.id === testId)) {
         currentFolderId = testId;
         renderDashboard();
+      }
+      break;
+    case "toggle-summary":
+      // Toggle the Show more / Show less state for a folder summary
+      try {
+        const fid = testId || null;
+        if (!fid) break;
+        if (expandedFolderSummaries.has(fid)) expandedFolderSummaries.delete(fid);
+        else expandedFolderSummaries.add(fid);
+        // Persist the user's expanded/collapsed preference and re-render
+        saveExpandedFolderSummaries();
+        renderDashboard();
+      } catch (e) {
+        /* ignore */
       }
       break;
     case "delete":
@@ -1691,25 +2140,32 @@ function renderDashboard(filter = "") {
       }
     }
 
+    // Build a nicer star button (SVG) based on starred state
+    const starSvg = meta.isStarred
+      ? `<svg class="star-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="#f59e0b" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>`
+      : `<svg class="star-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="#d1d5db" stroke-width="1.6" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>`;
+
     return `
-      <div class="test-card bg-white rounded-lg shadow p-4" data-testid="${testId}" draggable="true" ondragstart="drag(event)">
-        <div class="flex justify-between items-start">
-          <div>
-            <h4 class="text-lg font-semibold text-gray-800">${meta.customName}</h4>
-            <div class="text-sm text-gray-500">
-              ${attempts.length} attempt(s) • Avg ${attempts.length > 0 ? avgScore + "%" : "N/A"}
-            </div>
-            <div class="text-sm text-gray-500 mt-1">
-              Best: <span class="font-medium text-gray-800">${bestScore}</span>
-              <span class="mx-2">•</span>
-              Last: <span class="font-medium text-gray-800">${lastScore}</span>
-            </div>
+      <div class="test-card bg-white rounded-lg shadow p-4" data-select-id="test:${testId}" data-testid="${testId}" tabindex="0" draggable="true" ondragstart="drag(event)">
+        <div class="card-content">
+          <h4 class="text-lg font-semibold text-gray-800">${meta.customName}</h4>
+          <div class="text-sm text-gray-500 mt-1">
+            ${attempts.length} attempt(s) • Avg ${attempts.length > 0 ? avgScore + "%" : "N/A"}
           </div>
-          <div class="flex items-center space-x-2">
-            <button class="px-3 py-1 bg-blue-600 text-white rounded text-sm" data-action="start" data-testid="${testId}">Start</button>
-            <button class="px-2 py-1 border rounded text-sm" data-action="star" data-testid="${testId}">${meta.isStarred ? "★" : "☆"}</button>
+          <div class="text-sm text-gray-500 mt-2">
+            Best: <span class="font-medium text-gray-800">${bestScore}</span>
+            <span class="mx-2">•</span>
+            Last: <span class="font-medium text-gray-800">${lastScore}</span>
+          </div>
+        </div>
+        <div class="card-actions">
+          <div class="left-actions">
+            <button class="start-large" data-action="start" data-testid="${testId}">Start</button>
+          </div>
+          <div class="right-actions">
+            <button class="star-btn" data-action="star" data-testid="${testId}" aria-label="Toggle star">${starSvg}</button>
             <div class="card-menu-container relative" style="z-index:0">
-              <button class="card-menu-button px-2 py-1">⋯</button>
+              <button class="card-menu-button px-2 py-1" aria-label="Open menu">⋮</button>
               <div class="card-menu-dropdown hidden absolute right-0 mt-2 bg-white border rounded shadow">
                 <a href="#" class="card-menu-item" data-action="rename" data-testid="${testId}"><i class="ph ph-pencil w-5 inline-block mr-2"></i> Rename</a>
                 <a href="#" class="card-menu-item" data-action="reset" data-testid="${testId}"><i class="ph ph-arrow-counter-clockwise w-5 inline-block mr-2"></i> Reset</a>
@@ -1733,9 +2189,14 @@ function renderDashboard(filter = "") {
 
     // Build a short line-by-line summary: first child folders then tests (each on its own line)
     const childFolders = dashboardLayout.folders.filter((f) => f.parentId === folder.id);
+    // Assemble summaryItems: include child folders first, then visible tests
     const summaryItems = [];
-    childFolders.slice(0, 2).forEach((cf) => summaryItems.push({ type: "folder", id: cf.id, name: cf.name }));
-    visibleTests.slice(0, 4 - summaryItems.length).forEach((tid) => {
+    childFolders.forEach((cf) => {
+      const testsInChild = dashboardLayout.testsInFolders[cf.id] || [];
+      const subfolders = dashboardLayout.folders.filter((ff) => ff.parentId === cf.id) || [];
+      summaryItems.push({ type: "folder", id: cf.id, name: cf.name, testCount: testsInChild.length, folderCount: subfolders.length });
+    });
+    visibleTests.forEach((tid) => {
       const m = testMetadata[tid];
       const attempts = (m && m.attempts) || [];
       let avg = "N/A";
@@ -1745,36 +2206,59 @@ function renderDashboard(filter = "") {
       }
       summaryItems.push({ type: "test", id: tid, name: m ? m.customName : tid, avg });
     });
-
     let summaryHtml = "";
-    if (summaryItems.length === 0) summaryHtml = `<div class=\"text-sm text-gray-500 italic\">(empty)</div>`;
-    else
-      summaryItems.forEach((it) => {
+    if (summaryItems.length === 0) {
+      summaryHtml = `<div class="text-sm text-gray-500 italic">(empty)</div>`;
+    } else {
+      // If the user has expanded this folder's summary, show all items; otherwise show preview
+      const PREVIEW_COUNT = 6;
+      const isExpanded = expandedFolderSummaries.has(folder.id);
+      const visibleItems = isExpanded ? summaryItems : summaryItems.slice(0, PREVIEW_COUNT);
+
+      visibleItems.forEach((it) => {
         if (it.type === "folder") {
-          // Folder entries: icon + truncated name; make draggable so folders can be moved
-          summaryHtml += `<div class=\"folder-summary-line text-sm text-gray-700\" data-folder-id=\"${
+          // Folder entries: icon + truncated name + counts; make draggable so folders can be moved
+          const counts = [];
+          if (typeof it.testCount === "number" && it.testCount >= 0) counts.push(`${it.testCount} file${it.testCount === 1 ? "" : "s"}`);
+          if (typeof it.folderCount === "number" && it.folderCount > 0) counts.push(`${it.folderCount} folder${it.folderCount === 1 ? "" : "s"}`);
+          const countsText = counts.length > 0 ? counts.join(" • ") : "";
+          // Render as a flex row so name and counts align vertically centered
+          summaryHtml += `<div class="folder-summary-line text-sm text-gray-700" data-folder-id="${
             it.id
-          }\" draggable=\"true\" ondragstart=\"drag(event)\" title=\"${escapeHtml(
+          }" draggable="true" ondragstart="drag(event)" title="${escapeHtml(
             it.name
-          )}\">📁 <span style=\"display:inline-block;max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle\">${
+          )}"><div style="display:flex;align-items:center;gap:8px;min-width:0;"><svg class="summary-folder-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex:0 0 auto"><path d="M3 7.5C3 6.67157 3.67157 6 4.5 6H9.5L11 8H19.5C20.3284 8 21 8.67157 21 9.5V17.5C21 18.3284 20.3284 19 19.5 19H4.5C3.67157 19 3 18.3284 3 17.5V7.5Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${
             it.name
-          }</span></div>`;
+          }</span>${
+            countsText ? `<span style="flex:0 0 auto;color:#6b7280;white-space:nowrap;margin-left:6px">${escapeHtml(countsText)}</span>` : ""
+          }</div></div>`;
         } else {
           // Test entries: left truncated name, right fixed avg so avg is always visible; make draggable
-          summaryHtml += `<div class=\"folder-summary-line text-sm text-gray-700\" data-testid=\"${
+          summaryHtml += `<div class="folder-summary-line text-sm text-gray-700" data-testid="${
             it.id
-          }\" draggable=\"true\" ondragstart=\"drag(event)\" title=\"${escapeHtml(
+          }" draggable="true" ondragstart="drag(event)" title="${escapeHtml(
             it.name
-          )}\"><div style=\"display:flex;align-items:center;gap:8px;\"><div style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;\">${
+          )}"><div style="display:flex;align-items:center;gap:8px;"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;">${
             it.name
-          }</div><div style=\"flex:0 0 auto;color:#6b7280;margin-left:8px;\">${it.avg}</div></div></div>`;
+          }</div><div style="flex:0 0 auto;color:#6b7280;margin-left:8px;">${it.avg}</div></div></div>`;
         }
       });
 
+      // If not expanded and there are more items, show a Show more button
+      if (summaryItems.length > PREVIEW_COUNT) {
+        const remaining = Math.max(0, summaryItems.length - PREVIEW_COUNT);
+        if (!isExpanded) {
+          summaryHtml += `<div class="mt-2"><button class="show-more-btn" data-action="toggle-summary" data-folder-id="${folder.id}" aria-expanded="false">Show ${remaining} more</button></div>`;
+        } else {
+          summaryHtml += `<div class="mt-2"><button class="show-more-btn" data-action="toggle-summary" data-folder-id="${folder.id}" aria-expanded="true">Show less</button></div>`;
+        }
+      }
+    }
+
     const folderCard = `
-      <div class="folder-card col-span-1 rounded-lg p-4" data-folder-id="${
-        folder.id
-      }" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+      <div class="folder-card col-span-1 rounded-lg p-4" data-select-id="folder:${folder.id}" data-folder-id="${
+      folder.id
+    }" tabindex="0" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
         <div class="flex justify-between items-start">
           <div>
             <div class="folder-tab mb-2"><i class="ph ph-folder text-2xl"></i></div>
@@ -1782,11 +2266,23 @@ function renderDashboard(filter = "") {
             <div class="text-sm text-gray-500">${(dashboardLayout.testsInFolders[folder.id] || []).length} test(s) • Avg ${avgLabel}</div>
             <div class="mt-3">${summaryHtml}</div>
           </div>
-          <div class="flex flex-col items-end space-y-2">
-            <button class="px-3 py-1 bg-blue-600 text-white rounded text-sm" data-action="open-folder" data-testid="${folder.id}">Open</button>
-            <button class="text-gray-500 hover:text-red-600" data-action="delete-folder" data-testid="${
+          <div class="folder-card-actions" aria-hidden="false">
+            <!-- Delete button sits left of the hint and is keyboard-accessible -->
+            <button class="folder-delete-btn text-gray-500 hover:text-red-600" data-action="delete-folder" data-testid="${
               folder.id
-            }" title="Delete Folder"><i class="ph ph-trash text-lg"></i></button>
+            }" aria-label="Delete Folder" data-tooltip="Delete card and ungroup contents">
+              <i class="ph ph-trash text-lg" aria-hidden="true"></i>
+            </button>
+            <!-- Subtle hint (non-focusable) showing info about double-click to open.
+                 We use data-tooltip for a custom-styled tooltip that appears above the hint.
+                 Keep tabindex -1 so it doesn't become a keyboard target. -->
+            <button class="folder-open-hint" data-tooltip="Double click to open folder" aria-hidden="true" tabindex="-1">
+              <svg class="folder-open-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" fill="none"></circle>
+                <path d="M12 8.5h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                <path d="M11.5 11.5h1v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -1833,6 +2329,9 @@ function renderDashboard(filter = "") {
   // perform deterministic moves even if DOM event targets are ambiguous.
   try {
     const leaveBtnEl = testListEl.querySelector("#leave-folder-btn");
+    // Also attach handlers to the entire header region so the parent folder
+    // accepts drops across its full width/height.
+    const headerEl = testListEl.querySelector(".folder-view-header");
     if (leaveBtnEl) {
       leaveBtnEl.addEventListener("dragover", (e) => {
         e.preventDefault();
@@ -1844,6 +2343,20 @@ function renderDashboard(filter = "") {
       leaveBtnEl.addEventListener("drop", (e) => {
         leaveBtnEl.classList.remove("drag-over");
         moveDraggedItemToFolder(e, "");
+      });
+    }
+
+    if (headerEl) {
+      headerEl.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        headerEl.classList.add("drag-over");
+      });
+      headerEl.addEventListener("dragleave", (e) => headerEl.classList.remove("drag-over"));
+      headerEl.addEventListener("drop", (e) => {
+        headerEl.classList.remove("drag-over");
+        // Use the header's dataset.folderId as the explicit target ('' -> root)
+        const fid = typeof headerEl.dataset.folderId !== "undefined" ? headerEl.dataset.folderId : "";
+        moveDraggedItemToFolder(e, fid);
       });
     }
 
@@ -1878,6 +2391,29 @@ function renderDashboard(filter = "") {
     });
   } catch (e) {
     /* ignore attach errors */
+  }
+
+  // After rendering, restore selection state if present
+  try {
+    const allSelectable = testListEl.querySelectorAll("[data-select-id]");
+    // Ensure only the selected element is tabbable
+    allSelectable.forEach((el) => {
+      if (selectedCardId && el.dataset.selectId === selectedCardId) {
+        el.setAttribute("tabindex", "0");
+        el.classList.add("card-selected");
+        el.setAttribute("aria-selected", "true");
+        // Only focus when the dashboard is visible
+        try {
+          if (!screens.dashboard.classList.contains("hidden")) el.focus();
+        } catch (e) {}
+      } else {
+        el.setAttribute("tabindex", "-1");
+        el.classList.remove("card-selected");
+        el.removeAttribute("aria-selected");
+      }
+    });
+  } catch (e) {
+    /* ignore */
   }
 
   // Manually trigger Phosphor Icons to process the newly added dynamic elements
@@ -2262,7 +2798,7 @@ function drop(ev) {
   ev.preventDefault();
   // If an explicit move helper already handled this event, don't run the generic drop logic.
   if (ev && ev._movedByHelper) {
-    console.debug("drop: event already handled by moveDraggedItemToFolder, skipping generic drop.");
+    // debug log removed
     try {
       // Clear visual state
       ev.currentTarget && ev.currentTarget.classList && ev.currentTarget.classList.remove("drag-over");
@@ -2320,7 +2856,7 @@ function drop(ev) {
 
   // Normalize id for robust comparisons (trim whitespace that may sneak in)
   const id = rawId ? String(rawId).trim() : rawId;
-  console.debug("drop event:", { id, itemType, targetFolderId, dropTarget, rawTarget: ev.target });
+  // debug log removed
   if (!id) return;
 
   // Show an on-screen debug toast with the resolved values and current layout membership
@@ -2398,7 +2934,7 @@ function drop(ev) {
     // Add detailed debug info to the resolved toast so the user can paste it
     try {
       showDropDebugToast({ phase: "mutation", id, targetFolderId, pre, post });
-      console.debug("drop mutation pre/post:", { id, targetFolderId, pre, post });
+      // debug log removed
     } catch (e) {
       /* ignore */
     }
@@ -2440,7 +2976,7 @@ function drop(ev) {
       snapshot.testsInFolders[k] = [...(dashboardLayout.testsInFolders[k] || [])];
     });
     showDropDebugToast({ phase: "final", id, itemType, targetFolderId, inUngrouped, folderNow, snapshot });
-    console.debug("drop final state:", { id, inUngrouped, folderNow });
+    // debug log removed
   } catch (e) {
     /* ignore */
   }
@@ -2517,7 +3053,7 @@ function moveDraggedItemToFolder(ev, explicitFolderId) {
 
     try {
       showDropDebugToast({ phase: "moveHelper", id, targetFolderId, pre, post });
-      console.debug("moveDraggedItemToFolder pre/post:", { id, targetFolderId, pre, post });
+      // debug log removed
     } catch (e) {
       /* ignore */
     }
@@ -2530,7 +3066,48 @@ function moveDraggedItemToFolder(ev, explicitFolderId) {
 }
 
 // === STARTUP ===
-// Wrap the startup in an async function to correctly handle the await inside init()
+// Helper to render a fatal error overlay so user sees errors instead of a blank screen
+function showFatalError(err) {
+  try {
+    const appEl = document.getElementById("app");
+    if (!appEl) return;
+    const overlay = document.createElement("div");
+    overlay.style.position = "fixed";
+    overlay.style.inset = "0";
+    overlay.style.background = "rgba(0,0,0,0.75)";
+    overlay.style.color = "white";
+    overlay.style.zIndex = 99999;
+    overlay.style.padding = "24px";
+    overlay.style.overflow = "auto";
+    overlay.innerHTML = `<div style="max-width:900px;margin:40px auto;background:#1f2937;padding:20px;border-radius:8px;"><h2 style="margin:0 0 12px">Application error</h2><pre style="white-space:pre-wrap;color:#fee2e2">${escapeHtml(
+      String(err && err.stack ? err.stack : err)
+    )}</pre><div style="margin-top:12px"><button id="reload-app-btn" style="background:#0ea5e9;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Reload</button></div></div>`;
+    appEl.appendChild(overlay);
+    const btn = document.getElementById("reload-app-btn");
+    if (btn) btn.addEventListener("click", () => location.reload());
+  } catch (e) {
+    /* ignore */
+  }
+}
+
+// Wrap the startup in an async function and show a fatal overlay on uncaught errors
 (async () => {
-  await init();
+  try {
+    await init();
+  } catch (err) {
+    console.error("Fatal init error:", err);
+    showFatalError(err);
+  }
 })();
+
+// Global uncaught error handler to show errors on screen instead of leaving blank
+window.addEventListener("error", (ev) => {
+  try {
+    showFatalError(ev.error || ev.message || "Unknown error");
+  } catch (e) {}
+});
+window.addEventListener("unhandledrejection", (ev) => {
+  try {
+    showFatalError(ev.reason || "Unhandled rejection");
+  } catch (e) {}
+});

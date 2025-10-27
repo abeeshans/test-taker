@@ -2,6 +2,11 @@
 :root {
   --brand-blue: #005a9e;
   --brand-blue-light: #e6f0f7;
+  --brand-green: #16a34a; /* green-600 */
+  --brand-yellow: #f59e0b; /* amber-500 */
+  --brand-red: #ef4444; /* red-500 */
+  --muted-bg: #f3f6fb;
+  --card-gradient: linear-gradient(180deg, rgba(0,90,158,0.08) 0%, rgba(0,90,158,0.03) 100%);
 }
 
 /* Webkit-specific styles for scrollbars */
@@ -101,6 +106,112 @@
   display: none;
 }
 
+/* --- Theming: unify look & feel across app to match card styling --- */
+body {
+  background: var(--muted-bg);
+  color: #0f172a; /* gray-900 */
+}
+
+/* App header and footers use card-like elevated surface */
+#dashboard-screen header,
+#test-screen header,
+footer {
+  background: white;
+  border-bottom: 1px solid rgba(3,105,161,0.06);
+  box-shadow: 0 6px 20px rgba(2,6,23,0.06);
+  border-radius: 0;
+}
+
+/* Modal panels: elevated card look consistent with folder/test cards */
+[id$="-modal"] > div {
+  background: #ffffff;
+  background-image: var(--card-gradient);
+  border: 1px solid rgba(0,90,158,0.08);
+  box-shadow: 0 18px 48px rgba(2,6,23,0.16);
+  color: #0f172a;
+}
+
+/* Buttons: unified primary/secondary styles to match cards */
+button {
+  border-radius: 10px;
+  font-weight: 600;
+  transition: transform 120ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+/* Primary action button (Start, Add files, Confirm) */
+.start-large,
+#add-files-btn,
+#start-test-confirm-btn,
+#confirm-modal-confirm,
+button.btn-primary {
+  background: var(--brand-blue) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 28px rgba(3,105,161,0.12);
+}
+
+/* Success/finish actions */
+.bg-green-600,
+button.btn-success {
+  background: var(--brand-green) !important;
+  color: #fff !important;
+}
+
+/* Warning/ pause */
+.bg-yellow-500,
+button.btn-warning {
+  background: var(--brand-yellow) !important;
+  color: #082f2b !important; /* darker text for legibility */
+}
+
+/* Danger actions (delete) */
+.bg-red-600,
+button.btn-danger,
+.folder-delete-btn {
+  background: transparent !important;
+  color: var(--brand-red) !important;
+}
+
+/* Make small icon buttons (kebab, star) match card aesthetic */
+.card-menu-button,
+.star-btn,
+.folder-delete-btn {
+  background: rgba(15,23,42,0.02);
+  border: 1px solid rgba(15,23,42,0.03);
+  box-shadow: none;
+}
+
+/* Test screen specific: keep multi-color affordances for quick identification */
+#progress-bar {
+  background: var(--brand-blue) !important;
+  transition: width 260ms ease;
+}
+#timer {
+  color: #0f172a;
+  font-weight: 700;
+}
+#away-clicks-counter-container {
+  color: var(--brand-red);
+}
+#question-counter { color: #0f172a; font-weight:700 }
+
+/* Footer nav buttons: bigger, consistent with card theme */
+footer button {
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+
+/* Ensure dropdown menus read well on the tinted modal backgrounds */
+.card-menu-dropdown {
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  border: 1px solid rgba(2,6,23,0.06);
+}
+
+/* Ensure help load-summary panel matches modal/card aesthetic */
+#load-summary {
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(243,246,251,0.95));
+  border: 1px solid rgba(0,90,158,0.06);
+}
+
 /* Drag and Drop styles */
 .drag-over {
   background-color: var(--brand-blue-light);
@@ -145,7 +256,7 @@
 .folder-view-header .left.drag-over,
 .breadcrumb a.drag-over,
 #leave-folder-btn.drag-over {
-  background: rgba(14, 165, 233, 0.12); /* subtle blue */
+  background: rgba(0, 90, 158, 0.12); /* subtle brand-blue */
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(2, 6, 23, 0.06);
 }
@@ -269,10 +380,82 @@
   box-shadow: 0 16px 40px rgba(2, 6, 23, 0.14);
 }
 
-/* Folder-card styling: similar size to test cards but distinct color and folder-like tab */
+/* Make test cards layout into vertical column so actions sit at the bottom */
+.test-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.test-card .card-content {
+  /* ensure content grows to push actions to bottom */
+  flex: 1 1 auto;
+}
+.test-card .card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.test-card .card-actions .left-actions {
+  display: flex;
+  align-items: center;
+}
+.test-card .card-actions .right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Large prominent Start button placed bottom-left */
+.start-large {
+  background: var(--brand-blue);
+  color: white;
+  padding: 10px 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.08);
+}
+.start-large:active {
+  transform: translateY(1px) scale(0.998);
+}
+
+/* Star button (nicer SVG) */
+.star-btn {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.star-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+.star-btn:focus {
+  outline: 2px solid rgba(250, 204, 21, 0.2);
+  outline-offset: 2px;
+}
+
+/* Kebab menu button styling */
+.card-menu-button {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+}
+.card-menu-button:focus {
+  outline: 2px solid rgba(14, 165, 233, 0.12);
+}
+
 .folder-card {
-  background: linear-gradient(180deg, #f0f9ff 0%, #ebf8ff 100%); /* light blue */
-  border: 1px solid #dbeafe; /* blue-100 */
+  /* subtle, brand-tinted background using the Start button color */
+  background: linear-gradient(180deg, rgba(0, 90, 158, 0.08) 0%, rgba(0, 90, 158, 0.03) 100%);
+  border: 1px solid rgba(0, 90, 158, 0.12);
   box-shadow: 0 6px 20px rgba(2, 6, 23, 0.06);
   padding: 16px;
   position: relative;
@@ -285,26 +468,121 @@
 
 /* Visual style applied to the resolved drop target during dragover */
 .drop-target-highlight {
-  outline: 3px solid rgba(14, 165, 233, 0.9);
-  box-shadow: 0 12px 36px rgba(14, 165, 233, 0.12);
+  outline: 3px solid rgba(0, 90, 158, 0.9);
+  box-shadow: 0 12px 36px rgba(0, 90, 158, 0.12);
   border-radius: 8px;
 }
-.folder-card .folder-tab {
-  position: absolute;
-  left: 16px;
-  top: -8px;
-  background: #0ea5e9; /* sky-500 */
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px 6px 0 0;
-  transform: translateY(-50%);
-  box-shadow: 0 6px 12px rgba(2, 6, 23, 0.06);
-}
+/* Removed .folder-tab (folder icon) — replaced by decorative top bar via ::before */
 .folder-summary-line {
   line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Make folder summary lines use a horizontal flex layout to align name and counts */
+.folder-summary-line {
+  display: block; /* default for single-line summaries; inner content uses flex */
+}
+.folder-summary-line > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0; /* ensure child truncation works inside flex */
+}
+.folder-summary-line > div span {
+  line-height: 1.2;
+}
+
+/* Show more / Show less toggle button for folder summaries */
+.show-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(2, 132, 199, 0.06); /* slightly deeper and warmer blue */
+  color: var(--brand-blue); /* use start button blue */
+  border: 1px solid rgba(3, 105, 161, 0.08);
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+.show-more-btn:hover {
+  background: rgba(2, 132, 199, 0.1);
+  text-decoration: none;
+}
+.show-more-btn:focus {
+  outline: 3px solid rgba(0, 90, 158, 0.16);
+  outline-offset: 2px;
+}
+.show-more-btn::after {
+  content: "▾";
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.85rem;
+  transition: transform 220ms cubic-bezier(0.22, 0.9, 0.28, 1), opacity 180ms ease;
+  transform-origin: 50% 45%;
+  opacity: 0.95;
+}
+.show-more-btn[aria-expanded="true"]::after {
+  transform: rotate(180deg) translateY(-1px);
+  opacity: 1;
+}
+
+/* small bounce when toggling expanded state to give subtle motion */
+@keyframes chevronPulse {
+  0% {
+    transform: rotate(0deg) translateY(0);
+  }
+  40% {
+    transform: rotate(180deg) translateY(-2px) scale(1.03);
+  }
+  100% {
+    transform: rotate(180deg) translateY(-1px) scale(1);
+  }
+}
+.show-more-btn[aria-expanded="true"]::after {
+  animation: chevronPulse 260ms ease;
+}
+
+/* Subtle hint button on folder cards to show tooltip about double-click opening */
+.folder-open-hint {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 8px;
+  color: #475569; /* gray-600 */
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default; /* not interactive by keyboard */
+}
+.folder-open-hint:hover {
+  background: rgba(15, 23, 42, 0.04);
+}
+.folder-open-hint:focus {
+  outline: none;
+}
+.folder-open-hint .folder-open-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  color: #475569; /* inherit currentColor style */
+}
+.folder-open-hint:hover .folder-open-icon {
+  color: var(--brand-blue);
+}
+
+/* Summary folder icon (replaces emoji) */
+.summary-folder-icon {
+  display: inline-block;
+  vertical-align: middle;
+  color: #f59e0b; /* amber-500 to preserve previous yellow feel */
+}
+.folder-summary-line:hover .summary-folder-icon {
+  color: #d97706; /* amber-600 on hover for subtle emphasis */
 }
 
 /* Truncate long folder and test names so they don't overflow the card width */
@@ -329,15 +607,148 @@
   white-space: nowrap;
 }
 
+/* Make breadcrumb links keyboard-friendly and visible when focused via keyboard */
+.breadcrumb a:focus,
+.breadcrumb a:focus-visible {
+  outline: 3px solid rgba(0, 90, 158, 0.9);
+  outline-offset: 2px;
+  border-radius: 6px;
+  background: rgba(0, 90, 158, 0.06);
+  color: var(--brand-blue);
+}
+
+/* Slight hover to match focus affordance without causing layout shift */
+.breadcrumb a:hover {
+  background: rgba(0, 90, 158, 0.04);
+  border-radius: 6px;
+}
+
 /* Make the grid more consistent: ensure folder cards match test-card heights visually */
 .folder-card,
 .test-card {
   min-height: 140px;
 }
 
-/* Prevent any child content from overflowing the rounded card container */
+/* Hover state for folder cards to indicate interactivity; folders open only on double-click */
+.folder-card:hover {
+  /* Subtle hover for folders without changing layout/position */
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+  cursor: pointer;
+}
+
+/* Decorative bar at the top of folder cards matching the Start button blue */
+.folder-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--brand-blue); /* match Start button color */
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Actions container in the top-right of the folder card */
+.folder-card-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 140; /* above card content and decorative bar so tooltips can escape */
+  overflow: visible; /* ensure child tooltips are not clipped */
+}
+
+/* Delete button in the actions area */
+.folder-delete-btn {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.folder-delete-btn:focus {
+  outline: 3px solid rgba(239, 68, 68, 0.12);
+  outline-offset: 2px;
+}
+
+/* Custom tooltip for the hint button: appears above the top-right corner */
+.folder-open-hint {
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 8px;
+  color: #475569; /* gray-600 */
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default; /* not interactive by keyboard */
+}
+.folder-open-hint:focus {
+  outline: none;
+}
+
+/* Tooltip bubble */
+.folder-open-hint::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  /* anchor below the hint button so it renders inside the card and avoids being clipped at the very top */
+  top: calc(100% + 8px);
+  right: 6px;
+  left: auto;
+  transform: translateY(0);
+  background: rgba(15, 23, 42, 0.98);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  white-space: normal; /* allow wrapping */
+  max-width: 220px;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 160ms ease, opacity 160ms ease;
+  box-shadow: 0 10px 36px rgba(2, 6, 23, 0.18);
+  z-index: 240; /* sit above most UI elements */
+  text-align: left;
+}
+.folder-open-hint:hover::after,
+.folder-open-hint:focus::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* (hint tooltip positioning handled above) */
+
+/* Click feedback for cards */
+.card-clicked {
+  /* Use a clear outline as the click feedback (no glow or movement) */
+  outline: 3px solid rgba(0, 90, 158, 0.9);
+  outline-offset: 2px;
+  border-radius: 8px;
+  box-shadow: none !important;
+}
+
+/* Selected card state (persistent selection) */
+.card-selected {
+  outline: 2px solid rgba(0, 90, 158, 0.85);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Click feedback for summary items inside folder cards */
+.folder-summary-line.clicked {
+  background: rgba(0, 90, 158, 0.06);
+  border-radius: 6px;
+}
+
+/* Allow positioned tooltips to escape the folder card bounds while preserving layout */
 .folder-card {
-  overflow: hidden;
+  overflow: visible; /* tooltip bubbles need to appear above the card */
 }
 
 /* Ensure the left column inside folder cards is constrained so right-side controls don't get overlapped */
@@ -348,6 +759,70 @@
   /* Leave ~100px for the right-hand buttons; adjust if needed */
   max-width: calc(100% - 100px);
   box-sizing: border-box;
+}
+
+/* Ensure actions and tooltip are aligned and colored the same */
+.folder-card-actions > button {
+  color: #475569; /* gray-600 — used for both delete and hint */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.folder-delete-btn i,
+.folder-open-icon {
+  vertical-align: middle;
+  color: inherit; /* inherit the shared color */
+}
+
+/* Tooltip bubble: ensure it sits above card content and is visible */
+.folder-open-hint::after {
+  z-index: 60; /* higher than folder-card-actions */
+}
+.folder-open-hint::after {
+  z-index: 60; /* higher than folder-card-actions */
+}
+
+/* Generic tooltip for any action button that has data-tooltip */
+.folder-card-actions > button[data-tooltip] {
+  position: relative;
+}
+.folder-card-actions > button[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -42px;
+  left: 50%;
+  transform: translate(-50%, 6px);
+  background: rgba(15, 23, 42, 0.95);
+  color: white;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 160ms ease, opacity 160ms ease;
+  box-shadow: 0 6px 20px rgba(2, 6, 23, 0.12);
+  z-index: 60;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.folder-card-actions > button[data-tooltip]:hover::after,
+.folder-card-actions > button[data-tooltip]:focus::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/*
+  Disable CSS pseudo-element tooltips when using the JS-managed global tooltip.
+  The global tooltip is appended to document.body to avoid clipping and stacking issues.
+*/
+.folder-open-hint::after,
+.folder-card-actions > button[data-tooltip]::after {
+  content: none !important;
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 @keyframes fadeInUp {
@@ -469,6 +944,19 @@ button:active {
 
 .create-folder-error-text {
   display: block;
+}
+
+/* Style the Add More Files button to match Start button blue */
+#add-files-btn {
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#add-files-btn:hover {
+  filter: brightness(0.95);
 }
 
 /* Ensure the input above the error doesn't add extra margin so spacing is even
