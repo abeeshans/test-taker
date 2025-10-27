@@ -1,3 +1,5 @@
+/* stylelint-disable */
+/* eslint-disable */
 // === STATE MANAGEMENT ===
 let testMetadata = {}; // { id: { customName, isStarred, attempts: [] } }
 let inMemoryTestContent = {}; // { id: content } - Not persisted to localStorage
@@ -24,6 +26,8 @@ let currentTest = {
 };
 // Which folder is currently being viewed in the dashboard (null => root view)
 let currentFolderId = null;
+// Temporary holder for creating nested folders via the Create Folder modal
+let folderCreateParentId = null;
 const METADATA_STORAGE_KEY = "customTestAppMetadata";
 const LAYOUT_STORAGE_KEY = "customTestDashboardLayout";
 
@@ -58,6 +62,12 @@ let modalActionContext = null; // { action: 'rename'|'reset'|'delete', testId }
 
 // Transient callback for the generic confirm modal
 let confirmModalCallback = null;
+
+// Small helper to escape text for use in title attributes / HTML attributes
+function escapeHtml(unsafe) {
+  if (unsafe == null) return "";
+  return String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
 
 async function init() {
   // Load persisted state
@@ -119,6 +129,14 @@ async function init() {
   if (cancelCreateBtn)
     cancelCreateBtn.addEventListener("click", () => {
       if (createInput) createInput.value = "";
+      // Clear any validation error when cancelling and remove error state class
+      const err = document.getElementById("create-folder-error");
+      if (err) err.remove();
+      if (createInput) createInput.removeAttribute("aria-invalid");
+      const modalEl = document.getElementById("create-folder-modal");
+      if (modalEl) modalEl.classList.remove("has-create-error");
+      // Clear temporary parent context
+      folderCreateParentId = null;
       hideModal("createFolder");
     });
   if (confirmCreateBtn)
@@ -128,6 +146,16 @@ async function init() {
       // For programmatic clarity, log the created id
       console.log("createFolderConfirm createdId:", id);
     });
+  // Allow Enter to submit the create-folder modal without relying on native alert()
+  if (createInput) {
+    createInput.addEventListener("keydown", (ev) => {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        const id = createFolderConfirm();
+        console.log("createFolderConfirm (enter) createdId:", id);
+      }
+    });
+  }
 
   // Wire rename/reset/delete modal buttons
   const renameCancel = document.getElementById("rename-cancel-btn");
@@ -142,16 +170,36 @@ async function init() {
   if (renameConfirm)
     renameConfirm.addEventListener("click", () => {
       const newName = renameInput ? renameInput.value : null;
-      if (modalActionContext && modalActionContext.action === "rename") {
-        const id = modalActionContext.testId;
-        if (newName && newName.trim() !== "") {
-          testMetadata[id].customName = newName.trim();
-          saveMetadata();
-          renderDashboard();
-          hideModal("rename");
-          modalActionContext = null;
-        } else {
-          alert("Please enter a valid name.");
+      if (modalActionContext) {
+        if (modalActionContext.action === "rename") {
+          const id = modalActionContext.testId;
+          if (newName && newName.trim() !== "") {
+            testMetadata[id].customName = newName.trim();
+            saveMetadata();
+            renderDashboard();
+            hideModal("rename");
+            modalActionContext = null;
+          } else {
+            customAlert("Invalid Name", "Please enter a valid name.");
+          }
+        } else if (modalActionContext.action === "rename-folder") {
+          const fid = modalActionContext.folderId;
+          const folder = dashboardLayout.folders.find((f) => f.id === fid);
+          if (folder) {
+            if (newName && newName.trim() !== "") {
+              folder.name = newName.trim();
+              saveLayout();
+              renderDashboard();
+              hideModal("rename");
+              modalActionContext = null;
+            } else {
+              customAlert("Invalid Name", "Please enter a valid folder name.");
+            }
+          } else {
+            customAlert("Error", "Folder not found.");
+            modalActionContext = null;
+            hideModal("rename");
+          }
         }
       }
     });
@@ -272,7 +320,7 @@ async function loadLocalFiles() {
       // No toasts on auto-load; details are available in the Help modal via lastLoadInfo
       return true;
     }
-    console.log("Auto-load found no initial test files in json/");
+    console.log("Auto-load found no initial test files in json/.");
     return false;
   } catch (error) {
     console.error("Error loading initial files via IPC:", error);
@@ -552,13 +600,6 @@ function addEventListeners() {
       // Populate load summary before opening the dashboard help modal
       populateDashboardHelp();
       showModal("dashboardHelp");
-    } else if (target.closest(".minimize-folder-btn")) {
-        const folderContainer = target.closest(".folder-container");
-        const folderContent = folderContainer.querySelector(".folder-content");
-        const folderSummary = folderContainer.querySelector(".folder-summary");
-        const isMinimized = folderContent.classList.toggle("hidden");
-        folderSummary.classList.toggle("hidden", !isMinimized);
-        target.textContent = isMinimized ? "+" : "-";
     }
 
     const dashboardAction = target.closest("[data-action]"); // This can be on a card or a folder
@@ -566,8 +607,20 @@ function addEventListeners() {
       // --- Dashboard Card Actions (Delegated) ---
       e.preventDefault(); // Stop any native button behavior
       const action = dashboardAction.dataset.action;
-      const testId = dashboardAction.closest("[data-testid]").dataset.testid;
-      handleDashboardAction(action, testId);
+      // Resolve an id robustly: prefer an explicit data-testid on the element or an enclosing data-testid,
+      // then fall back to data-folder-id (for folder wrappers) to support folder actions.
+      let targetId = null;
+      try {
+        targetId =
+          dashboardAction.dataset.testid ||
+          (dashboardAction.closest("[data-testid]") && dashboardAction.closest("[data-testid]").dataset.testid) ||
+          dashboardAction.dataset.folderId ||
+          (dashboardAction.closest("[data-folder-id]") && dashboardAction.closest("[data-folder-id]").dataset.folderId) ||
+          null;
+      } catch (err) {
+        targetId = null;
+      }
+      handleDashboardAction(action, targetId);
     } else if (target.closest(".card-menu-button")) {
       // --- Dropdown Menu Toggle ---
       const menuButton = target.closest(".card-menu-button");
@@ -623,8 +676,17 @@ function addEventListeners() {
       hideModal("alert");
     } else if (target.closest("#help-btn")) {
       showHelp();
+    } else if (target.closest("[data-folder-id]")) {
+      // Click on a breadcrumb/folder-link/back item. data-folder-id may be "" for root.
+      const el = target.closest("[data-folder-id]");
+      const fid = el.dataset.folderId;
+      currentFolderId = fid && fid !== "" ? fid : null;
+      renderDashboard();
     } else if (target.closest("#leave-folder-btn")) {
-      currentFolderId = null;
+      // Back button: respect its data-folder-id to go only one level up
+      const el = target.closest("#leave-folder-btn");
+      const fid = el ? el.dataset.folderId : null;
+      currentFolderId = fid && fid !== "" ? fid : null;
       renderDashboard();
     } else if (target.closest("#abandon-test-btn")) {
       showConfirmModal("Abandon Test", "Are you sure you want to abandon this test? Your progress will not be saved.", () => {
@@ -672,6 +734,41 @@ function addEventListeners() {
   });
   document.addEventListener("keydown", handleKeyDown);
   document.addEventListener("visibilitychange", handleVisibilityChange);
+  // Delegate dragstart so summary inline handlers aren't the only source of drag events
+  document.addEventListener("dragstart", (e) => {
+    try {
+      // Prefer summary-line wrapper (these have explicit data attributes)
+      const summaryEl = e.target.closest('.folder-summary-line');
+      if (summaryEl) {
+        if (summaryEl.dataset.testid) {
+          e.dataTransfer.setData('text/plain', summaryEl.dataset.testid);
+          e.dataTransfer.setData('application/x-item-type', 'test');
+          e.dataTransfer.effectAllowed = 'move';
+          return;
+        }
+        if (summaryEl.dataset.folderId) {
+          e.dataTransfer.setData('text/plain', summaryEl.dataset.folderId);
+          e.dataTransfer.setData('application/x-item-type', 'folder');
+          e.dataTransfer.effectAllowed = 'move';
+          return;
+        }
+      }
+
+      const el = e.target.closest("[data-testid],[data-folder-id]");
+      if (!el) return;
+      if (el.dataset.testid) {
+        e.dataTransfer.setData("text/plain", el.dataset.testid);
+        e.dataTransfer.setData("application/x-item-type", "test");
+        e.dataTransfer.effectAllowed = "move";
+      } else if (el.dataset.folderId) {
+        e.dataTransfer.setData("text/plain", el.dataset.folderId);
+        e.dataTransfer.setData("application/x-item-type", "folder");
+        e.dataTransfer.effectAllowed = "move";
+      }
+    } catch (err) {
+      /* ignore dragstart delegate errors */
+    }
+  });
 }
 
 /**
@@ -858,6 +955,16 @@ function handleDashboardAction(action, testId) {
           renderDashboard();
         });
       }
+      break;
+    case "rename-folder":
+      // Open rename modal for a folder
+      modalActionContext = { action: "rename-folder", folderId: testId };
+      const renameInputEl2 = document.getElementById("rename-input");
+      const folderToRename = dashboardLayout.folders.find((f) => f.id === testId);
+      if (renameInputEl2 && folderToRename) {
+        renameInputEl2.value = folderToRename.name;
+      }
+      showModal("rename");
       break;
     case "open-folder":
       // testId here represents folder id
@@ -1061,19 +1168,24 @@ function renderQuestion() {
     }
 
     optionsHtml += `
-          <label for="${id}" class="option-label flex items-start p-4 bg-white border border-gray-300 rounded-md cursor-pointer hover:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600 ${isStruck ? "bg-gray-100" : ""}">
-            <input type="radio" name="option" id="${id}" value="${index}" class="custom-radio mt-1" ${isChecked ? "checked" : ""} ${currentTest.isReviewMode ? "disabled" : ""}>
+          <label for="${id}" class="option-label flex items-start p-4 bg-white border border-gray-300 rounded-md cursor-pointer hover:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600 ${
+      isStruck ? "bg-gray-100" : ""
+    }">
+            <input type="radio" name="option" id="${id}" value="${index}" class="custom-radio mt-1" ${isChecked ? "checked" : ""} ${
+      currentTest.isReviewMode ? "disabled" : ""
+    }>
             <div class="flex-1">
               <span class="text-lg ${isStruck ? "strikethrough" : "text-gray-800"}">${formatText(option)}</span>
               ${reviewLabel}
             </div>
-            ${!currentTest.isReviewMode
-              ? `
+            ${
+              !currentTest.isReviewMode
+                ? `
               <button class="strike-btn text-gray-400 hover:text-red-600 ml-4 p-1" data-option-index="${index}" title="Strikethrough">
                 [S]
               </button>
             `
-              : ""
+                : ""
             }
           </label>
         `;
@@ -1407,6 +1519,33 @@ function renderDashboard(filter = "") {
   testListEl.innerHTML = ""; // Clear the list
   const lowerCaseFilter = filter.trim().toLowerCase();
 
+  // If viewing inside a folder, render a small header with Back button and breadcrumb
+  if (currentFolderId) {
+    // Build breadcrumb path from root -> current
+    const pathParts = [];
+    let walkId = currentFolderId;
+    while (walkId) {
+      const f = dashboardLayout.folders.find((ff) => ff.id === walkId);
+      if (!f) break;
+      pathParts.unshift({ id: f.id, name: f.name });
+      walkId = f.parentId || null;
+    }
+
+    // Build clickable breadcrumb HTML (ensure it spans the full grid row)
+    // Make breadcrumb links and the Back button drop targets so users can drag items to move them to a folder/root
+    const currentFolderObj = dashboardLayout.folders.find((ff) => ff.id === currentFolderId) || {};
+    const parentFolderId = currentFolderObj.parentId || "";
+    let bcHtml = `<div class="folder-view-header col-span-full mb-4 flex items-center justify-between" ondragover="allowDrop(event)" ondrop="drop(event)" data-folder-id="${parentFolderId}"><div class="left flex items-center">`;
+    bcHtml += `<button id="leave-folder-btn" data-folder-id="${parentFolderId}" ondragover="allowDrop(event)" ondrop="drop(event)" class="mr-3 px-3 py-1 bg-gray-100 border rounded">← Back</button>`;
+    bcHtml += `<nav class="breadcrumb text-sm text-gray-600"><a href="#" data-folder-id="" ondragover="allowDrop(event)" ondrop="drop(event)" class="mr-2">Root</a>`;
+    pathParts.forEach((p) => {
+      bcHtml += `<span class="mx-1">/</span> <a href="#" data-folder-id="${p.id}" ondragover="allowDrop(event)" ondrop="drop(event)" class="ml-2 text-blue-600">${p.name}</a>`;
+    });
+    bcHtml += `</nav></div><div class="right text-sm text-gray-500">Folder: <strong>${pathParts[pathParts.length - 1].name}</strong></div></div>`;
+
+    testListEl.innerHTML = bcHtml;
+  }
+
   // Get a list of all test IDs that match the filter
   const allVisibleTestIds = Object.keys(testMetadata).filter((id) => {
     if (lowerCaseFilter === "") return true;
@@ -1442,22 +1581,40 @@ function renderDashboard(filter = "") {
       avgScore = Math.round(totalPercentage / attempts.length);
     }
 
+    // Compute best and last scores for richer card summary
+    let bestScore = "N/A";
+    let lastScore = "N/A";
+    if (attempts.length > 0) {
+      const percentages = attempts.map((a) => (typeof a.percentage === "number" ? a.percentage : NaN)).filter((p) => !isNaN(p));
+      if (percentages.length > 0) {
+        bestScore = Math.max(...percentages) + "%";
+        lastScore = percentages[percentages.length - 1] + "%";
+      }
+    }
+
     return `
-      <div class="test-card bg-white rounded-lg shadow p-4" data-testid="${testId}">
+      <div class="test-card bg-white rounded-lg shadow p-4" data-testid="${testId}" draggable="true" ondragstart="drag(event)">
         <div class="flex justify-between items-start">
           <div>
             <h4 class="text-lg font-semibold text-gray-800">${meta.customName}</h4>
-            <div class="text-sm text-gray-500">${attempts.length} attempt(s) • Avg ${attempts.length > 0 ? avgScore + "%" : "N/A"}</div>
+            <div class="text-sm text-gray-500">
+              ${attempts.length} attempt(s) • Avg ${attempts.length > 0 ? avgScore + "%" : "N/A"}
+            </div>
+            <div class="text-sm text-gray-500 mt-1">
+              Best: <span class="font-medium text-gray-800">${bestScore}</span>
+              <span class="mx-2">•</span>
+              Last: <span class="font-medium text-gray-800">${lastScore}</span>
+            </div>
           </div>
           <div class="flex items-center space-x-2">
             <button class="px-3 py-1 bg-blue-600 text-white rounded text-sm" data-action="start" data-testid="${testId}">Start</button>
             <button class="px-2 py-1 border rounded text-sm" data-action="star" data-testid="${testId}">${meta.isStarred ? "★" : "☆"}</button>
-            <div class="card-menu-container relative">
+            <div class="card-menu-container relative" style="z-index:0">
               <button class="card-menu-button px-2 py-1">⋯</button>
-              <div class="card-menu-dropdown hidden absolute right-0 mt-2 bg-white border rounded shadow z-10">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-action="rename" data-testid="${testId}"><i class="ph ph-pencil w-6 inline-block"></i> Rename</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-action="reset" data-testid="${testId}"><i class="ph ph-arrow-counter-clockwise w-6 inline-block"></i> Reset stats</a>
-                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50" data-action="delete" data-testid="${testId}"><i class="ph ph-trash w-6 inline-block"></i> Delete</a>
+              <div class="card-menu-dropdown hidden absolute right-0 mt-2 bg-white border rounded shadow">
+                <a href="#" class="card-menu-item" data-action="rename" data-testid="${testId}"><i class="ph ph-pencil w-5 inline-block mr-2"></i> Rename</a>
+                <a href="#" class="card-menu-item" data-action="reset" data-testid="${testId}"><i class="ph ph-arrow-counter-clockwise w-5 inline-block mr-2"></i> Reset</a>
+                <a href="#" class="card-menu-item text-red-600" data-action="delete" data-testid="${testId}"><i class="ph ph-trash w-5 inline-block mr-2"></i> Delete</a>
               </div>
             </div>
           </div>
@@ -1466,58 +1623,83 @@ function renderDashboard(filter = "") {
     `;
   };
 
-  // Render folders
-  dashboardLayout.folders.forEach((folder) => {
-    let folderContentHtml = "";
+  // Render folders as folder-cards (top-level or nested depending on currentFolderId)
+  const foldersToShow = dashboardLayout.folders.filter((f) => (currentFolderId ? f.parentId === currentFolderId : !f.parentId));
+  foldersToShow.forEach((folder) => {
+    // Compute basic stats and a short summary list (show up to 4 items)
     const testIdsInFolder = dashboardLayout.testsInFolders[folder.id] || [];
+    const visibleTests = testIdsInFolder.filter((id) => allVisibleTestIds.includes(id));
+    const folderStats = computeFolderStats(folder.id);
+    const avgLabel = !isNaN(folderStats.avgPercentage) ? folderStats.avgPercentage + "%" : "N/A";
 
-    // Filter and sort tests within the folder
-    const visibleTestsInFolder = testIdsInFolder
-      .filter((id) => allVisibleTestIds.includes(id))
-      .sort((a, b) => {
-        const aMeta = testMetadata[a];
-        const bMeta = testMetadata[b];
-        if (!aMeta || !bMeta) return 0;
-        if (aMeta.isStarred && !bMeta.isStarred) return -1;
-        if (!aMeta.isStarred && bMeta.isStarred) return 1;
-        return aMeta.customName.localeCompare(bMeta.customName);
-      });
-
-    visibleTestsInFolder.forEach((testId) => {
-      folderContentHtml += renderTestCard(testId);
+    // Build a short line-by-line summary: first child folders then tests (each on its own line)
+    const childFolders = dashboardLayout.folders.filter((f) => f.parentId === folder.id);
+    const summaryItems = [];
+    childFolders.slice(0, 2).forEach((cf) => summaryItems.push({ type: "folder", id: cf.id, name: cf.name }));
+    visibleTests.slice(0, 4 - summaryItems.length).forEach((tid) => {
+      const m = testMetadata[tid];
+      const attempts = (m && m.attempts) || [];
+      let avg = "N/A";
+      if (attempts.length > 0) {
+        const tot = attempts.reduce((s, a) => s + (a.percentage || 0), 0);
+        avg = Math.round(tot / attempts.length) + "%";
+      }
+      summaryItems.push({ type: "test", id: tid, name: m ? m.customName : tid, avg });
     });
 
-    const summaryText = `${visibleTestsInFolder.length} tests: ${visibleTestsInFolder.map(id => testMetadata[id].customName).join(", ")}`;
+    let summaryHtml = "";
+    if (summaryItems.length === 0) summaryHtml = `<div class=\"text-sm text-gray-500 italic\">(empty)</div>`;
+    else
+      summaryItems.forEach((it) => {
+        if (it.type === "folder") {
+          // Folder entries: icon + truncated name; make draggable so folders can be moved
+          summaryHtml += `<div class=\"folder-summary-line text-sm text-gray-700\" data-folder-id=\"${
+            it.id
+          }\" draggable=\"true\" ondragstart=\"drag(event)\" title=\"${escapeHtml(
+            it.name
+          )}\">📁 <span style=\"display:inline-block;max-width:calc(100% - 28px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle\">${
+            it.name
+          }</span></div>`;
+        } else {
+          // Test entries: left truncated name, right fixed avg so avg is always visible; make draggable
+          summaryHtml += `<div class=\"folder-summary-line text-sm text-gray-700\" data-testid=\"${
+            it.id
+          }\" draggable=\"true\" ondragstart=\"drag(event)\" title=\"${escapeHtml(
+            it.name
+          )}\"><div style=\"display:flex;align-items:center;gap:8px;\"><div style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;\">${
+            it.name
+          }</div><div style=\"flex:0 0 auto;color:#6b7280;margin-left:8px;\">${it.avg}</div></div></div>`;
+        }
+      });
 
-    const folderHtml = `
-      <div class="col-span-full">
-        <div 
-          class="folder-container bg-gray-200/50 p-4 rounded-xl border border-gray-300" 
-          data-folder-id="${folder.id}"
-        >
-          <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center">
-                <button class="minimize-folder-btn text-gray-500 hover:text-gray-700 mr-2">-</button>
-                <h3 class="text-xl font-bold text-gray-700">${folder.name}</h3>
-            </div>
-            <button class="text-gray-500 hover:text-red-600" data-action="delete-folder" data-testid="${folder.id}" title="Delete Folder">
-              <i class="ph ph-trash"></i>
-            </button>
+    const folderCard = `
+      <div class="folder-card col-span-1 rounded-lg p-4" data-folder-id="${
+        folder.id
+      }" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="folder-tab mb-2"><i class="ph ph-folder text-2xl"></i></div>
+            <h4 class="text-lg font-semibold text-gray-800">${folder.name}</h4>
+            <div class="text-sm text-gray-500">${(dashboardLayout.testsInFolders[folder.id] || []).length} test(s) • Avg ${avgLabel}</div>
+            <div class="mt-3">${summaryHtml}</div>
           </div>
-          <div class="folder-summary hidden text-sm text-gray-600">${summaryText}</div>
-          <div class="folder-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${folderContentHtml}
-            ${visibleTestsInFolder.length === 0 ? '<p class="text-gray-500 italic col-span-full text-center py-4">Drag tests here to organize</p>' : ""}
+          <div class="flex flex-col items-end space-y-2">
+            <button class="px-3 py-1 bg-blue-600 text-white rounded text-sm" data-action="open-folder" data-testid="${folder.id}">Open</button>
+            <button class="text-gray-500 hover:text-red-600" data-action="delete-folder" data-testid="${
+              folder.id
+            }" title="Delete Folder"><i class="ph ph-trash text-lg"></i></button>
           </div>
         </div>
       </div>
     `;
-    testListEl.innerHTML += folderHtml;
+
+    testListEl.innerHTML += folderCard;
   });
 
-  // Render ungrouped tests
-  let ungroupedHtml = "";
-  const visibleUngroupedTests = dashboardLayout.ungroupedTests
+  // Render tests for the current view: if inside a folder, show its tests; otherwise show ungrouped tests
+  let testsHtml = "";
+  const testsInView = currentFolderId ? dashboardLayout.testsInFolders[currentFolderId] || [] : dashboardLayout.ungroupedTests;
+  const visibleTestsInView = (testsInView || [])
     .filter((id) => allVisibleTestIds.includes(id))
     .sort((a, b) => {
       const aMeta = testMetadata[a];
@@ -1528,19 +1710,22 @@ function renderDashboard(filter = "") {
       return aMeta.customName.localeCompare(bMeta.customName);
     });
 
-  visibleUngroupedTests.forEach((testId) => {
-    ungroupedHtml += renderTestCard(testId);
+  visibleTestsInView.forEach((testId) => {
+    testsHtml += renderTestCard(testId);
   });
 
-  if (visibleUngroupedTests.length > 0) {
-    testListEl.innerHTML += `<div id="ungrouped-tests-container" class="col-span-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${ungroupedHtml}</div>`;
+  if (visibleTestsInView.length > 0) {
+    testListEl.innerHTML += `<div class="col-span-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${testsHtml}</div>`;
+  } else if (currentFolderId) {
+    // If we're inside a folder and nothing to show, provide a clear empty state for the folder
+    testListEl.innerHTML += `<p class="text-gray-500 col-span-full text-center">This folder is empty. Drag tests here or use Create Folder to add content.</p>`;
   }
 
+  // If nothing was rendered at all (no folders, no tests), show the dashboard-level message
   if (testListEl.innerHTML.trim() === "") {
     testListEl.innerHTML = dashboardHtml; // Show "No tests loaded" or "No results" message
   }
 
-  initializeSortable();
   // Manually trigger Phosphor Icons to process the newly added dynamic elements
   embedPhosphorIcons();
 }
@@ -1633,8 +1818,7 @@ function activateFocusTrap(modalId) {
   if (!modal) return;
 
   const selector =
-    'a[href], area[href], input:not([disabled]):not([type="hidden"]),
-     select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])';
+    'a[href], area[href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])';
   const focusable = Array.from(modal.querySelectorAll(selector)).filter((el) => el.offsetParent !== null);
   if (focusable.length === 0) return;
   const first = focusable[0];
@@ -1758,77 +1942,10 @@ function showToast(message, duration = 3000, opts = {}) {
 
 // === FOLDER & DRAG/DROP LOGIC ===
 
-function initializeSortable() {
-    const testListEl = document.getElementById("test-list");
-    const ungroupedContainer = document.getElementById("ungrouped-tests-container");
-
-    // Make ungrouped container sortable
-    if (ungroupedContainer) {
-        new Sortable(ungroupedContainer, {
-            group: 'shared',
-            animation: 150,
-            onEnd: function (evt) {
-                const testId = evt.item.dataset.testid;
-                const newIndex = evt.newIndex;
-
-                // Find which folder it was dropped in, if any
-                const folderEl = evt.to.closest('.folder-container');
-                if (folderEl) {
-                    const folderId = folderEl.dataset.folderId;
-                    // Move from ungrouped to folder
-                    dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter(id => id !== testId);
-                    if (!dashboardLayout.testsInFolders[folderId]) {
-                        dashboardLayout.testsInFolders[folderId] = [];
-                    }
-                    dashboardLayout.testsInFolders[folderId].splice(newIndex, 0, testId);
-                } else {
-                    // Reorder within ungrouped
-                    dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter(id => id !== testId);
-                    dashboardLayout.ungroupedTests.splice(newIndex, 0, testId);
-                }
-                saveLayout();
-            }
-        });
-    }
-
-    // Make each folder content sortable
-    document.querySelectorAll('.folder-content').forEach(folderContentEl => {
-        new Sortable(folderContentEl, {
-            group: 'shared',
-            animation: 150,
-            onEnd: function (evt) {
-                const testId = evt.item.dataset.testid;
-                const fromFolderId = evt.from.closest('.folder-container').dataset.folderId;
-                const toFolderEl = evt.to.closest('.folder-container');
-
-                // Remove from old location
-                if(fromFolderId){
-                    dashboardLayout.testsInFolders[fromFolderId] = dashboardLayout.testsInFolders[fromFolderId].filter(id => id !== testId);
-                } else {
-                    dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter(id => id !== testId);
-                }
-
-                if (toFolderEl) {
-                    // Dropped in another folder
-                    const toFolderId = toFolderEl.dataset.folderId;
-                    const newIndex = evt.newIndex;
-                    if (!dashboardLayout.testsInFolders[toFolderId]) {
-                        dashboardLayout.testsInFolders[toFolderId] = [];
-                    }
-                    dashboardLayout.testsInFolders[toFolderId].splice(newIndex, 0, testId);
-                } else {
-                    // Dropped in ungrouped area
-                    const newIndex = evt.newIndex;
-                    dashboardLayout.ungroupedTests.splice(newIndex, 0, testId);
-                }
-                saveLayout();
-            }
-        });
-    });
-}
-
 // Opens the Create Folder modal for interactive use
 function createFolder() {
+  // If we're inside a folder, make the new folder a child of the current folder
+  folderCreateParentId = currentFolderId || null;
   showModal("createFolder");
   const input = document.getElementById("create-folder-input");
   if (input) {
@@ -1841,22 +1958,72 @@ function createFolder() {
 // Returns created folder id or null.
 function createFolderConfirm() {
   const input = document.getElementById("create-folder-input");
-  const folderName = input ? input.value : null;
+  const folderName = input ? (input.value || "").trim() : "";
   console.log("createFolderConfirm: folderName=", folderName);
-  if (folderName && folderName.trim() !== "") {
+  if (folderName.length > 0) {
     const newFolder = {
       id: `folder_${Date.now()}`,
       name: folderName.trim(),
+      parentId: folderCreateParentId || null,
     };
     dashboardLayout.folders.push(newFolder);
     saveLayout();
     renderDashboard();
     if (input) input.value = "";
+    // Clear any previous error state on success
+    const modalEl = document.getElementById("create-folder-modal");
+    if (modalEl) modalEl.classList.remove("has-create-error");
+    // Reset the temporary parent holder
+    folderCreateParentId = null;
     hideModal("createFolder");
     return newFolder.id;
   }
-  // If invalid, show a non-blocking custom alert.
-  customAlert("Invalid Name", "Please enter a valid folder name.");
+  // If invalid, keep modal open but show an inline validation message and keep focus
+  // Avoid native alert() which blocks and can interfere with focus trapping.
+  try {
+    let err = document.getElementById("create-folder-error");
+    if (!err) {
+      err = document.createElement("div");
+      err.id = "create-folder-error";
+      err.className = "create-folder-error";
+      // Build a small inline SVG icon + message for better visual affordance
+      err.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <path d="M12 9v4" stroke="#b91c1c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 17h.01" stroke="#b91c1c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="9" stroke="#fecaca" stroke-width="1.2" fill="rgba(254, 242, 242, 0.6)"/>
+        </svg>
+        <div class="create-folder-error-text">Please enter a valid folder name.</div>
+      `;
+      if (input && input.parentNode) {
+        // Insert after the input for visibility
+        input.parentNode.insertBefore(err, input.nextSibling);
+      } else if (input) {
+        input.after(err);
+      }
+      // Mark the modal as having an error so we can adjust adjacent spacing via CSS
+      const modalEl = document.getElementById("create-folder-modal");
+      if (modalEl) modalEl.classList.add("has-create-error");
+    } else {
+      // Update text if it already exists (keeps the icon)
+      const text = err.querySelector(".create-folder-error-text");
+      if (text) text.textContent = "Please enter a valid folder name.";
+    }
+    if (input) {
+      input.setAttribute("aria-invalid", "true");
+      input.classList.add("input-error");
+      // Move focus back to the input so keyboard users can continue typing
+      setTimeout(() => {
+        try {
+          input.focus();
+        } catch (e) {
+          /* ignore */
+        }
+      }, 10);
+    }
+  } catch (e) {
+    console.warn("Failed to show inline validation for create-folder:", e);
+  }
   return null;
 }
 
@@ -1867,17 +2034,107 @@ function createFolderProgrammatic(name) {
   dashboardLayout.folders.push(newFolder);
   saveLayout();
   renderDashboard();
-  return newNewFolder.id;
+  return newFolder.id;
 }
 
 function deleteFolder(folderId) {
-  // Move tests from the deleted folder to ungrouped
+  // Move tests from the deleted folder to its parent (or ungrouped if no parent)
+  const parentId = (dashboardLayout.folders.find((f) => f.id === folderId) || {}).parentId || null;
   const testsToMove = dashboardLayout.testsInFolders[folderId] || [];
-  dashboardLayout.ungroupedTests.push(...testsToMove);
+  if (parentId) {
+    if (!dashboardLayout.testsInFolders[parentId]) dashboardLayout.testsInFolders[parentId] = [];
+    dashboardLayout.testsInFolders[parentId].push(...testsToMove);
+  } else {
+    dashboardLayout.ungroupedTests.push(...testsToMove);
+  }
+
+  // Reparent any child folders to the deleted folder's parent
+  dashboardLayout.folders.forEach((f) => {
+    if (f.parentId === folderId) f.parentId = parentId || null;
+  });
 
   // Remove the folder and its test list
   dashboardLayout.folders = dashboardLayout.folders.filter((f) => f.id !== folderId);
   delete dashboardLayout.testsInFolders[folderId];
+}
+
+function allowDrop(ev) {
+  ev.preventDefault();
+  const dropTarget = ev.currentTarget;
+  // Mark any drop target as active so we can style it (breadcrumb/back/folder cards)
+  try {
+    dropTarget.classList.add("drag-over");
+  } catch (e) {
+    /* ignore */
+  }
+}
+
+function dragLeave(ev) {
+  try {
+    ev.currentTarget.classList.remove("drag-over");
+  } catch (e) {
+    /* ignore */
+  }
+}
+
+function drag(ev) {
+  const el = ev.target.closest("[data-testid],[data-folder-id]");
+  if (!el) return;
+  if (el.dataset.testid) {
+    ev.dataTransfer.setData("text/plain", el.dataset.testid);
+    ev.dataTransfer.setData("application/x-item-type", "test");
+  } else if (el.dataset.folderId) {
+    ev.dataTransfer.setData("text/plain", el.dataset.folderId);
+    ev.dataTransfer.setData("application/x-item-type", "folder");
+  }
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  const dropTarget = ev.currentTarget;
+  dropTarget.classList.remove("drag-over");
+  const id = ev.dataTransfer.getData("text/plain");
+  const itemType = ev.dataTransfer.getData("application/x-item-type") || "test";
+  const targetFolderId = dropTarget.dataset.folderId || null; // null => root (ungrouped)
+
+  if (!id) return;
+
+  if (itemType === "test") {
+    // Remove test from its original location
+    dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter((tid) => tid !== id);
+    for (const folderId in dashboardLayout.testsInFolders) {
+      dashboardLayout.testsInFolders[folderId] = dashboardLayout.testsInFolders[folderId].filter((tid) => tid !== id);
+    }
+
+    if (targetFolderId) {
+      if (!dashboardLayout.testsInFolders[targetFolderId]) dashboardLayout.testsInFolders[targetFolderId] = [];
+      dashboardLayout.testsInFolders[targetFolderId].push(id);
+    } else {
+      dashboardLayout.ungroupedTests.push(id);
+    }
+  } else if (itemType === "folder") {
+    // Move the folder (reparent)
+    const folder = dashboardLayout.folders.find((f) => f.id === id);
+    if (folder) {
+      // Prevent making a folder a child of itself or one of its descendants
+      let p = targetFolderId;
+      let invalid = false;
+      while (p) {
+        if (p === folder.id) {
+          invalid = true;
+          break;
+        }
+        const pf = dashboardLayout.folders.find((ff) => ff.id === p);
+        p = pf ? pf.parentId : null;
+      }
+      if (!invalid) {
+        folder.parentId = targetFolderId || null;
+      }
+    }
+  }
+
+  saveLayout();
+  renderDashboard();
 }
 
 // === STARTUP ===

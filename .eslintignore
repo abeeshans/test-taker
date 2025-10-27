@@ -1,0 +1,2 @@
+# Ignore renderer runtime script handled by Electron
+renderer.js

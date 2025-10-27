@@ -77,14 +77,11 @@ function createWindow() {
 
   // and load the index.html of the app.
   mainWindow.loadFile("index.html");
+
   // No automatic test hooks in production main process — keep main minimal.
 
-  // Open the DevTools in a detached window to help debug renderer issues during development.
-  try {
-    mainWindow.webContents.openDevTools({ mode: "detach" });
-  } catch (e) {
-    console.warn("Could not open DevTools automatically:", e);
-  }
+  // Open the DevTools.
+  // mainWindow.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished

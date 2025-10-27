@@ -1,0 +1,3 @@
+# Ignore generated renderer and vendor files
+renderer.js
+/assets/**

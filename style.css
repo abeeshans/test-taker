@@ -111,6 +111,36 @@
   position: relative;
 }
 
+/* Ensure dropdown menus appear above neighboring cards and are not clipped */
+.card-menu-dropdown {
+  position: absolute;
+  right: 0;
+  margin-top: 0.5rem;
+  z-index: 99999; /* very high to avoid clipping by other stacking contexts */
+  min-width: 160px;
+}
+
+/* Make menu items concise and prevent wrapping/overflow */
+.card-menu-item,
+.card-menu-dropdown a {
+  display: block;
+  padding: 8px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
+  color: #374151; /* gray-700 */
+}
+.card-menu-item:hover {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+/* Ensure icons inside menu don't cause vertical wrapping */
+.card-menu-item i,
+.card-menu-dropdown a i {
+  vertical-align: middle;
+}
+
 /* Toast styles removed (toasts disabled) */
 
 /* Load summary minimize styles inside Help modal */
@@ -221,6 +251,75 @@
   box-shadow: 0 16px 40px rgba(2, 6, 23, 0.14);
 }
 
+/* Folder-card styling: similar size to test cards but distinct color and folder-like tab */
+.folder-card {
+  background: linear-gradient(180deg, #f0f9ff 0%, #ebf8ff 100%); /* light blue */
+  border: 1px solid #dbeafe; /* blue-100 */
+  box-shadow: 0 6px 20px rgba(2, 6, 23, 0.06);
+  padding: 16px;
+  position: relative;
+}
+.folder-card .folder-tab {
+  position: absolute;
+  left: 16px;
+  top: -12px;
+  background: #0ea5e9; /* sky-500 */
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px 6px 0 0;
+  transform: translateY(-50%);
+  box-shadow: 0 6px 12px rgba(2, 6, 23, 0.06);
+}
+.folder-summary-line {
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Truncate long folder and test names so they don't overflow the card width */
+.folder-card h4,
+.folder-card .folder-summary-line,
+.folder-card .text-sm {
+  display: block; /* allow max-width to apply */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Breadcrumb truncation: limit each crumb to a reasonable width and ellipsize */
+.breadcrumb a,
+.breadcrumb span {
+  display: inline-block;
+  max-width: 180px; /* keeps breadcrumb compact; adjust if needed */
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Make the grid more consistent: ensure folder cards match test-card heights visually */
+.folder-card,
+.test-card {
+  min-height: 140px;
+}
+
+/* Prevent any child content from overflowing the rounded card container */
+.folder-card {
+  overflow: hidden;
+}
+
+/* Ensure the left column inside folder cards is constrained so right-side controls don't get overlapped */
+.folder-card > .flex {
+  align-items: flex-start;
+}
+.folder-card > .flex > div:first-child {
+  /* Leave ~100px for the right-hand buttons; adjust if needed */
+  max-width: calc(100% - 100px);
+  box-sizing: border-box;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -314,10 +413,41 @@ button:active {
   }
 }
 
-.folder-container.minimized .folder-content {
-  display: none;
+/* Inline validation styles for create-folder modal */
+.input-error {
+  border-color: #ef4444 !important; /* red-500 */
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.06);
+}
+.create-folder-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Even vertical spacing so the message doesn't feel cramped between input and buttons */
+  margin: 16px 0; /* 16px top and bottom for even breathing room */
+  color: #b91c1c; /* red-700 */
+  background: rgba(254, 242, 242, 0.75); /* slightly more visible light red background */
+  padding: 8px 12px; /* more generous padding for breathing room */
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+.create-folder-error svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
 }
 
-.folder-container.minimized .folder-summary {
+.create-folder-error-text {
   display: block;
+}
+
+/* Ensure the input above the error doesn't add extra margin so spacing is even
+   when an error is present. We set the modal class 'has-create-error' from JS. */
+#create-folder-modal.has-create-error #create-folder-input {
+  margin-bottom: 0 !important;
+}
+
+/* Also add a little extra gap between the error and the modal actions for large screens */
+#create-folder-modal .create-folder-error + .flex {
+  margin-top: 4px;
 }
