@@ -272,7 +272,7 @@ async function loadLocalFiles() {
       // No toasts on auto-load; details are available in the Help modal via lastLoadInfo
       return true;
     }
-    console.log("Auto-load found no initial test files in json/.");
+    console.log("Auto-load found no initial test files in json/");
     return false;
   } catch (error) {
     console.error("Error loading initial files via IPC:", error);
@@ -552,6 +552,13 @@ function addEventListeners() {
       // Populate load summary before opening the dashboard help modal
       populateDashboardHelp();
       showModal("dashboardHelp");
+    } else if (target.closest(".minimize-folder-btn")) {
+        const folderContainer = target.closest(".folder-container");
+        const folderContent = folderContainer.querySelector(".folder-content");
+        const folderSummary = folderContainer.querySelector(".folder-summary");
+        const isMinimized = folderContent.classList.toggle("hidden");
+        folderSummary.classList.toggle("hidden", !isMinimized);
+        target.textContent = isMinimized ? "+" : "-";
     }
 
     const dashboardAction = target.closest("[data-action]"); // This can be on a card or a folder
@@ -1054,24 +1061,19 @@ function renderQuestion() {
     }
 
     optionsHtml += `
-          <label for="${id}" class="option-label flex items-start p-4 bg-white border border-gray-300 rounded-md cursor-pointer hover:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600 ${
-      isStruck ? "bg-gray-100" : ""
-    }">
-            <input type="radio" name="option" id="${id}" value="${index}" class="custom-radio mt-1" ${isChecked ? "checked" : ""} ${
-      currentTest.isReviewMode ? "disabled" : ""
-    }>
+          <label for="${id}" class="option-label flex items-start p-4 bg-white border border-gray-300 rounded-md cursor-pointer hover:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600 ${isStruck ? "bg-gray-100" : ""}">
+            <input type="radio" name="option" id="${id}" value="${index}" class="custom-radio mt-1" ${isChecked ? "checked" : ""} ${currentTest.isReviewMode ? "disabled" : ""}>
             <div class="flex-1">
               <span class="text-lg ${isStruck ? "strikethrough" : "text-gray-800"}">${formatText(option)}</span>
               ${reviewLabel}
             </div>
-            ${
-              !currentTest.isReviewMode
-                ? `
+            ${!currentTest.isReviewMode
+              ? `
               <button class="strike-btn text-gray-400 hover:text-red-600 ml-4 p-1" data-option-index="${index}" title="Strikethrough">
                 [S]
               </button>
             `
-                : ""
+              : ""
             }
           </label>
         `;
@@ -1441,7 +1443,7 @@ function renderDashboard(filter = "") {
     }
 
     return `
-      <div class="test-card bg-white rounded-lg shadow p-4" data-testid="${testId}" draggable="true" ondragstart="drag(event)">
+      <div class="test-card bg-white rounded-lg shadow p-4" data-testid="${testId}">
         <div class="flex justify-between items-start">
           <div>
             <h4 class="text-lg font-semibold text-gray-800">${meta.customName}</h4>
@@ -1485,22 +1487,25 @@ function renderDashboard(filter = "") {
       folderContentHtml += renderTestCard(testId);
     });
 
+    const summaryText = `${visibleTestsInFolder.length} tests: ${visibleTestsInFolder.map(id => testMetadata[id].customName).join(", ")}`;
+
     const folderHtml = `
       <div class="col-span-full">
         <div 
           class="folder-container bg-gray-200/50 p-4 rounded-xl border border-gray-300" 
-          data-folder-id="${folder.id}" 
-          ondrop="drop(event)" 
-          ondragover="allowDrop(event)"
-          ondragleave="dragLeave(event)"
+          data-folder-id="${folder.id}"
         >
           <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-gray-700">${folder.name}</h3>
+            <div class="flex items-center">
+                <button class="minimize-folder-btn text-gray-500 hover:text-gray-700 mr-2">-</button>
+                <h3 class="text-xl font-bold text-gray-700">${folder.name}</h3>
+            </div>
             <button class="text-gray-500 hover:text-red-600" data-action="delete-folder" data-testid="${folder.id}" title="Delete Folder">
               <i class="ph ph-trash"></i>
             </button>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="folder-summary hidden text-sm text-gray-600">${summaryText}</div>
+          <div class="folder-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             ${folderContentHtml}
             ${visibleTestsInFolder.length === 0 ? '<p class="text-gray-500 italic col-span-full text-center py-4">Drag tests here to organize</p>' : ""}
           </div>
@@ -1528,13 +1533,14 @@ function renderDashboard(filter = "") {
   });
 
   if (visibleUngroupedTests.length > 0) {
-    testListEl.innerHTML += `<div class="col-span-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${ungroupedHtml}</div>`;
+    testListEl.innerHTML += `<div id="ungrouped-tests-container" class="col-span-full mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${ungroupedHtml}</div>`;
   }
 
   if (testListEl.innerHTML.trim() === "") {
     testListEl.innerHTML = dashboardHtml; // Show "No tests loaded" or "No results" message
   }
 
+  initializeSortable();
   // Manually trigger Phosphor Icons to process the newly added dynamic elements
   embedPhosphorIcons();
 }
@@ -1627,7 +1633,8 @@ function activateFocusTrap(modalId) {
   if (!modal) return;
 
   const selector =
-    'a[href], area[href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])';
+    'a[href], area[href], input:not([disabled]):not([type="hidden"]),
+     select:not([disabled]), textarea:not([disabled]), button:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])';
   const focusable = Array.from(modal.querySelectorAll(selector)).filter((el) => el.offsetParent !== null);
   if (focusable.length === 0) return;
   const first = focusable[0];
@@ -1751,6 +1758,75 @@ function showToast(message, duration = 3000, opts = {}) {
 
 // === FOLDER & DRAG/DROP LOGIC ===
 
+function initializeSortable() {
+    const testListEl = document.getElementById("test-list");
+    const ungroupedContainer = document.getElementById("ungrouped-tests-container");
+
+    // Make ungrouped container sortable
+    if (ungroupedContainer) {
+        new Sortable(ungroupedContainer, {
+            group: 'shared',
+            animation: 150,
+            onEnd: function (evt) {
+                const testId = evt.item.dataset.testid;
+                const newIndex = evt.newIndex;
+
+                // Find which folder it was dropped in, if any
+                const folderEl = evt.to.closest('.folder-container');
+                if (folderEl) {
+                    const folderId = folderEl.dataset.folderId;
+                    // Move from ungrouped to folder
+                    dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter(id => id !== testId);
+                    if (!dashboardLayout.testsInFolders[folderId]) {
+                        dashboardLayout.testsInFolders[folderId] = [];
+                    }
+                    dashboardLayout.testsInFolders[folderId].splice(newIndex, 0, testId);
+                } else {
+                    // Reorder within ungrouped
+                    dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter(id => id !== testId);
+                    dashboardLayout.ungroupedTests.splice(newIndex, 0, testId);
+                }
+                saveLayout();
+            }
+        });
+    }
+
+    // Make each folder content sortable
+    document.querySelectorAll('.folder-content').forEach(folderContentEl => {
+        new Sortable(folderContentEl, {
+            group: 'shared',
+            animation: 150,
+            onEnd: function (evt) {
+                const testId = evt.item.dataset.testid;
+                const fromFolderId = evt.from.closest('.folder-container').dataset.folderId;
+                const toFolderEl = evt.to.closest('.folder-container');
+
+                // Remove from old location
+                if(fromFolderId){
+                    dashboardLayout.testsInFolders[fromFolderId] = dashboardLayout.testsInFolders[fromFolderId].filter(id => id !== testId);
+                } else {
+                    dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter(id => id !== testId);
+                }
+
+                if (toFolderEl) {
+                    // Dropped in another folder
+                    const toFolderId = toFolderEl.dataset.folderId;
+                    const newIndex = evt.newIndex;
+                    if (!dashboardLayout.testsInFolders[toFolderId]) {
+                        dashboardLayout.testsInFolders[toFolderId] = [];
+                    }
+                    dashboardLayout.testsInFolders[toFolderId].splice(newIndex, 0, testId);
+                } else {
+                    // Dropped in ungrouped area
+                    const newIndex = evt.newIndex;
+                    dashboardLayout.ungroupedTests.splice(newIndex, 0, testId);
+                }
+                saveLayout();
+            }
+        });
+    });
+}
+
 // Opens the Create Folder modal for interactive use
 function createFolder() {
   showModal("createFolder");
@@ -1779,8 +1855,8 @@ function createFolderConfirm() {
     hideModal("createFolder");
     return newFolder.id;
   }
-  // If invalid, keep modal open and optionally flash input (left as simple alert)
-  alert("Please enter a valid folder name.");
+  // If invalid, show a non-blocking custom alert.
+  customAlert("Invalid Name", "Please enter a valid folder name.");
   return null;
 }
 
@@ -1791,7 +1867,7 @@ function createFolderProgrammatic(name) {
   dashboardLayout.folders.push(newFolder);
   saveLayout();
   renderDashboard();
-  return newFolder.id;
+  return newNewFolder.id;
 }
 
 function deleteFolder(folderId) {
@@ -1802,51 +1878,6 @@ function deleteFolder(folderId) {
   // Remove the folder and its test list
   dashboardLayout.folders = dashboardLayout.folders.filter((f) => f.id !== folderId);
   delete dashboardLayout.testsInFolders[folderId];
-}
-
-function allowDrop(ev) {
-  ev.preventDefault();
-  const dropTarget = ev.currentTarget;
-  if (dropTarget.classList.contains("folder-container")) {
-    dropTarget.classList.add("drag-over");
-  }
-}
-
-function dragLeave(ev) {
-  ev.currentTarget.classList.remove("drag-over");
-}
-
-function drag(ev) {
-  const testId = ev.target.closest("[data-testid]").dataset.testid;
-  ev.dataTransfer.setData("text/plain", testId);
-}
-
-function drop(ev) {
-  ev.preventDefault();
-  const dropTarget = ev.currentTarget;
-  dropTarget.classList.remove("drag-over");
-
-  const testId = ev.dataTransfer.getData("text/plain");
-  const targetFolderId = dropTarget.dataset.folderId;
-
-  if (!testId || !targetFolderId) return;
-
-  // Remove test from its original location
-  // 1. From ungrouped
-  dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter((id) => id !== testId);
-  // 2. From any other folder
-  for (const folderId in dashboardLayout.testsInFolders) {
-    dashboardLayout.testsInFolders[folderId] = dashboardLayout.testsInFolders[folderId].filter((id) => id !== testId);
-  }
-
-  // Add test to the new folder
-  if (!dashboardLayout.testsInFolders[targetFolderId]) {
-    dashboardLayout.testsInFolders[targetFolderId] = [];
-  }
-  dashboardLayout.testsInFolders[targetFolderId].push(testId);
-
-  saveLayout();
-  renderDashboard();
 }
 
 // === STARTUP ===
