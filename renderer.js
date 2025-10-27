@@ -637,6 +637,47 @@ function addEventListeners() {
     }
   });
 
+  // Double-click handling for dashboard: start tests or open folders
+  screens.dashboard.addEventListener("dblclick", (e) => {
+    // Only active in dashboard view
+    if (screens.dashboard.classList.contains("hidden")) return;
+    const target = e.target;
+
+    // Prefer summary-line wrapper which may be inside folder cards
+    const summaryEl = target.closest(".folder-summary-line");
+    if (summaryEl) {
+      if (summaryEl.dataset.testid) {
+        handleDashboardAction("start", summaryEl.dataset.testid);
+        return;
+      }
+      if (summaryEl.dataset.folderId) {
+        handleDashboardAction("open-folder", summaryEl.dataset.folderId);
+        return;
+      }
+    }
+
+    // Double-click a test card or any element annotated with data-testid => start
+    const testEl = target.closest("[data-testid]");
+    if (testEl && testEl.dataset.testid) {
+      handleDashboardAction("start", testEl.dataset.testid);
+      return;
+    }
+
+    // Double-click a folder card or breadcrumb link => open
+    const folderEl = target.closest("[data-folder-id]");
+    if (folderEl && folderEl.dataset.folderId !== undefined) {
+      const fid = folderEl.dataset.folderId || null;
+      if (fid) {
+        handleDashboardAction("open-folder", fid);
+      } else {
+        // empty means root
+        currentFolderId = null;
+        renderDashboard();
+      }
+      return;
+    }
+  });
+
   // Main app listener for delegated clicks
   app.addEventListener("click", (e) => {
     const target = e.target;
@@ -738,18 +779,18 @@ function addEventListeners() {
   document.addEventListener("dragstart", (e) => {
     try {
       // Prefer summary-line wrapper (these have explicit data attributes)
-      const summaryEl = e.target.closest('.folder-summary-line');
+      const summaryEl = e.target.closest(".folder-summary-line");
       if (summaryEl) {
         if (summaryEl.dataset.testid) {
-          e.dataTransfer.setData('text/plain', summaryEl.dataset.testid);
-          e.dataTransfer.setData('application/x-item-type', 'test');
-          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData("text/plain", summaryEl.dataset.testid);
+          e.dataTransfer.setData("application/x-item-type", "test");
+          e.dataTransfer.effectAllowed = "move";
           return;
         }
         if (summaryEl.dataset.folderId) {
-          e.dataTransfer.setData('text/plain', summaryEl.dataset.folderId);
-          e.dataTransfer.setData('application/x-item-type', 'folder');
-          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData("text/plain", summaryEl.dataset.folderId);
+          e.dataTransfer.setData("application/x-item-type", "folder");
+          e.dataTransfer.effectAllowed = "move";
           return;
         }
       }
@@ -1517,6 +1558,15 @@ function renderDashboard(filter = "") {
   if (!testListEl) return;
 
   testListEl.innerHTML = ""; // Clear the list
+  // Make the main grid accept drops so users can drop items into the current view (root or folder)
+  try {
+    testListEl.ondragover = allowDrop;
+    testListEl.ondrop = drop;
+    // Expose the current folder id on the grid as a data attribute ('' => root)
+    testListEl.dataset.folderId = currentFolderId || "";
+  } catch (e) {
+    /* ignore */
+  }
   const lowerCaseFilter = filter.trim().toLowerCase();
 
   // If viewing inside a folder, render a small header with Back button and breadcrumb
@@ -1940,6 +1990,51 @@ function showToast(message, duration = 3000, opts = {}) {
   return;
 }
 
+/**
+ * Shows a transient on-screen debug toast for drop events.
+ * Designed to help reproduce drag/drop issues without opening DevTools.
+ */
+function showDropDebugToast(info) {
+  try {
+    // Remove any existing toast
+    const existing = document.getElementById("drop-debug-toast");
+    if (existing) existing.remove();
+
+    const container = document.createElement("div");
+    container.id = "drop-debug-toast";
+    const pretty = JSON.stringify(info, (k, v) => (typeof v === "string" && v.length > 120 ? v.substring(0, 120) + "..." : v), 2);
+    container.textContent = pretty;
+    Object.assign(container.style, {
+      position: "fixed",
+      bottom: "18px",
+      right: "18px",
+      maxWidth: "60%",
+      background: "rgba(17,24,39,0.95)",
+      color: "#fff",
+      padding: "10px 12px",
+      borderRadius: "8px",
+      fontSize: "12px",
+      lineHeight: "1.2",
+      boxShadow: "0 6px 20px rgba(2,6,23,0.2)",
+      zIndex: 99999,
+      whiteSpace: "pre-wrap",
+      overflow: "hidden",
+    });
+    document.body.appendChild(container);
+    setTimeout(() => {
+      try {
+        container.style.transition = "opacity 300ms ease";
+        container.style.opacity = "0";
+        setTimeout(() => container.remove(), 320);
+      } catch (e) {
+        container.remove();
+      }
+    }, 4000);
+  } catch (e) {
+    /* ignore */
+  }
+}
+
 // === FOLDER & DRAG/DROP LOGIC ===
 
 // Opens the Create Folder modal for interactive use
@@ -2064,6 +2159,12 @@ function allowDrop(ev) {
   // Mark any drop target as active so we can style it (breadcrumb/back/folder cards)
   try {
     dropTarget.classList.add("drag-over");
+    // Indicate move is allowed
+    try {
+      ev.dataTransfer.dropEffect = "move";
+    } catch (e) {
+      /* ignore */
+    }
   } catch (e) {
     /* ignore */
   }
@@ -2093,27 +2194,77 @@ function drop(ev) {
   ev.preventDefault();
   const dropTarget = ev.currentTarget;
   dropTarget.classList.remove("drag-over");
-  const id = ev.dataTransfer.getData("text/plain");
+  // Robustly determine the folder id the user intended to drop into.
+  // Some drop targets may be child elements without dataset.folderId, so
+  // fall back to the closest ancestor that has data-folder-id.
+  const rawId = ev.dataTransfer.getData("text/plain") || ev.dataTransfer.getData("Text") || ev.dataTransfer.getData("text");
   const itemType = ev.dataTransfer.getData("application/x-item-type") || "test";
-  const targetFolderId = dropTarget.dataset.folderId || null; // null => root (ungrouped)
+  let targetFolderId = null;
+  try {
+    const dt = dropTarget && dropTarget.dataset && dropTarget.dataset.folderId;
+    // Accept dataset.folderId even if it's an empty string (which represents root).
+    if (typeof dt !== "undefined") {
+      targetFolderId = dt || null; // empty string => root (null)
+    } else {
+      // Try to locate the nearest element under the pointer that has a folder id
+      const fallback = ev.target && ev.target.closest ? ev.target.closest("[data-folder-id]") : null;
+      if (fallback && typeof fallback.dataset.folderId !== "undefined") {
+        targetFolderId = fallback.dataset.folderId || null;
+      } else {
+        // If the drop happened on the grid representing the current view, use its dataset
+        const grid = document.getElementById("test-list");
+        if (grid && grid.dataset && typeof grid.dataset.folderId !== "undefined") {
+          targetFolderId = grid.dataset.folderId || null;
+        }
+      }
+    }
+    // As a last resort, use a hit-test at the drop coordinates to find the element directly under the pointer.
+    // This helps when the DOM structure or pointer events cause ev.target to be something unexpected.
+    try {
+      if ((typeof targetFolderId === "undefined" || targetFolderId === null) && typeof ev.clientX === "number" && typeof ev.clientY === "number") {
+        const under = document.elementFromPoint(ev.clientX, ev.clientY);
+        const hit = under && under.closest ? under.closest("[data-folder-id]") : null;
+        if (hit && typeof hit.dataset.folderId !== "undefined") {
+          targetFolderId = hit.dataset.folderId || null;
+        }
+      }
+    } catch (e) {
+      /* ignore hit-test errors */
+    }
+  } catch (e) {
+    console.warn("Error resolving targetFolderId on drop:", e);
+    targetFolderId = null;
+  }
 
+  const id = rawId;
+  console.debug("drop event:", { id, itemType, targetFolderId, dropTarget, rawTarget: ev.target });
   if (!id) return;
 
+  // Show an on-screen debug toast with the resolved values and current layout membership
+  try {
+    const inUngroupedBefore = (dashboardLayout.ungroupedTests || []).includes(id);
+    const folderBefore = Object.keys(dashboardLayout.testsInFolders || {}).find((k) => (dashboardLayout.testsInFolders[k] || []).includes(id)) || null;
+    showDropDebugToast({ phase: "resolved", id, itemType, targetFolderId, inUngroupedBefore, folderBefore });
+  } catch (e) {
+    /* ignore */
+  }
+
   if (itemType === "test") {
-    // Remove test from its original location
-    dashboardLayout.ungroupedTests = dashboardLayout.ungroupedTests.filter((tid) => tid !== id);
+    // Remove test from any original location
+    dashboardLayout.ungroupedTests = (dashboardLayout.ungroupedTests || []).filter((tid) => tid !== id);
     for (const folderId in dashboardLayout.testsInFolders) {
-      dashboardLayout.testsInFolders[folderId] = dashboardLayout.testsInFolders[folderId].filter((tid) => tid !== id);
+      if (!Object.prototype.hasOwnProperty.call(dashboardLayout.testsInFolders, folderId)) continue;
+      dashboardLayout.testsInFolders[folderId] = (dashboardLayout.testsInFolders[folderId] || []).filter((tid) => tid !== id);
     }
 
     if (targetFolderId) {
       if (!dashboardLayout.testsInFolders[targetFolderId]) dashboardLayout.testsInFolders[targetFolderId] = [];
-      dashboardLayout.testsInFolders[targetFolderId].push(id);
+      // Avoid duplicates
+      if (!dashboardLayout.testsInFolders[targetFolderId].includes(id)) dashboardLayout.testsInFolders[targetFolderId].push(id);
     } else {
-      dashboardLayout.ungroupedTests.push(id);
+      if (!dashboardLayout.ungroupedTests.includes(id)) dashboardLayout.ungroupedTests.push(id);
     }
   } else if (itemType === "folder") {
-    // Move the folder (reparent)
     const folder = dashboardLayout.folders.find((f) => f.id === id);
     if (folder) {
       // Prevent making a folder a child of itself or one of its descendants
@@ -2133,8 +2284,17 @@ function drop(ev) {
     }
   }
 
+  // After mutation, persist and re-render; then show where the item now resides.
   saveLayout();
   renderDashboard();
+  try {
+    const inUngrouped = (dashboardLayout.ungroupedTests || []).includes(id);
+    const folderNow = Object.keys(dashboardLayout.testsInFolders || {}).find((k) => (dashboardLayout.testsInFolders[k] || []).includes(id)) || null;
+    showDropDebugToast({ phase: "final", id, itemType, targetFolderId, inUngrouped, folderNow });
+    console.debug("drop final state:", { id, inUngrouped, folderNow });
+  } catch (e) {
+    /* ignore */
+  }
 }
 
 // === STARTUP ===

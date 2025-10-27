@@ -141,6 +141,16 @@
   vertical-align: middle;
 }
 
+/* Visual drop target highlight for header/breadcrumb/back */
+.folder-view-header.drag-over,
+.folder-view-header .left.drag-over,
+.breadcrumb a.drag-over,
+#leave-folder-btn.drag-over {
+  background: rgba(14, 165, 233, 0.12); /* subtle blue */
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(2, 6, 23, 0.06);
+}
+
 /* Toast styles removed (toasts disabled) */
 
 /* Load summary minimize styles inside Help modal */
