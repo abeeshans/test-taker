@@ -104,7 +104,6 @@
 /* Drag and Drop styles */
 .drag-over {
   background-color: var(--brand-blue-light);
-  border: 2px dashed var(--brand-blue);
 }
 
 .card-menu-container {
@@ -149,6 +148,15 @@
   background: rgba(14, 165, 233, 0.12); /* subtle blue */
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(2, 6, 23, 0.06);
+}
+
+/* Ensure the folder view header sits above folder cards so breadcrumb/back
+   receive pointer events and drop targets don't get overlapped by cards. */
+.folder-view-header {
+  position: relative;
+  z-index: 50;
+  /* give a slight backdrop so it visually separates from cards beneath */
+  background: transparent;
 }
 
 /* Toast styles removed (toasts disabled) */
@@ -269,10 +277,22 @@
   padding: 16px;
   position: relative;
 }
+.folder-card {
+  /* push folder cards slightly below the header area to avoid overlap */
+  margin-top: 12px;
+  z-index: 1;
+}
+
+/* Visual style applied to the resolved drop target during dragover */
+.drop-target-highlight {
+  outline: 3px solid rgba(14, 165, 233, 0.9);
+  box-shadow: 0 12px 36px rgba(14, 165, 233, 0.12);
+  border-radius: 8px;
+}
 .folder-card .folder-tab {
   position: absolute;
   left: 16px;
-  top: -12px;
+  top: -8px;
   background: #0ea5e9; /* sky-500 */
   color: white;
   padding: 6px 12px;
