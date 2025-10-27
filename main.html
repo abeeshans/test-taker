@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Test Taker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* Custom Styles */
+        :root {
+            --brand-blue: #005a9e;
+            --brand-blue-light: #e6f0f7;
+        }
+
+        /* Webkit-specific styles for scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c0c0c0;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+
+        /* Main layout scroll */
+        .main-layout {
+            height: calc(100vh - 4rem);
+            /* Full height minus header */
+        }
+
+        /* Custom Radio Button */
+        .custom-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--brand-blue);
+            border-radius: 50%;
+            outline: none;
+            cursor: pointer;
+            margin-right: 12px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .custom-radio:checked {
+            background-color: var(--brand-blue);
+        }
+
+        .custom-radio:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: white;
+        }
+
+        /* Custom label for review */
+        .review-label {
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
+
+        .review-correct {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .review-incorrect {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .review-unanswered {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        /* Strikethrough style */
+        .strikethrough {
+            text-decoration: line-through;
+            color: #777;
+        }
+
+        /* Phosphor icon fill */
+        .ph-star-fill {
+            color: #facc15;
+            /* yellow-400 */
+        }
+
+        /* Ensure app hides elements correctly */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="h-full font-sans antialiased">
+
+    <div id="app" class="h-full">
+
+        <!-- === SCREEN 2: TEST DASHBOARD === -->
+        <div id="dashboard-screen" class="hidden h-full">
+            <header class="bg-white shadow-md p-4 flex items-center space-x-6">
+                <h1 class="text-2xl font-bold text-gray-800 flex-shrink-0">Dashboard</h1>
+                <div class="relative flex-grow">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="search" id="search-bar" placeholder="Search tests..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-center space-x-4 flex-shrink-0">
+                    <button id="add-files-btn"
+                        class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center">
+                        <i class="ph ph-plus-circle text-lg mr-1"></i>
+                        Add More Files
+                    </button>
+                    <input type="file" id="add-files-input" class="hidden" multiple accept=".json">
+
+                    <button id="change-folder-btn"
+                        class="text-sm text-gray-600 hover:text-blue-800 font-medium flex items-center">
+                        <i class="ph ph-folder-open text-lg mr-1"></i>
+                        Load from Folder
+                    </button>
+                    <button id="dashboard-help-btn"
+                        class="text-sm text-gray-600 hover:text-blue-800 font-medium flex items-center p-2 rounded-full bg-gray-100 hover:bg-gray-200"
+                        title="Help">
+                        <i class="ph ph-question text-xl"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="p-8 h-full overflow-y-auto bg-gray-100">
+                <div id="test-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Test cards will be injected here -->
+                    <!-- A 'How to Use' card will be injected here by renderDashboard -->
+                </div>
+            </main>
+        </div>
+
+        <!-- === SCREEN 3: TEST TAKER === -->
+        <div id="test-screen" class="hidden h-full">
+            <!-- Header Bar -->
+            <header class="bg-white shadow-md flex items-center justify-between p-4 h-16">
+                <div class="flex items-center">
+                    <h1 id="test-title-header" class="text-xl font-bold text-gray-800">Test In Progress...</h1>
+                </div>
+                <div class="flex-1 mx-8">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center text-gray-700">
+                        <i class="ph ph-timer text-xl align-middle mr-1"></i>
+                        <span id="timer" class="font-medium text-lg">00:00:00</span>
+                    </div>
+                    <div id="away-clicks-counter-container" class="flex items-center text-red-600"
+                        title="Away clicks counter">
+                        <i class="ph ph-warning-circle text-xl align-middle mr-1"></i>
+                        <span id="away-clicks-counter" class="font-medium text-lg">0</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <button id="help-btn" class="text-gray-700 hover:text-blue-600" title="Text interface guide">
+                            <i class="ph ph-question text-xl align-middle mr-1"></i>
+                        </button>
+                        <span id="question-counter" class="font-medium text-lg">1 / 10</span>
+                    </div>
+                    <button id="review-dashboard-btn"
+                        class="hidden bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md flex items-center">
+                        <i class="ph ph-squares-four text-lg mr-1"></i> Dashboard
+                    </button>
+                    <button id="finish-btn-header"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex items-center">
+                        <i class="ph ph-check-circle text-lg mr-1"></i> Finish
+                    </button><button id="pause-btn"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md flex items-center">
+                        <i class="ph ph-pause text-lg mr-1"></i>
+                        <span id="pause-btn-text">Pause</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Test Layout (2-col) -->
+            <div class="main-layout flex w-full" style="height: calc(100vh - 8rem);">
+                <!-- Left: Passage -->
+                <div id="passage-container" class="w-1/2 p-6 overflow-y-auto border-r border-gray-300 bg-white">
+                    <!-- Passage content injected here -->
+                </div>
+
+                <!-- Right: Question -->
+                <div id="question-container" class="w-1/2 p-6 overflow-y-auto bg-gray-50 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 id="question-number" class="text-xl font-semibold text-gray-800">Question 1</h2>
+                        <button id="flag-btn"
+                            class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-md flex items-center">
+                            <i class="ph ph-flag text-lg mr-1"></i>
+                            <span>Flag for Review</span>
+                        </button>
+                    </div>
+                    <p id="question-text" class="text-gray-700 text-lg mb-6 leading-relaxed">Question text...</p>
+                    <div id="options-container" class="space-y-4">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bar -->
+            <footer class="bg-white shadow-inner flex justify-between items-center p-4 h-16 border-t border-gray-200">
+                <button id="prev-btn"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="ph ph-arrow-left text-lg mr-1"></i>
+                    Previous
+                </button>
+                <button id="nav-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md flex items-center">
+                    <i class="ph ph-navigation-arrow text-lg mr-1"></i>
+                    Navigation
+                </button>
+                <button id="next-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                    Next
+                    <i class="ph ph-arrow-right text-lg ml-1"></i>
+                </button>
+            </footer>
+        </div>
+
+        <!-- === SCREEN 4: RESULTS SCREEN === -->
+        <div id="results-screen" class="hidden flex items-center justify-center h-full">
+            <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-2xl w-full">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">Test Complete!</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-8 text-lg">
+                    <div class="bg-blue-100 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-blue-800">SCORE</div>
+                        <div id="results-score" class="text-3xl font-bold text-blue-900">10 / 12</div>
+                    </div>
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-green-800">PERCENTAGE</div>
+                        <div id="results-percentage" class="text-3xl font-bold text-green-900">83%</div>
+                    </div>
+                    <div class="bg-red-100 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-red-800">AWAY CLICKS</div>
+                        <div id="results-away-clicks" class="text-3xl font-bold text-red-900">2</div>
+                    </div>
+                </div>
+                <div class="flex justify-center space-x-4">
+                    <button id="review-btn"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <i class="ph ph-eye text-xl mr-2"></i>
+                        Review Test
+                    </button>
+                    <button id="dashboard-btn"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="ph ph-squares-four text-xl mr-2"></i>
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- === MODALS / OVERLAYS === -->
+
+        <!-- Navigation Modal -->
+        <div id="nav-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-xl font-semibold text-gray-800">Question Navigation</h2>
+                    <button id="close-nav-modal-btn" class="text-gray-500 hover:text-gray-700">
+                        <i class="ph ph-x text-2xl"></i>
+                    </button>
+                </div>
+                <div id="nav-grid" class="p-6 overflow-y-auto grid grid-cols-10 gap-2">
+                    <!-- Nav items injected here -->
+                </div>
+                <div id="nav-legend-test" class="p-4 bg-gray-50 border-t flex justify-start space-x-4">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full bg-blue-600 mr-2"></div>
+                        <span class="text-sm text-gray-700">Current</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+                        <span class="text-sm text-gray-700">Answered</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full bg-gray-300 mr-2"></div>
+                        <span class="text-sm text-gray-700">Unanswered</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full bg-yellow-300 mr-2"></div>
+                        <span class="text-sm text-gray-700">Flagged</span>
+                    </div>
+                </div>
+                <div id="nav-legend-review" class="hidden p-4 bg-gray-50 border-t grid grid-cols-2 gap-x-4 gap-y-2">
+                    <div class="flex items-center"><i class="ph-fill ph-check-circle text-green-600 mr-2"></i><span
+                            class="text-sm">Correct</span></div>
+                    <div class="flex items-center"><i class="ph-fill ph-x-circle text-red-600 mr-2"></i><span
+                            class="text-sm">Incorrect</span></div>
+                    <div class="flex items-center"><i class="ph-fill ph-minus-circle text-yellow-600 mr-2"></i><span
+                            class="text-sm">Unanswered</span></div>
+                    <div class="flex items-center"><i class="ph-fill ph-flag text-blue-600 mr-2"></i><span
+                            class="text-sm">Ever Flagged</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay"
+            class="hidden fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-40 flex-col">
+            <h1 class="text-6xl font-bold text-white mb-8">Test Paused</h1>
+            <button id="resume-overlay-btn"
+                class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-md flex items-center text-2xl">
+                <i class="ph ph-play text-3xl mr-2"></i>
+                Resume Test
+            </button>
+            <button id="abandon-test-btn"
+                class="mt-6 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md flex items-center text-lg">
+                <i class="ph ph-trash text-xl mr-2"></i>
+                Abandon Test
+            </button>
+        </div>
+
+        <!-- Time Input Modal -->
+        <div id="time-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 class="text-xl font-semibold mb-4">Set Test Time</h2>
+                <p class="text-gray-600 mb-4">How many minutes for this test?</p>
+                <input type="number" id="time-input-modal" class="w-full border border-gray-300 p-2 rounded-md mb-4"
+                    placeholder="e.g., 180">
+                <div class="flex justify-end space-x-2">
+                    <button id="cancel-time-btn"
+                        class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
+                    <button id="start-test-confirm-btn"
+                        class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">Start</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div id="alert-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 id="alert-title" class="text-xl font-semibold mb-2">Alert</h2>
+                <div id="alert-message" class="text-gray-600 mb-6 text-sm">This is an alert message.</div>
+                <button id="alert-ok-btn"
+                    class="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">OK</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Help Modal -->
+        <div id="dashboard-help-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-xl font-semibold text-gray-800">Help & Information</h2>
+                    <button id="close-dashboard-help-btn" class="text-gray-500 hover:text-gray-700">
+                        <i class="ph ph-x text-2xl"></i>
+                    </button>
+                </div>
+                <div class="p-6 overflow-y-auto space-y-3 text-sm">
+                    <details class="bg-gray-50 p-3 rounded-lg" open>
+                        <summary class="font-semibold cursor-pointer text-base">About This App</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <p>This is a custom test-taking application designed to help you practice with your own
+                                question sets in <code>.json</code> format. It saves your progress and stats locally in
+                                your browser.</p>
+                        </div>
+                    </details>
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Adding Tests</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <p>You can add tests in two ways:</p>
+                            <ul>
+                                <li><strong>Auto-Loading:</strong> On startup, the app looks for a
+                                    <code>/json/manifest.json</code> file to load tests automatically. This works best
+                                    when running from a local web server.
+                                </li>
+                                <li><strong>Manual Loading:</strong> Use the <strong>"Add More Files"</strong> or
+                                    <strong>"Load from Folder"</strong> buttons in the header.
+                                </li>
+                            </ul>
+                            <p>Your <code>.json</code> files must be an array of question objects. Here is a basic
+                                example:</p>
+                            <pre class="bg-gray-200 p-2 rounded text-xs whitespace-pre-wrap"><code>[
+  {
+    "passage": "Optional passage text...",
+    "question": "What is the capital of France?",
+    "options": [
+      "A. London", "B. Paris", "C. Berlin"
+    ],
+    "correctAnswer": "B. Paris"
+  }
+]</code></pre>
+                        </div>
+                    </details>
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Starting a Test</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <p>Click the <strong>"Start Test"</strong> button on any card. You will be prompted to enter
+                                a time limit in minutes. During the test, you can use keyboard shortcuts (like arrow
+                                keys, 1-4 for answers, F for flag, P for pause) for faster navigation.</p>
+                        </div>
+                    </details>
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Dashboard Features</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <ul>
+                                <li><i class="ph-fill ph-star text-yellow-400"></i> <strong>Star:</strong> Click the
+                                    star icon to pin a test to the top of the list.</li>
+                                <li><i class="ph ph-pencil-simple"></i> <strong>Rename:</strong> Click the rename button
+                                    to give a test a more descriptive name.</li>
+                                <li><i class="ph ph-chart-bar"></i> <strong>Stats:</strong> The cards display your
+                                    number of attempts, average score, and last score for each test.</li>
+                                <li><i class="ph ph-magnifying-glass"></i> <strong>Search:</strong> Use the search bar
+                                    to quickly filter tests by name.</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // === STATE MANAGEMENT ===
+        let allTests = []; // { id, name, content }
+        let testMetadata = {}; // { id: { customName, isStarred, attempts: [] } }
+        let currentTest = {
+            flatQuestions: [], // All questions in a flat array
+            userAnswers: [], // Array of user answers
+            wasEverFlagged: [], // Array of booleans to track if a question was ever flagged
+            isFlagged: [], // Array of booleans
+            strikethroughs: [], // Array of Set()
+            totalTime: 0,
+            timeLeft: 0,
+            awayClicks: 0,
+            currentQ: 0,
+            timerInterval: null,
+            isPaused: false,
+            isReviewMode: false,
+            testToStartId: null // Temp holder for which test to start
+        };
+        const STORAGE_KEY = 'customTestAppMetadata';
+
+        // === DOM ELEMENTS ===
+        const app = document.getElementById('app');
+        const screens = {
+            dashboard: document.getElementById('dashboard-screen'),
+            test: document.getElementById('test-screen'),
+            results: document.getElementById('results-screen')
+        };
+        const modals = {
+            nav: document.getElementById('nav-modal'),
+            pause: document.getElementById('pause-overlay'),
+            time: document.getElementById('time-modal'),
+            alert: document.getElementById('alert-modal'),
+            dashboardHelp: document.getElementById('dashboard-help-modal')
+        };
+
+        // Test Screen Elements
+        const timerEl = document.getElementById('timer');
+        const questionCounterEl = document.getElementById('question-counter');
+        const progressBarEl = document.getElementById('progress-bar');
+        const testTitleHeaderEl = document.getElementById('test-title-header');
+        const passageContainerEl = document.getElementById('passage-container');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        const flagBtn = document.getElementById('flag-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const pauseBtnText = document.getElementById('pause-btn-text');
+        const nextBtn = document.getElementById('next-btn');
+        const finishBtnHeader = document.getElementById('finish-btn-header');
+        const reviewDashboardBtn = document.getElementById('review-dashboard-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const navGridEl = document.getElementById('nav-grid');
+
+        // Results Screen Elements
+        const resultsScoreEl = document.getElementById('results-score');
+        const resultsPercentageEl = document.getElementById('results-percentage');
+        const resultsAwayClicksEl = document.getElementById('results-away-clicks');
+        const awayClicksCounterEl = document.getElementById('away-clicks-counter');
+        const awayClicksCounterContainerEl = document.getElementById('away-clicks-counter-container');
+
+        // === CORE LOGIC ===
+
+        /**
+         * Initializes the application.
+         * Tries to load metadata from localStorage. If not found, shows setup.
+         * If found, it skips setup and shows the dashboard.
+         */
+        async function init() {
+            loadMetadata();
+            // The old folder input is gone, but we can repurpose the button if needed.
+            // For now, let's make the "Load from Folder" button also trigger a file input.
+            const folderInput = document.createElement('input');
+            folderInput.type = 'file';
+            folderInput.webkitdirectory = true;
+            folderInput.directory = true;
+            folderInput.multiple = true;
+            folderInput.className = 'hidden';
+            folderInput.addEventListener('change', handleFolderSelect);
+            document.body.appendChild(folderInput);
+            document.getElementById('change-folder-btn').addEventListener('click', () => folderInput.click());
+            document.getElementById('add-files-input').addEventListener('change', handleAddFiles);
+
+            // Add optimized event listeners
+            addEventListeners();
+
+            // Attempt to auto-load local files
+            await loadLocalFiles();
+
+            // Always go to the dashboard now
+            renderDashboard();
+            showScreen('dashboard');
+        }
+
+        /**
+         * Attempts to load test files listed in a local manifest.json.
+         * Returns true if successful, false otherwise.
+         */
+        async function loadLocalFiles() {
+            try {
+                const manifestResponse = await fetch('./json/manifest.json');
+                if (!manifestResponse.ok) throw new Error('manifest.json not found');
+                const manifest = await manifestResponse.json();
+
+                const fileReadPromises = manifest.map(async (filename) => {
+                    const fileResponse = await fetch(`./json/${filename}`);
+                    if (!fileResponse.ok) throw new Error(`Could not fetch ${filename}`);
+                    const content = await fileResponse.text();
+                    return { name: filename, content: content };
+                });
+
+                const fileObjects = await Promise.all(fileReadPromises);
+                processFiles(fileObjects);
+                return true;
+            } catch (error) {
+                console.warn("Could not auto-load local files:", error.message);
+                return false;
+            }
+        }
+
+        /**
+         * Shows a custom, non-blocking alert modal.
+         */
+        function customAlert(title, message) {
+            document.getElementById('alert-title').textContent = title;
+            document.getElementById('alert-message').innerHTML = message; // Use innerHTML for rich content
+            showModal('alert');
+        }
+
+        /**
+         * Shows the help information modal.
+         */
+        function showHelp() {
+            const helpTitle = "Test Interface Guide";
+            const helpMessage = `
+                <ul class="text-left list-none space-y-3 prose-sm">
+                    <li><i class="ph ph-arrows-left-right text-lg mr-2 text-blue-500"></i> Use <strong>Arrow Keys</strong> or on-screen buttons to navigate.</li>
+                    <li><i class="ph ph-list-numbers text-lg mr-2 text-blue-500"></i> Press <strong>1-4</strong> to select an answer.</li>
+                    <li><i class="ph ph-flag text-lg mr-2 text-blue-500"></i> Press <strong>F</strong> to flag a question for review.</li>
+                    <li><i class="ph ph-pause text-lg mr-2 text-blue-500"></i> Press <strong>P</strong> to pause or resume the test.</li>
+                    <li><i class="ph ph-strikethrough text-lg mr-2 text-blue-500"></i> Click the <strong>[S]</strong> button to strikethrough an option.</li>
+                    <li><i class="ph ph-navigation-arrow text-lg mr-2 text-blue-500"></i> Use the <strong>Navigation</strong> button for a question overview.</li>
+                </ul>`;
+            customAlert(helpTitle, helpMessage.trim());
+        }
+
+        /**
+         * Adds event listeners using event delegation for optimized performance.
+         */
+        function addEventListeners() {
+            // Main app listener for delegated clicks
+            app.addEventListener('click', (e) => {
+                const target = e.target;
+                const targetId = target.id;
+
+                // --- Buttons ---
+                if (target.matches('#add-files-btn')) {
+                    document.getElementById('add-files-input').click();
+                } else if (target.matches('#review-btn')) {
+                    startReviewMode();
+                } else if (target.matches('#dashboard-btn')) {
+                    showScreen('dashboard');
+                } else if (target.matches('#prev-btn')) {
+                    navigateQuestion(-1);
+                } else if (target.matches('#next-btn')) {
+                    navigateQuestion(1);
+                } else if (target.matches('#nav-btn')) {
+                    renderNavModal();
+                    showModal('nav');
+                } else if (target.matches('#close-nav-modal-btn') || target.closest('#close-nav-modal-btn')) {
+                    hideModal('nav');
+                } else if (target.matches('#flag-btn') || target.closest('#flag-btn')) {
+                    toggleFlag();
+                } else if (target.matches('#pause-btn') || target.closest('#pause-btn') || target.matches('#resume-overlay-btn')) {
+                    togglePause();
+                } else if (target.matches('#cancel-time-btn')) {
+                    hideModal('time');
+                } else if (target.matches('#start-test-confirm-btn')) {
+                    confirmStartTest();
+                } else if (target.matches('#alert-ok-btn')) {
+                    hideModal('alert');
+                } else if (target.matches('#help-btn') || target.closest('#help-btn')) {
+                    showHelp();
+                } else if (target.matches('#abandon-test-btn')) {
+                    if (confirm("Are you sure you want to abandon this test? Your progress will not be saved.")) {
+                        stopTimer();
+                        hideModal('pause');
+                        showScreen('dashboard');
+                    }
+                } else if (target.matches('#finish-btn-header') || target.closest('#finish-btn-header')) {
+                    if (confirm("Are you sure you want to finish the test?")) {
+                        finishTest();
+                    }
+                } else if (target.matches('#review-dashboard-btn') || target.closest('#review-dashboard-btn')) {
+                    showScreen('dashboard');
+                } else if (target.matches('#dashboard-help-btn') || target.closest('#dashboard-help-btn')) {
+                    showModal('dashboardHelp');
+                } else if (target.matches('#close-dashboard-help-btn') || target.closest('#close-dashboard-help-btn')) {
+                    hideModal('dashboardHelp');
+                }
+
+
+                // --- Dashboard Card Actions (Delegated) ---
+                const dashboardAction = target.closest('[data-action]');
+                if (dashboardAction) {
+                    e.preventDefault(); // Stop any native button behavior
+                    const action = dashboardAction.dataset.action;
+                    const testId = dashboardAction.closest('[data-testid]').dataset.testid;
+                    handleDashboardAction(action, testId);
+                }
+
+                // --- Nav Modal Grid (Delegated) ---
+                const navItem = target.closest('[data-nav-index]');
+                if (navItem) {
+                    const index = parseInt(navItem.dataset.navIndex, 10);
+                    goToQuestion(index);
+                    hideModal('nav');
+                }
+
+                // --- Option Selection (Delegated) ---
+                const optionLabel = target.closest('.option-label');
+                if (optionLabel && !currentTest.isReviewMode) {
+                    const input = optionLabel.querySelector('input[type="radio"]');
+                    if (input) {
+                        currentTest.userAnswers[currentTest.currentQ] = parseInt(input.value, 10);
+                        input.checked = true;
+                        renderQuestion(); // Re-render to update UI, but only if needed
+                    }
+                }
+
+                // --- Strikethrough (Delegated) ---
+                const strikeBtn = target.closest('.strike-btn');
+                if (strikeBtn && !currentTest.isReviewMode) {
+                    const optionIndex = parseInt(strikeBtn.dataset.optionIndex, 10);
+                    toggleStrikethrough(optionIndex);
+                }
+            });
+
+            // --- Other Listeners ---
+            document.getElementById('search-bar').addEventListener('input', (e) => {
+                // Re-render the dashboard with the search filter
+                renderDashboard(e.target.value);
+            });
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+        }
+
+        /**
+         * Handles keyboard shortcuts for navigation during a test.
+         */
+        function handleKeyDown(e) {
+            // Only act if the test screen is visible and no modals are open
+            if (screens.test.classList.contains('hidden') ||
+                !Object.values(modals).every(m => m.classList.contains('hidden'))) {
+                return;
+            }
+
+            // Avoid triggering when user is typing in an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                return;
+            }
+
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault(); // Prevent browser default action (like scrolling)
+                navigateQuestion(-1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                navigateQuestion(1);
+            } else if (['1', '2', '3', '4'].includes(e.key)) {
+                e.preventDefault();
+                const optionIndex = parseInt(e.key, 10) - 1;
+                selectOption(optionIndex);
+            } else if (e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                toggleFlag();
+            } else if (e.key.toLowerCase() === 'p') {
+                e.preventDefault();
+                togglePause();
+            }
+        }
+
+        /**
+         * Selects a specific option for the current question.
+         */
+        function selectOption(optionIndex) {
+            if (currentTest.isReviewMode || optionIndex >= currentTest.flatQuestions[currentTest.currentQ].options.length) return;
+            currentTest.userAnswers[currentTest.currentQ] = optionIndex;
+            renderQuestion();
+        }
+
+        /**
+         * Handles the selection of a test folder.
+         * Reads all files, filters for .json, and parses them.
+         */
+        async function handleFolderSelect(e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+
+            const filePromises = Array.from(files)
+                .filter(file => file.name.endsWith('.json'))
+                .map(async (file) => ({
+                    name: file.name,
+                    content: await file.text()
+                }));
+
+            const parsedFiles = await Promise.all(filePromises);
+            processFiles(parsedFiles, true); // true to clear existing tests
+
+            renderDashboard();
+            document.getElementById('search-bar').value = ''; // Clear search on new folder load
+            showScreen('dashboard');
+        }
+
+        /**
+         * Handles adding more files without clearing existing ones.
+         */
+        async function handleAddFiles(e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+
+            const filePromises = Array.from(files)
+                .filter(file => file.name.endsWith('.json'))
+                .map(async (file) => ({
+                    name: file.name,
+                    content: await file.text()
+                }));
+
+            const parsedFiles = await Promise.all(filePromises);
+            processFiles(parsedFiles, false); // false to append
+
+            // Re-render with the current search filter preserved
+            renderDashboard();
+        }
+
+        /**
+         * Processes an array of file objects {name, content}.
+         * @param {Array} files - Array of file objects.
+         * @param {boolean} clearExisting - If true, clears allTests before processing.
+         */
+        function processFiles(files, clearExisting = false) {
+            if (clearExisting) {
+                allTests = [];
+            }
+
+            for (const file of files) {
+                try {
+                    const testData = JSON.parse(file.content);
+                    const testId = file.name;
+                    if (!allTests.some(t => t.id === testId)) {
+                        allTests.push({ id: testId, name: file.name, content: testData });
+                    }
+                    if (!testMetadata[testId]) {
+                        testMetadata[testId] = { customName: testId.replace('.json', ''), isStarred: false, attempts: [] };
+                    }
+                } catch (err) {
+                    console.warn(`Failed to process file ${file.name}:`, err.message);
+                }
+            }
+            saveMetadata();
+        }
+
+        /**
+         * Handles all actions from the test dashboard (start, rename, star).
+         */
+        function handleDashboardAction(action, testId) {
+            switch (action) {
+                case 'start':
+                    currentTest.testToStartId = testId;
+                    showModal('time');
+                    document.getElementById('time-input-modal').focus();
+                    break;
+                case 'rename':
+                    const newName = prompt("Enter new test name:", testMetadata[testId].customName);
+                    if (newName && newName.trim() !== "") {
+                        testMetadata[testId].customName = newName.trim();
+                        saveMetadata();
+                        renderDashboard();
+                    }
+                    break;
+                case 'star':
+                    testMetadata[testId].isStarred = !testMetadata[testId].isStarred;
+                    saveMetadata();
+                    renderDashboard();
+                    break;
+            }
+        }
+
+        /**
+         * Confirms the time and starts the test.
+         */
+        function confirmStartTest() {
+            const timeInput = document.getElementById('time-input-modal');
+            const minutes = parseInt(timeInput.value, 10);
+
+            if (isNaN(minutes) || minutes <= 0) {
+                customAlert("Invalid Time", "Please enter a valid number of minutes.");
+                return;
+            }
+
+            const testId = currentTest.testToStartId;
+            if (testId) {
+                // startTest now returns true on success, false on failure
+                if (startTest(testId, minutes * 60)) {
+                    hideModal('time'); // Only hide if test started successfully
+                    timeInput.value = ''; // Clear input
+                    currentTest.testToStartId = null;
+                }
+            }
+        }
+
+        /**
+         * Prepares and starts a test.
+         * Returns true on success, false on failure.
+         */
+        function startTest(testId, totalTimeInSeconds) {
+            const testObject = allTests.find(t => t.id === testId);
+            if (!testObject || !testObject.content) {
+                customAlert("Test Error", `Could not find test data for ${testId}. The file might be empty or failed to load.`);
+                return false;
+            }
+            const testData = testObject.content;
+
+            if (!testData) {
+                customAlert("Test Error", `Could not find test data for ${testId}.`);
+                return false;
+            }
+
+            // Flatten the questions
+            const flatQuestions = [];
+            testData.forEach((q, index) => {
+                // Validate question structure from your JSON format
+                if (q && q.question && Array.isArray(q.options) && q.correctAnswer != null) {
+                    // Find the 0-based index of the correct answer
+                    const correctOptLetter = q.correctAnswer.trim().split('.')[0]; // "B" from "B. 7"
+                    const answerIndex = correctOptLetter.charCodeAt(0) - 'A'.charCodeAt(0);
+
+                    // Find the option text without the "A. " prefix
+                    const correctOptionText = q.options.find(opt => opt.startsWith(correctOptLetter + '.'));
+
+                    // Re-map options to not have the "A. " prefix
+                    const cleanedOptions = q.options.map(opt => opt.substring(opt.indexOf(' ') + 1));
+
+                    flatQuestions.push({
+                        question: q.question,
+                        options: cleanedOptions,
+                        answer: answerIndex, // Use the calculated index
+                        passage: q.passage,
+                        // Use the question's own index as the passage index to ensure it re-renders
+                        passageIndex: index,
+                        questionIndexInPassage: 0
+                    });
+                } else {
+                    console.warn(`Skipping malformed question in ${testId}. Question data:`, q);
+                }
+            });
+
+            // Check if any questions were actually loaded
+            if (flatQuestions.length === 0) {
+                customAlert("Test Error", `Test file "${testId}" contains no valid questions. Please check the file format.`);
+                return false; // Abort starting the test
+            }
+
+            currentTest = {
+                flatQuestions, // This now correctly sets the flatQuestions
+                userAnswers: new Array(flatQuestions.length).fill(null),
+                isFlagged: new Array(flatQuestions.length).fill(false),
+                wasEverFlagged: new Array(flatQuestions.length).fill(false),
+                strikethroughs: new Array(flatQuestions.length).fill(null).map(() => new Set()),
+                totalTime: totalTimeInSeconds,
+                timeLeft: totalTimeInSeconds,
+                awayClicks: 0,
+                currentQ: 0,
+                timerInterval: null,
+                isPaused: false,
+                isReviewMode: false,
+                testId: testId // Store which test is being taken
+            };
+
+            testTitleHeaderEl.textContent = testMetadata[testId].customName;
+            awayClicksCounterEl.textContent = '0';
+            awayClicksCounterContainerEl.classList.remove('hidden');
+
+            goToQuestion(0);
+            startTimer();
+            showScreen('test');
+            return true; // Success
+        }
+
+        /**
+         * Starts the review mode after a test is complete.
+         */
+        function startReviewMode() {
+            currentTest.isReviewMode = true;
+            currentTest.currentQ = 0;
+            stopTimer();
+            timerEl.textContent = "Review Mode";
+            progressBarEl.style.width = "100%";
+            progressBarEl.classList.add('bg-green-600');
+            pauseBtn.classList.add('hidden');
+            reviewDashboardBtn.classList.remove('hidden');
+            finishBtnHeader.classList.add('hidden');
+            awayClicksCounterContainerEl.classList.add('hidden');
+
+            flagBtn.disabled = true;
+            flagBtn.classList.add('opacity-50');
+
+            goToQuestion(0);
+            showScreen('test');
+        }
+
+        /**
+         * Navigates to a specific question.
+         */
+        function goToQuestion(index) {
+            if (index < 0 || index >= currentTest.flatQuestions.length) return;
+            currentTest.currentQ = index;
+            renderQuestion();
+            updateNavButtons();
+            updateProgressBar();
+        }
+
+        /**
+         * Moves to the next or previous question.
+         */
+        function navigateQuestion(direction) {
+            const newQ = currentTest.currentQ + direction;
+            goToQuestion(newQ);
+        }
+
+        /**
+         * Renders the current question, passage, and options.
+         */
+        function renderQuestion() {
+            const q = currentTest.flatQuestions[currentTest.currentQ];
+            if (!q) return;
+
+            // --- Update Passage ---
+            // Only update passage if it's a new one
+            const currentPassage = passageContainerEl.dataset.passageIndex;
+            if (currentPassage !== q.passageIndex.toString()) {
+                passageContainerEl.innerHTML = `<div class="prose prose-lg max-w-none">${formatText(q.passage)}</div>`;
+                passageContainerEl.dataset.passageIndex = q.passageIndex;
+                passageContainerEl.scrollTop = 0; // Scroll to top of new passage
+            }
+
+            // --- Update Question ---
+            questionNumberEl.textContent = `Question ${currentTest.currentQ + 1}`;
+            questionTextEl.innerHTML = formatText(q.question);
+
+            // --- Update Options ---
+            const strikes = currentTest.strikethroughs[currentTest.currentQ];
+            let optionsHtml = '';
+            q.options.forEach((option, index) => {
+                const isChecked = currentTest.userAnswers[currentTest.currentQ] === index;
+                const isStruck = strikes.has(index);
+                const id = `q${currentTest.currentQ}-opt${index}`;
+
+                let reviewLabel = '';
+                if (currentTest.isReviewMode) {
+                    const isCorrect = q.answer === index;
+                    const isUserChoice = currentTest.userAnswers[currentTest.currentQ] === index;
+                    const isUnanswered = currentTest.userAnswers[currentTest.currentQ] === null;
+
+                    if (isCorrect) {
+                        reviewLabel = `<span class="review-label review-correct">✔ Correct Answer</span>`;
+                        if (isUnanswered) {
+                            reviewLabel = `<span class="review-label review-unanswered">• Unanswered</span>`;
+                        }
+                    } else if (isUserChoice) {
+                        reviewLabel = `<span class="review-label review-incorrect">✖ Your Answer</span>`;
+                    }
+                }
+
+                optionsHtml += `
+          <label for="${id}" class="option-label flex items-start p-4 bg-white border border-gray-300 rounded-md cursor-pointer hover:border-blue-500 has-[:checked]:bg-blue-50 has-[:checked]:border-blue-600 ${isStruck ? 'bg-gray-100' : ''}">
+            <input type="radio" name="option" id="${id}" value="${index}" class="custom-radio mt-1" ${isChecked ? 'checked' : ''} ${currentTest.isReviewMode ? 'disabled' : ''}>
+            <div class="flex-1">
+              <span class="text-lg ${isStruck ? 'strikethrough' : 'text-gray-800'}">${formatText(option)}</span>
+              ${reviewLabel}
+            </div>
+            ${!currentTest.isReviewMode ? `
+              <button class="strike-btn text-gray-400 hover:text-red-600 ml-4 p-1" data-option-index="${index}" title="Strikethrough">
+                [S]
+              </button>
+            ` : ''}
+          </label>
+        `;
+            });
+            optionsContainerEl.innerHTML = optionsHtml;
+
+            // --- Update Flag Button ---
+            if (currentTest.isFlagged[currentTest.currentQ]) {
+                flagBtn.classList.add('bg-yellow-300', 'border-yellow-500');
+                flagBtn.querySelector('span').textContent = 'Flagged';
+                flagBtn.querySelector('i').classList.replace('ph-flag', 'ph-flag-fill');
+            } else {
+                flagBtn.classList.remove('bg-yellow-300', 'border-yellow-500');
+                flagBtn.querySelector('span').textContent = 'Flag for Review';
+                flagBtn.querySelector('i').classList.replace('ph-flag-fill', 'ph-flag');
+            }
+
+            // --- Update Question Counter ---
+            questionCounterEl.textContent = `${currentTest.currentQ + 1} / ${currentTest.flatQuestions.length}`;
+        }
+
+        /**
+         * Renders the navigation modal grid.
+         */
+        function renderNavModal() {
+            const legendTest = document.getElementById('nav-legend-test');
+            const legendReview = document.getElementById('nav-legend-review');
+
+            if (currentTest.isReviewMode) {
+                legendTest.classList.add('hidden');
+                legendReview.classList.remove('hidden');
+            } else {
+                legendTest.classList.remove('hidden');
+                legendReview.classList.add('hidden');
+            }
+
+            let gridHtml = '';
+            for (let i = 0; i < currentTest.flatQuestions.length; i++) {
+                let content;
+                if (currentTest.isReviewMode) {
+                    const q = currentTest.flatQuestions[i];
+                    const userAnswer = currentTest.userAnswers[i];
+                    const wasFlagged = currentTest.wasEverFlagged[i];
+                    let icon = '';
+
+                    if (userAnswer === null) {
+                        icon = '<i class="ph-fill ph-minus-circle text-yellow-600 text-2xl"></i>';
+                    } else if (userAnswer === q.answer) {
+                        icon = '<i class="ph-fill ph-check-circle text-green-600 text-2xl"></i>';
+                    } else {
+                        icon = '<i class="ph-fill ph-x-circle text-red-600 text-2xl"></i>';
+                    }
+                    content = `<div class="relative">${icon}${wasFlagged ? '<i class="ph-fill ph-flag text-blue-600 text-xs absolute -top-1 -right-1"></i>' : ''}</div>`;
+                } else {
+                    let stateClass = 'bg-gray-300'; // Unanswered
+                    if (currentTest.userAnswers[i] !== null) stateClass = 'bg-green-500'; // Answered
+                    if (currentTest.isFlagged[i]) stateClass = 'bg-yellow-300'; // Flagged
+                    if (currentTest.currentQ === i) stateClass = 'bg-blue-600 text-white'; // Current
+                    content = `<div class="h-10 w-10 flex items-center justify-center font-medium rounded-full ${stateClass} hover:opacity-80">${i + 1}</div>`;
+                }
+
+                gridHtml += `
+          <button data-nav-index="${i}" class="flex items-center justify-center">
+            ${content}
+          </button>
+        `;
+            }
+            navGridEl.innerHTML = gridHtml;
+        }
+        /**
+         * Updates the enabled/disabled state of nav buttons.
+         */
+        function updateNavButtons() {
+            prevBtn.disabled = currentTest.currentQ === 0;
+            if (currentTest.currentQ === currentTest.flatQuestions.length - 1) {
+                nextBtn.innerHTML = 'Finish <i class="ph ph-check-circle text-lg ml-1"></i>';
+                nextBtn.classList.replace('bg-blue-600', 'bg-green-600');
+                nextBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            } else {
+                nextBtn.innerHTML = 'Next <i class="ph ph-arrow-right text-lg ml-1"></i>';
+                nextBtn.classList.replace('bg-green-600', 'bg-blue-600');
+                nextBtn.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+                nextBtn.disabled = false;
+            }
+
+            // Finish button in review mode
+            if (currentTest.isReviewMode && currentTest.currentQ === currentTest.flatQuestions.length - 1) {
+                nextBtn.innerHTML = 'Back to Results <i class="ph ph-chart-bar text-lg ml-1"></i>';
+                nextBtn.onclick = () => showScreen('results');
+            } else if (currentTest.isReviewMode) {
+                nextBtn.onclick = null; // Use default delegated listener
+            } else {
+                // Handle finish button in test mode
+                if (currentTest.currentQ === currentTest.flatQuestions.length - 1) {
+                    nextBtn.onclick = finishTest; // Assign special click handler
+                } else {
+                    nextBtn.onclick = null; // Clear handler, will use delegated listener
+                }
+            }
+        }
+
+        /**
+         * Updates the top progress bar.
+         */
+        function updateProgressBar() {
+            const answeredCount = currentTest.userAnswers.filter(a => a !== null).length;
+            const percent = (currentTest.flatQuestions.length > 0) ? (answeredCount / currentTest.flatQuestions.length) * 100 : 0;
+            progressBarEl.style.width = `${percent}%`;
+        }
+
+        /**
+         * Toggles the "flag" state for the current question.
+         */
+        function toggleFlag() {
+            if (currentTest.isReviewMode) return;
+            currentTest.isFlagged[currentTest.currentQ] = !currentTest.isFlagged[currentTest.currentQ];
+            if (currentTest.isFlagged[currentTest.currentQ]) currentTest.wasEverFlagged[currentTest.currentQ] = true;
+            renderQuestion();
+        }
+
+        /**
+         * Toggles the strikethrough state for a given option.
+         */
+        function toggleStrikethrough(optionIndex) {
+            const strikes = currentTest.strikethroughs[currentTest.currentQ];
+            if (strikes.has(optionIndex)) {
+                strikes.delete(optionIndex);
+            } else {
+                strikes.add(optionIndex);
+            }
+            renderQuestion(); // Re-render to show strike
+        }
+
+        /**
+         * Pauses or resumes the test.
+         */
+        function togglePause() {
+            if (currentTest.isReviewMode) return;
+
+            currentTest.isPaused = !currentTest.isPaused;
+            if (currentTest.isPaused) {
+                stopTimer();
+                pauseBtnText.textContent = 'Resume';
+                pauseBtn.classList.replace('bg-yellow-500', 'bg-green-500');
+                pauseBtn.classList.replace('hover:bg-yellow-600', 'hover:bg-green-600');
+                pauseBtn.querySelector('i').classList.replace('ph-pause', 'ph-play');
+                showModal('pause');
+            } else {
+                startTimer();
+                pauseBtnText.textContent = 'Pause';
+                pauseBtn.classList.replace('bg-green-500', 'bg-yellow-500');
+                pauseBtn.classList.replace('hover:bg-green-600', 'hover:bg-yellow-600');
+                pauseBtn.querySelector('i').classList.replace('ph-play', 'ph-pause');
+                hideModal('pause');
+            }
+        }
+
+        /**
+         * Starts the countdown timer.
+         */
+        function startTimer() {
+            if (currentTest.timerInterval) clearInterval(currentTest.timerInterval);
+            currentTest.timerInterval = setInterval(() => {
+                if (currentTest.isPaused) return;
+
+                currentTest.timeLeft--;
+                timerEl.textContent = formatTime(currentTest.timeLeft);
+
+                if (currentTest.timeLeft <= 0) {
+                    finishTest();
+                }
+            }, 1000);
+        }
+
+        /**
+         * Stops the countdown timer.
+         */
+        function stopTimer() {
+            clearInterval(currentTest.timerInterval);
+            currentTest.timerInterval = null;
+        }
+
+        /**
+         * Finishes the test, calculates score, and shows results.
+         */
+        function finishTest() {
+            stopTimer();
+            let score = 0;
+            currentTest.flatQuestions.forEach((q, index) => {
+                if (q.answer === currentTest.userAnswers[index]) {
+                    score++;
+                }
+            });
+
+            const total = currentTest.flatQuestions.length;
+            const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+
+            // Save the attempt
+            const attempt = {
+                score: score,
+                total: total,
+                percentage: percentage,
+                awayClicks: currentTest.awayClicks,
+                timestamp: new Date().toISOString()
+            };
+
+            // Ensure metadata for this test exists before trying to push
+            if (!testMetadata[currentTest.testId]) {
+                testMetadata[currentTest.testId] = {
+                    customName: currentTest.testId.replace('.json', ''),
+                    isStarred: false,
+                    attempts: []
+                };
+            }
+            if (!testMetadata[currentTest.testId].attempts) {
+                testMetadata[currentTest.testId].attempts = [];
+            }
+
+            testMetadata[currentTest.testId].attempts.push(attempt);
+            saveMetadata();
+
+            // Display results
+            resultsScoreEl.textContent = `${score} / ${total}`;
+            resultsPercentageEl.textContent = `${percentage}%`;
+            resultsAwayClicksEl.textContent = currentTest.awayClicks;
+
+            // Update dashboard
+            renderDashboard();
+            showScreen('results');
+
+            // Reset test-specific UI
+            progressBarEl.style.width = "0%";
+            progressBarEl.classList.remove('bg-green-600');
+            pauseBtn.classList.remove('hidden');
+            finishBtnHeader.classList.remove('hidden');
+            reviewDashboardBtn.classList.add('hidden');
+            flagBtn.disabled = false;
+            flagBtn.classList.remove('opacity-50');
+            nextBtn.onclick = null; // clear special finish handler
+        }
+
+        /**
+         * Handles browser window losing focus.
+         */
+        function handleVisibilityChange() {
+            if (document.visibilityState === 'hidden' && !currentTest.isPaused && currentTest.timerInterval) {
+                currentTest.awayClicks++;
+                awayClicksCounterEl.textContent = currentTest.awayClicks;
+            }
+        }
+
+        // === DASHBOARD & METADATA ===
+
+        /**
+         * Loads metadata from localStorage.
+         */
+        function loadMetadata() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                testMetadata = JSON.parse(stored);
+            }
+        }
+
+        /**
+         * Saves metadata to localStorage.
+         */
+        function saveMetadata() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(testMetadata));
+        }
+
+        /**
+         * Renders the dashboard with test cards.
+         */
+        function renderDashboard(filter = '') {
+            const testListEl = document.getElementById('test-list');
+            if (!testListEl) return;
+
+            const lowerCaseFilter = filter.trim().toLowerCase();
+
+            // Filter tests based on the search query before sorting
+            const filteredTestIds = Object.keys(testMetadata).filter(id => {
+                if (lowerCaseFilter === '') return true;
+                return testMetadata[id].customName.toLowerCase().includes(lowerCaseFilter);
+            });
+
+            // Sort tests: starred first, then by name
+            const sortedTestIds = filteredTestIds.sort((a, b) => {
+                const aMeta = testMetadata[a];
+                const bMeta = testMetadata[b];
+                if (aMeta.isStarred && !bMeta.isStarred) return -1;
+                if (!aMeta.isStarred && bMeta.isStarred) return 1;
+                return aMeta.customName.localeCompare(bMeta.customName);
+            });
+
+            let dashboardHtml = '';
+            if (sortedTestIds.length === 0 && lowerCaseFilter === '') {
+                dashboardHtml = `<p class="text-gray-500 col-span-full text-center">No tests loaded. Click "Load from Folder" or "Add More Files" to begin.</p>`;
+            } else if (sortedTestIds.length === 0 && lowerCaseFilter !== '') {
+                dashboardHtml = `<p class="text-gray-500 col-span-full text-center">No tests match your search for "${filter}".</p>`;
+            }
+
+            for (const testId of sortedTestIds) {
+                const meta = testMetadata[testId];
+                const attempts = meta.attempts || [];
+                const lastAttempt = attempts.length > 0 ? attempts[attempts.length - 1] : null;
+
+                let avgScore = 0;
+                if (attempts.length > 0) {
+                    const totalPercentage = attempts.reduce((sum, att) => sum + att.percentage, 0);
+                    avgScore = Math.round(totalPercentage / attempts.length);
+                }
+
+                dashboardHtml += `
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col" data-testid="${testId}">
+                        <div class="p-5 flex-1">
+                            <div class="flex justify-between items-start">
+                                <h2 class="text-xl font-bold text-gray-800 mb-2">${meta.customName}</h2>
+                                <button class="text-gray-400 hover:text-yellow-400 p-1 ${meta.isStarred ? 'text-yellow-400' : ''}" data-action="star" title="Star Test">
+                                <i class="ph ph-star ${meta.isStarred ? 'ph-fill' : ''} text-2xl"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-4">${testId}</p>
+                            
+                            <div class="grid grid-cols-3 gap-4 text-center mb-4">
+                                <div>
+                                <div class="text-xs font-semibold text-gray-500 uppercase">Attempts</div>
+                                <div class="text-2xl font-bold text-gray-800">${attempts.length}</div>
+                                </div>
+                                <div>
+                                <div class="text-xs font-semibold text-gray-500 uppercase">Avg. Score</div>
+                                <div class="text-2xl font-bold text-blue-700">${attempts.length > 0 ? `${avgScore}%` : 'N/A'}</div>
+                                </div>
+                                <div>
+                                <div class="text-xs font-semibold text-gray-500 uppercase">Last Score</div>
+                                <div class="text-2xl font-bold text-gray-800">${lastAttempt ? `${lastAttempt.percentage}%` : 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 flex justify-between items-center border-t border-gray-200">
+                            <button class="text-sm text-gray-600 hover:text-blue-600 font-medium flex items-center" data-action="rename" title="Rename Test">
+                                <i class="ph ph-pencil-simple text-lg mr-1"></i> Rename
+                            </button>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md" data-action="start">
+                                Start Test
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            testListEl.innerHTML = dashboardHtml;
+        }
+
+
+        // === UTILITY FUNCTIONS ===
+
+        /**
+         * Shows a screen and hides all others.
+         */
+        function showScreen(screenId) {
+            Object.values(screens).forEach(screen => {
+                if (screen.id === `${screenId}-screen`) {
+                    screen.classList.remove('hidden');
+                } else {
+                    screen.classList.add('hidden');
+                }
+            });
+        }
+
+        /**
+         * Shows a modal.
+         */
+        function showModal(modalId) {
+            if (modals[modalId]) {
+                modals[modalId].classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Hides a modal.
+         */
+        function hideModal(modalId) {
+            if (modals[modalId]) {
+                modals[modalId].classList.add('hidden');
+            }
+        }
+
+        /**
+         * Formats remaining seconds into HH:MM:SS.
+         */
+        function formatTime(totalSeconds) {
+            if (totalSeconds < 0) totalSeconds = 0;
+            const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const s = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        /**
+    * Formats text, converting *bold* to <strong> and newlines to <br>.
+    */
+        function formatText(text) {
+            if (!text) return '';
+            return text
+                .replace(/\*(.*?)\*/g, '<strong>$1</strong>') // Bold
+                .replace(/\n/g, '<br>'); // Newlines
+        }
+
+        // === STARTUP ===
+        // Wrap the startup in an async function to correctly handle the await inside init()
+        (async () => {
+            await init();
+        })();
+
+    </script>
+
+</body>
+
+</html>
