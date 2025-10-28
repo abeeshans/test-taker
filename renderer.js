@@ -1,3 +1,109 @@
+// Global floating card menu (appended to document.body) to avoid stacking/context clipping
+let _globalCardMenuEl = null;
+let _globalCardMenuDismissHandler = null;
+
+function hideGlobalCardMenu() {
+  try {
+    if (_globalCardMenuEl && _globalCardMenuEl.parentNode) _globalCardMenuEl.parentNode.removeChild(_globalCardMenuEl);
+  } catch (e) {}
+  _globalCardMenuEl = null;
+  if (_globalCardMenuDismissHandler) {
+    document.removeEventListener("pointerdown", _globalCardMenuDismissHandler, true);
+    window.removeEventListener("resize", _globalCardMenuDismissHandler, true);
+    _globalCardMenuDismissHandler = null;
+  }
+}
+
+function showGlobalCardMenu(menuButton) {
+  try {
+    hideGlobalCardMenu();
+    const card = menuButton.closest("[data-testid],[data-folder-id]");
+    const testId = card ? card.dataset.testid || null : null;
+    const folderId = card ? card.dataset.folderId || null : null;
+
+    // Build menu items (mirror the existing per-card menu)
+    const items = [
+      { action: "rename", label: "Rename", icon: "ph ph-pencil" },
+      { action: "reset", label: "Reset", icon: "ph ph-arrow-counter-clockwise" },
+      { action: "delete", label: "Delete", icon: "ph ph-trash", danger: true },
+    ];
+
+    const menu = document.createElement("div");
+    menu.className = "card-menu-dropdown global absolute bg-white border rounded shadow";
+    menu.setAttribute("role", "menu");
+    menu.style.minWidth = "140px";
+    menu.style.maxWidth = "200px"; // cap width tighter so it stays compact
+    menu.style.boxSizing = "border-box";
+    menu.style.padding = "4px 0";
+    menu.style.fontSize = "14px";
+    menu.style.zIndex = "999999";
+
+    items.forEach((it) => {
+      const a = document.createElement("button");
+      a.type = "button";
+      a.className = "card-menu-item";
+      a.style.display = "flex";
+      a.style.alignItems = "center";
+      a.style.gap = "8px";
+      a.style.width = "100%"; // ensure each item fits the menu width
+      a.style.justifyContent = "flex-start";
+      a.style.padding = "8px 10px"; // comfortable touch/click area
+      a.style.textAlign = "left";
+      if (it.danger) a.style.color = "#b91c1c";
+      // icon
+      const icon = document.createElement("i");
+      icon.className = it.icon;
+      icon.setAttribute("aria-hidden", "true");
+      a.appendChild(icon);
+      const span = document.createElement("span");
+      span.textContent = it.label;
+      // ensure long labels truncate instead of forcing the menu wider
+      span.style.flex = "1";
+      span.style.overflow = "hidden";
+      span.style.textOverflow = "ellipsis";
+      span.style.whiteSpace = "nowrap";
+      span.style.textAlign = "left";
+      a.appendChild(span);
+      a.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        hideGlobalCardMenu();
+        // Resolve target id to pass to handler
+        const targetId = testId || folderId || null;
+        handleDashboardAction(it.action, targetId);
+      });
+      menu.appendChild(a);
+    });
+
+    document.body.appendChild(menu);
+    _globalCardMenuEl = menu;
+
+    // Position the menu: prefer right-aligned to the button
+    const rect = menuButton.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    // compute left so menu's right aligns with button's right
+    let left = rect.right - menuRect.width;
+    if (left + menuRect.width > window.innerWidth - 8) left = window.innerWidth - menuRect.width - 8;
+    if (left < 8) left = 8;
+    // top below the button with small margin
+    let top = rect.bottom + 8;
+    if (top + menuRect.height > window.innerHeight - 8) top = rect.top - menuRect.height - 8;
+    if (top < 8) top = 8;
+    menu.style.left = Math.round(left) + "px";
+    menu.style.top = Math.round(top) + "px";
+
+    // Dismiss when clicking outside or resizing/scrolling
+    _globalCardMenuDismissHandler = function (ev) {
+      // If click is inside the menu or the button, keep it
+      if (!menu.contains(ev.target) && !menuButton.contains(ev.target)) hideGlobalCardMenu();
+    };
+    document.addEventListener("pointerdown", _globalCardMenuDismissHandler, true);
+    window.addEventListener("resize", _globalCardMenuDismissHandler, true);
+  } catch (e) {
+    console.warn("showGlobalCardMenu failed:", e);
+    hideGlobalCardMenu();
+  }
+}
+
 /* stylelint-disable */
 /* eslint-disable */
 // === STATE MANAGEMENT ===
@@ -83,6 +189,7 @@ const modals = {
   time: document.getElementById("time-modal"),
   alert: document.getElementById("alert-modal"),
   dashboardHelp: document.getElementById("dashboard-help-modal"),
+  testStats: document.getElementById("test-stats-modal"),
   createFolder: document.getElementById("create-folder-modal"),
   rename: document.getElementById("rename-modal"),
   reset: document.getElementById("reset-modal"),
@@ -502,10 +609,8 @@ function populateDashboardHelp() {
     const errorCount = (lastLoadInfo.errorFiles || []).length;
 
     // Small animated SVG for the header (subtle pulse) to add polish without external deps
-    // Placeholder container for Lottie animation. We'll attempt to load a Lottie JSON
-    // from common asset paths ('assets/load_summary.json' or 'json/load_summary.json').
-    // If Lottie or the asset is not available, we'll fall back to an inline SVG.
-    const lottieContainer = `<div id="load-summary-lottie" style="width:28px;height:28px;margin-right:8px;display:inline-block;vertical-align:middle"></div>`;
+    // Lottie animation removed — keep header compact without external animation.
+    const lottieContainer = ``;
 
     // Render header in a single line: include lottie container to the left of the title
     let html = `
@@ -541,91 +646,490 @@ function populateDashboardHelp() {
     const minimized = localStorage.getItem("loadSummaryMinimized") === "1";
     if (minimized) container.classList.add("minimized");
     attachLoadSummaryToggle();
-    // Try to load a Lottie animation into the placeholder, if available.
-    try {
-      attemptLoadLottie();
-    } catch (e) {
-      /* ignore */
-    }
+    // (Lottie animation removed) no additional async assets loaded here.
   } catch (err) {
     console.warn("populateDashboardHelp failed:", err);
   }
 }
 
 /**
- * Attempt to load lottie-web and a local JSON animation into #load-summary-lottie.
- * Tries common asset paths and falls back silently if not available.
+ * Populate the Test Statistics modal with a list of known tests and their stats.
  */
-async function attemptLoadLottie() {
-  const container = document.getElementById("load-summary-lottie");
-  if (!container) return;
-
-  // If lottie global exists, use it; otherwise try to inject the CDN script.
-  async function ensureLottie() {
-    if (window.lottie && typeof window.lottie.loadAnimation === "function") return window.lottie;
-    return new Promise((resolve, reject) => {
-      const s = document.createElement("script");
-      s.src = "https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js";
-      s.onload = () => resolve(window.lottie);
-      s.onerror = () => reject(new Error("Failed to load lottie-web"));
-      document.head.appendChild(s);
-    });
-  }
-
-  // Try a list of possible asset locations. The user can add the JSON to one of these.
-  const candidates = ["assets/load_summary.json", "json/load_summary.json", "assets/load-summary.json"];
-
-  let lottie;
+function populateTestStats() {
   try {
-    lottie = await ensureLottie();
-  } catch (e) {
-    // Can't load lottie; bail out and optionally show a fallback SVG
-    renderFallbackLoadIcon(container);
-    return;
-  }
+    const container = document.getElementById("test-stats-list");
+    const calendarContainer = document.getElementById("test-stats-calendar");
+    if (!container) return;
+    // Read search & sort controls
+    const searchInput = document.getElementById("test-stats-search");
+    const sortSelect = document.getElementById("test-stats-sort");
+    const search = searchInput
+      ? String(searchInput.value || "")
+          .trim()
+          .toLowerCase()
+      : "";
+    const sortKey = sortSelect ? sortSelect.value : "name";
 
-  // Find the first candidate that exists (200 OK)
-  let chosen = null;
-  for (const path of candidates) {
+    const tests = Object.keys(testMetadata || {});
+
+    // Build an array of stats objects to support sorting and filtering
+    const rows = tests.map((tid) => {
+      const meta = testMetadata[tid] || {};
+      const attempts = Array.isArray(meta.attempts) ? meta.attempts : [];
+      const attemptsCount = attempts.length;
+      const avgPercent = attemptsCount > 0 ? attempts.reduce((s, a) => s + (a.percentage || 0), 0) / attemptsCount : null;
+      const bestPercent = attemptsCount > 0 ? attempts.reduce((m, a) => Math.max(m, a.percentage || 0), 0) : null;
+      const avgAway = attemptsCount > 0 ? Math.round((attempts.reduce((s, a) => s + (a.awayClicks || 0), 0) / attemptsCount) * 10) / 10 : null;
+      // Support optional duration fields if present in attempts
+      const avgTime = attemptsCount > 0 ? attempts.reduce((s, a) => s + (a.duration || a.timeTaken || 0), 0) / attemptsCount : null;
+      // Determine last attempt timestamp (metadata-level field preferred)
+      const lastAttemptTs = meta.lastAttemptDate || (attemptsCount > 0 ? attempts[attemptsCount - 1].timestamp : null) || null;
+      return {
+        id: tid,
+        name: meta.customName || tid.replace(/\.json$/, ""),
+        attemptsCount,
+        avgPercent,
+        bestPercent,
+        avgAway,
+        avgTime,
+        lastAttemptTs,
+      };
+    });
+
+    // Filter by search
+    const filtered = rows.filter((r) => {
+      if (!search) return true;
+      return r.name.toLowerCase().includes(search) || r.id.toLowerCase().includes(search);
+    });
+
+    // Sort
+    filtered.sort((a, b) => {
+      switch (sortKey) {
+        case "attempts":
+          return (b.attemptsCount || 0) - (a.attemptsCount || 0);
+        case "avgPercent":
+          return (b.avgPercent || 0) - (a.avgPercent || 0);
+        case "bestPercent":
+          return (b.bestPercent || 0) - (a.bestPercent || 0);
+        case "avgAway":
+          return (b.avgAway || 0) - (a.avgAway || 0);
+        case "avgTime":
+          return (b.avgTime || 0) - (a.avgTime || 0);
+        case "name":
+        default:
+          return a.name.localeCompare(b.name);
+      }
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = `<div class="p-4 text-sm text-gray-600">No tests found. Add some <strong>.json</strong> test files to see statistics.</div>`;
+      // Wire simple handlers so live search updates work
+      if (searchInput) searchInput.oninput = populateTestStats;
+      if (sortSelect) sortSelect.onchange = populateTestStats;
+      return;
+    }
+
+    let html = `<div class="p-1">`;
+    html += `<table class="w-full text-left border-collapse"><thead><tr>`;
+    html += `<th>Test</th>`;
+    html += `<th class="stats-value">Last</th>`;
+    html += `<th class="stats-value">Attempts</th>`;
+    html += `<th class="stats-value">Avg %</th>`;
+    html += `<th class="stats-value">Best %</th>`;
+    html += `<th class="stats-value">Avg Time</th>`;
+    html += `</tr></thead><tbody>`;
+
+    // Render each test row with an optional per-set selector and a detail area
+    filtered.forEach((r) => {
+      const name = escapeHtml(r.name);
+      const idEsc = escapeHtml(r.id);
+      const attemptsCount = r.attemptsCount || 0;
+      const avgPct = r.avgPercent == null ? "-" : Math.round(r.avgPercent * 10) / 10 + " %";
+      const bestPct = r.bestPercent == null ? "-" : r.bestPercent + " %";
+      const avgTime = r.avgTime == null || r.avgTime === 0 ? "-" : formatTime(Math.round(r.avgTime));
+      const lastAttempt = r.lastAttemptTs ? new Date(r.lastAttemptTs).toLocaleDateString() : "-";
+
+      // Detect sets for this test so we can render a selector
+      const rawContent = inMemoryTestContent[r.id];
+      let setsCount = 0;
+      let setTitles = [];
+      try {
+        if (Array.isArray(rawContent)) {
+          const isArrayOfArrays = rawContent.length > 0 && rawContent.every((it) => Array.isArray(it));
+          const isArrayOfSetObjects = rawContent.length > 0 && rawContent.every((it) => it && Array.isArray(it.questions));
+          if (isArrayOfArrays || isArrayOfSetObjects) {
+            setsCount = rawContent.length;
+            setTitles = rawContent.map((s, idx) => (s && s.title ? s.title : String.fromCharCode(65 + idx)));
+          }
+        } else if (rawContent && Array.isArray(rawContent.sets)) {
+          setsCount = rawContent.sets.length;
+          setTitles = rawContent.sets.map((s, idx) => (s && s.title ? s.title : String.fromCharCode(65 + idx)));
+        }
+      } catch (e) {
+        setsCount = 0;
+        setTitles = [];
+      }
+
+      const safeId = (r.id || "").replace(/[^a-z0-9-_:.]/gi, "_");
+
+      // Build a collapsible row: main summary row + hidden per-set details row
+      const toggleId = `test-stats-toggle-${safeId}`;
+      const setsRowId = `test-stats-sets-${safeId}`;
+      // Summary cell shows a caret to toggle sets (we always reserve space for alignment)
+      // Use an inline SVG caret for crisper visuals and allow CSS animation on the SVG
+      const caretSvg = `<svg class="test-stats-caret" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l8 7-8 7V5z" fill="currentColor"/></svg>`;
+      const caretHtml = `<button id="${toggleId}" class="test-stats-toggle" aria-expanded="false" ${setsCount > 1 ? "" : "disabled"}>${caretSvg}</button>`;
+      html += `<tr class="test-stats-main-row"><td class="py-3"><div style="display:flex;align-items:center;gap:8px;">${caretHtml}<div><div class="font-medium text-gray-800">${name}</div><div class="text-xs text-gray-500">${idEsc}</div></div></div></td>`;
+      html += `<td class="py-3 stats-value">${lastAttempt}</td>`;
+      html += `<td class="py-3 stats-value">${attemptsCount}</td>`;
+      html += `<td class="py-3 stats-value">${avgPct}</td>`;
+      html += `<td class="py-3 stats-value">${bestPct}</td>`;
+      html += `<td class="py-3 stats-value">${avgTime}</td>`;
+      html += `</tr>`;
+      // Insert one table row per set (hidden by default). Each set row mirrors the main columns
+      if (setsCount > 0) {
+        // compute per-set stats from existing attempts
+        const metaForSets = testMetadata[r.id] || {};
+        const allAttemptsForTest = Array.isArray(metaForSets.attempts) ? metaForSets.attempts : [];
+        for (let i = 0; i < setsCount; i++) {
+          const setLabel = escapeHtml(setTitles[i] || `Set ${i + 1}`);
+          const setRowId = `test-stats-set-${safeId}-${i}`;
+          const attemptsForSet = allAttemptsForTest.filter((a) => typeof a.setIndex !== "undefined" && a.setIndex === i);
+          const countSet = attemptsForSet.length;
+          const avgSet = countSet > 0 ? Math.round((attemptsForSet.reduce((s, a) => s + (a.percentage || 0), 0) / countSet) * 10) / 10 : null;
+          const bestSet =
+            countSet > 0
+              ? Math.max(...attemptsForSet.map((a) => (typeof a.percentage === "number" ? a.percentage : -Infinity)).filter((n) => isFinite(n)))
+              : null;
+          const avgTimeSet = countSet > 0 ? Math.round(attemptsForSet.reduce((s, a) => s + (a.duration || a.timeTaken || 0), 0) / countSet) : null;
+          const lastTs =
+            countSet > 0
+              ? attemptsForSet.reduce((m, a) => (a.timestamp && a.timestamp > m ? a.timestamp : m), attemptsForSet[0] ? attemptsForSet[0].timestamp : null)
+              : null;
+          const lastAttemptSet = lastTs ? new Date(lastTs).toLocaleDateString() : "-";
+          const avgSetText = avgSet == null ? "-" : avgSet + "%";
+          const bestSetText = bestSet == null ? "-" : bestSet + "%";
+          const avgTimeSetText = avgTimeSet == null || avgTimeSet === 0 ? "-" : formatTime(avgTimeSet);
+          html += `<tr id="${setRowId}" class="test-stats-set-row hidden" data-parent="${safeId}">`;
+          // Indent set titles so they appear tabbed under the main test title. Remove bracket prefix per request.
+          // Use a larger indent (72px) so sets are visibly tabbed under the main row which reserves 48px for caret.
+          html += `<td class="py-2" style="padding-left:72px"><div class="text-sm text-gray-700">${setLabel}</div></td>`;
+          html += `<td class="py-2 stats-value">${lastAttemptSet}</td>`;
+          html += `<td class="py-2 stats-value">${countSet}</td>`;
+          html += `<td class="py-2 stats-value">${escapeHtml(avgSetText)}</td>`;
+          html += `<td class="py-2 stats-value">${escapeHtml(bestSetText)}</td>`;
+          html += `<td class="py-2 stats-value">${escapeHtml(avgTimeSetText)}</td>`;
+          html += `</tr>`;
+        }
+      }
+    });
+
+    html += `</tbody></table></div>`;
+    container.innerHTML = html;
+
+    // Wire live search/sort handlers (overwrite previous) so controls update the table
+    if (searchInput) searchInput.oninput = populateTestStats;
+    if (sortSelect) sortSelect.onchange = populateTestStats;
+
+    // Attach handlers to toggle per-test set rows
     try {
-      const resp = await fetch(path, { method: "HEAD" });
-      if (resp && resp.ok) {
-        chosen = path;
-        break;
+      filtered.forEach((r) => {
+        const safeId = (r.id || "").replace(/[^a-z0-9-_:.]/gi, "_");
+        const toggleBtn = document.getElementById(`test-stats-toggle-${safeId}`);
+        const setRows = Array.from(document.querySelectorAll(`#test-stats-list tr.test-stats-set-row[data-parent="${safeId}"]`));
+
+        if (toggleBtn) {
+          toggleBtn.addEventListener("click", () => {
+            // Determine current state and flip. Keep the inline SVG intact
+            // (do not replace button text/content) to avoid layout shifts
+            // which caused misalignment of the title column.
+            const currentlyExpanded = toggleBtn.getAttribute("aria-expanded") === "true";
+            const newState = !currentlyExpanded;
+            setRows.forEach((row) => {
+              row.classList.toggle("hidden", !newState);
+            });
+            toggleBtn.setAttribute("aria-expanded", String(newState));
+            // Toggle a class used by CSS to rotate/scale the SVG caret
+            toggleBtn.classList.toggle("expanded", newState);
+          });
+        }
+      });
+    } catch (e) {
+      /* ignore per-test wiring errors */
+    }
+
+    // Also render the calendar view data if calendar container exists
+    try {
+      if (calendarContainer) {
+        // Show/hide year controls depending on active tab (List vs Calendar).
+        const yearControlsEl = document.getElementById("test-stats-year-controls");
+        const calElForTab = document.getElementById("test-stats-calendar");
+        if (yearControlsEl) {
+          if (!calElForTab || calElForTab.classList.contains("hidden")) yearControlsEl.classList.add("hidden");
+          else yearControlsEl.classList.remove("hidden");
+        }
+        // Build a map of date (YYYY-MM-DD) -> array of entries { testId, name, percentage }
+        const dateMap = {};
+        Object.keys(testMetadata || {}).forEach((tid) => {
+          const meta = testMetadata[tid] || {};
+          const attempts = Array.isArray(meta.attempts) ? meta.attempts : [];
+          attempts.forEach((a) => {
+            if (!a || !a.timestamp) return;
+            const d = new Date(a.timestamp);
+            if (isNaN(d.getTime())) return;
+            const key = d.toISOString().slice(0, 10);
+            if (!dateMap[key]) dateMap[key] = [];
+            // Preserve set metadata if present on attempts (newer attempts will have this)
+            const setIndex = typeof a.setIndex !== "undefined" && a.setIndex !== null ? a.setIndex : null;
+            const setLabel = a.setLabel || (setIndex !== null ? String.fromCharCode(65 + Number(setIndex)) : null);
+            dateMap[key].push({
+              testId: tid,
+              name: meta.customName || tid,
+              percentage: a.percentage,
+              time: a.duration || a.timeTaken || null,
+              setIndex,
+              setLabel,
+            });
+          });
+        });
+
+        // Determine selected year via new year label (or fall back to select if present)
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        let selectedYear = currentYear;
+        const yearLabel = document.getElementById("test-stats-year-label");
+        const yearSelect = document.getElementById("test-stats-year-select");
+        if (yearLabel) {
+          const ds = yearLabel.dataset && yearLabel.dataset.year ? parseInt(yearLabel.dataset.year, 10) : NaN;
+          selectedYear = !isNaN(ds) ? ds : currentYear;
+          // ensure the label shows a year
+          yearLabel.textContent = String(selectedYear);
+        } else if (yearSelect) {
+          // Backwards-compat: populate a small range around the current year if empty
+          if (yearSelect.options.length === 0) {
+            for (let y = currentYear + 1; y >= currentYear - 3; y--) {
+              const opt = document.createElement("option");
+              opt.value = String(y);
+              opt.textContent = String(y);
+              if (y === currentYear) opt.selected = true;
+              yearSelect.appendChild(opt);
+            }
+          }
+          selectedYear = parseInt(yearSelect.value, 10) || currentYear;
+          yearSelect.onchange = populateTestStats;
+        }
+
+        // Helper to format a day's tooltip content (HTML)
+        function buildDayTooltipHtml(dateKey, entries) {
+          let html = `<div class="cal-tooltip-date">${new Date(dateKey).toLocaleDateString(undefined, {
+            weekday: "long",
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })}</div>`;
+          if (!entries || entries.length === 0) {
+            html += `<div class="cal-tooltip-empty text-sm text-gray-500">No tests completed</div>`;
+            return html;
+          }
+          html += `<ul class="cal-tooltip-list">`;
+          entries.forEach((e) => {
+            const score = typeof e.percentage === "number" ? `${e.percentage}%` : "-";
+            const setPart = e.setLabel ? ` <span class="cal-tooltip-set">[${escapeHtml(String(e.setLabel))}]</span>` : "";
+            html += `<li class="cal-tooltip-item"><span class="cal-tooltip-name">${escapeHtml(
+              e.name
+            )}${setPart}</span><span class="cal-tooltip-score">${escapeHtml(score)}</span></li>`;
+          });
+          html += `</ul>`;
+          return html;
+        }
+
+        // Build the calendar: 12 months in a responsive grid, each month shows week rows (Sun-Sat)
+        const months = [];
+        for (let m = 0; m < 12; m++) {
+          const firstOfMonth = new Date(selectedYear, m, 1);
+          const daysInMonth = new Date(selectedYear, m + 1, 0).getDate();
+          const monthName = firstOfMonth.toLocaleString(undefined, { month: "short" });
+          // Determine the weekday index (0=Sun..6=Sat) of the first day
+          const startWeekday = firstOfMonth.getDay();
+          // Build a 6x7 grid (6 weeks) to cover any month layout
+          const cells = [];
+          // Fill leading empty cells
+          for (let i = 0; i < startWeekday; i++) cells.push(null);
+          for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(selectedYear, m, d));
+          // Fill trailing empty cells to make length a multiple of 7
+          while (cells.length % 7 !== 0) cells.push(null);
+          months.push({ monthIndex: m, name: monthName, cells });
+        }
+
+        // Render HTML: compact month blocks showing only month title and a dot per day
+        let calHtml = `<div class="stats-calendar-grid grid grid-cols-4 gap-3 p-2">`;
+        months.forEach((month) => {
+          calHtml += `<div class="month-block text-xs">
+        <div class="font-medium mb-1 text-sm">${month.name} ${selectedYear}</div>
+              <div class="calendar-month">
+                <div class="weeks">`;
+          // render rows of 7 but hide numbers/weekday headers — only dots are visible
+          for (let r = 0; r < month.cells.length / 7; r++) {
+            calHtml += `<div class="week-row">`;
+            for (let c = 0; c < 7; c++) {
+              const cell = month.cells[r * 7 + c];
+              if (!cell) {
+                // Empty padding cell: keep structure for alignment but render no dot (blank)
+                calHtml += `<div class="day-cell empty" aria-hidden="true"></div>`;
+                continue;
+              }
+              const key = cell.toISOString().slice(0, 10);
+              const entries = dateMap[key] || [];
+              const hasEntries = entries.length > 0;
+              const dayNumber = cell.getDate();
+              const dataEntries = encodeURIComponent(JSON.stringify(entries));
+              // Keep an informative aria-label even though numbers are visually hidden
+              const ariaLabel = hasEntries
+                ? `${dayNumber} ${month.name} ${selectedYear}, ${entries.length} test(s)`
+                : `${dayNumber} ${month.name} ${selectedYear}`;
+              calHtml += `<div class="day-cell${
+                hasEntries ? " has-entries" : " no-entries"
+              }" tabindex="0" data-date="${key}" data-entries="${dataEntries}" aria-label="${escapeHtml(ariaLabel)}">`;
+              // Render only the dot visually
+              calHtml += `<div class="day-dot${hasEntries ? "" : " day-dot-empty"}" aria-hidden="true"></div>`;
+              calHtml += `</div>`;
+            }
+            calHtml += `</div>`; // end week-row
+          }
+          calHtml += `</div></div></div>`;
+        });
+        calHtml += `</div>`;
+        calendarContainer.innerHTML = calHtml;
+
+        // Create or reuse a tooltip element for calendar day hover/focus
+        let calTooltip = document.getElementById("cal-tooltip");
+        if (!calTooltip) {
+          calTooltip = document.createElement("div");
+          calTooltip.id = "cal-tooltip";
+          calTooltip.className = "cal-tooltip hidden";
+          document.body.appendChild(calTooltip);
+        }
+
+        // Show/hide handlers using delegation
+        let tooltipTimeout = null;
+        function showCalTooltip(target) {
+          if (!target) return;
+          const dateKey = target.dataset.date;
+          // If the day-cell has no data-date (empty padding cell or invalid), do not show tooltip
+          if (!dateKey) return;
+          const entriesRaw = target.dataset.entries || "";
+          let entries = [];
+          try {
+            entries = entriesRaw ? JSON.parse(decodeURIComponent(entriesRaw)) : [];
+          } catch (e) {
+            entries = [];
+          }
+          calTooltip.innerHTML = buildDayTooltipHtml(dateKey, entries);
+          calTooltip.style.opacity = "0";
+          calTooltip.classList.remove("hidden");
+          // position tooltip above the target if space, else below
+          const rect = target.getBoundingClientRect();
+          const ttRect = calTooltip.getBoundingClientRect();
+          const margin = 8;
+          let left = rect.left + rect.width / 2 - ttRect.width / 2;
+          left = Math.max(8, Math.min(left, window.innerWidth - ttRect.width - 8));
+          let top = rect.top - ttRect.height - margin;
+          if (top < 8) top = rect.bottom + margin;
+          calTooltip.style.left = Math.round(left) + "px";
+          calTooltip.style.top = Math.round(top) + "px";
+          requestAnimationFrame(() => {
+            calTooltip.style.opacity = "1";
+            calTooltip.style.transform = "translateY(0)";
+          });
+        }
+
+        function hideCalTooltip() {
+          if (!calTooltip) return;
+          calTooltip.style.opacity = "0";
+          calTooltip.style.transform = "translateY(6px)";
+          // hide after transition
+          if (tooltipTimeout) clearTimeout(tooltipTimeout);
+          tooltipTimeout = setTimeout(() => calTooltip.classList.add("hidden"), 180);
+        }
+
+        calendarContainer.addEventListener("pointerover", (ev) => {
+          const el = ev.target.closest && ev.target.closest(".day-cell");
+          if (el) {
+            if (tooltipTimeout) clearTimeout(tooltipTimeout);
+            showCalTooltip(el);
+          }
+        });
+        calendarContainer.addEventListener("pointerout", (ev) => {
+          const el = ev.target.closest && ev.target.closest(".day-cell");
+          if (el) {
+            hideCalTooltip();
+          }
+        });
+        // keyboard accessibility: show tooltip on focus
+        calendarContainer.addEventListener("focusin", (ev) => {
+          const el = ev.target.closest && ev.target.closest(".day-cell");
+          if (el) showCalTooltip(el);
+        });
+        calendarContainer.addEventListener("focusout", (ev) => {
+          const el = ev.target.closest && ev.target.closest(".day-cell");
+          if (el) hideCalTooltip();
+        });
+
+        // Wire prev/next year buttons to update the year label (or select as fallback)
+        try {
+          const yearLabelEl = document.getElementById("test-stats-year-label");
+          const yearSelectEl = document.getElementById("test-stats-year-select");
+          const prevBtn = document.getElementById("test-stats-year-prev");
+          const nextBtn = document.getElementById("test-stats-year-next");
+          function setYear(y) {
+            if (yearLabelEl) {
+              yearLabelEl.dataset.year = String(y);
+              yearLabelEl.textContent = String(y);
+            } else if (yearSelectEl) {
+              const s = String(y);
+              const exists = Array.from(yearSelectEl.options).some((o) => o.value === s);
+              if (!exists) {
+                const opt = document.createElement("option");
+                opt.value = s;
+                opt.textContent = s;
+                yearSelectEl.appendChild(opt);
+              }
+              yearSelectEl.value = s;
+            }
+            // trigger re-render
+            populateTestStats();
+          }
+          if (prevBtn)
+            prevBtn.onclick = () => {
+              const cur = yearLabelEl
+                ? parseInt(yearLabelEl.dataset.year, 10) || currentYear
+                : yearSelectEl
+                ? parseInt(yearSelectEl.value, 10) || currentYear
+                : currentYear;
+              setYear(cur - 1);
+            };
+          if (nextBtn)
+            nextBtn.onclick = () => {
+              const cur = yearLabelEl
+                ? parseInt(yearLabelEl.dataset.year, 10) || currentYear
+                : yearSelectEl
+                ? parseInt(yearSelectEl.value, 10) || currentYear
+                : currentYear;
+              setYear(cur + 1);
+            };
+        } catch (e) {
+          /* ignore prev/next wiring errors */
+        }
       }
     } catch (e) {
-      /* ignore */
+      console.warn("Failed to render test stats calendar:", e);
     }
-  }
-
-  if (!chosen) {
-    renderFallbackLoadIcon(container);
-    return;
-  }
-
-  try {
-    // Load the animation into the container
-    lottie.loadAnimation({ container: container, renderer: "svg", loop: true, autoplay: true, path: chosen });
   } catch (e) {
-    // If load fails, fallback to SVG
-    renderFallbackLoadIcon(container);
+    console.warn("populateTestStats failed:", e);
   }
 }
 
-function renderFallbackLoadIcon(container) {
-  try {
-    container.innerHTML = `
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-        <circle cx="12" cy="12" r="6" fill="#0ea5e9" opacity="0.95">
-          <animate attributeName="r" values="6;10;6" dur="1.6s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.95;0.35;0.95" dur="1.6s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="12" cy="12" r="2.5" fill="#0369a1" />
-      </svg>`;
-  } catch (e) {
-    /* ignore */
-  }
-}
+/* Lottie animation support removed — no dynamic load here. */
 
 /**
  * Attach click handler to the load summary toggle button (if present).
@@ -760,16 +1264,17 @@ function addEventListeners() {
     } else if (target.closest(".card-menu-button")) {
       // --- Dropdown Menu Toggle ---
       const menuButton = target.closest(".card-menu-button");
-      // The dropdown is not the next sibling, it's inside the container.
-      const dropdown = menuButton.closest(".card-menu-container").querySelector(".card-menu-dropdown");
-      // Close all other dropdowns
-      document.querySelectorAll(".card-menu-dropdown").forEach((d) => {
-        if (d !== dropdown) {
-          d.classList.add("hidden");
-        }
-      });
-      // Toggle the clicked one
-      if (dropdown) dropdown.classList.toggle("hidden");
+      // Use the global body-appended dropdown so it isn't clipped by card stacking contexts
+      try {
+        showGlobalCardMenu(menuButton);
+      } catch (e) {
+        // Fallback to the per-card dropdown if something goes wrong
+        const dropdown = menuButton.closest(".card-menu-container").querySelector(".card-menu-dropdown");
+        document.querySelectorAll(".card-menu-dropdown").forEach((d) => {
+          if (d !== dropdown) d.classList.add("hidden");
+        });
+        if (dropdown) dropdown.classList.toggle("hidden");
+      }
     }
   });
 
@@ -819,17 +1324,68 @@ function addEventListeners() {
     const target = e.target;
 
     // --- Buttons ---
-    // Close dropdown if clicking outside
+    // Close global dropdown if clicking outside of any card menu container or the global menu
     if (!target.closest(".card-menu-container")) {
-      document.querySelectorAll(".card-menu-dropdown").forEach((d) => {
-        d.classList.add("hidden");
-      });
+      // Hide per-card dropdowns (legacy) and body-appended menu
+      document.querySelectorAll(".card-menu-dropdown").forEach((d) => d.classList.add("hidden"));
+      hideGlobalCardMenu();
     }
 
     if (target.closest("#review-btn")) {
       startReviewMode();
     } else if (target.closest("#dashboard-btn")) {
       showScreen("dashboard");
+    } else if (target.closest("#dashboard-title-btn")) {
+      // Clicking the dashboard title returns to root view
+      currentFolderId = null;
+      renderDashboard();
+      showScreen("dashboard");
+    } else if (target.closest("#test-stats-btn")) {
+      // Populate and show Test Statistics modal
+      populateTestStats();
+      showModal("testStats");
+    } else if (target.closest("#close-test-stats-btn")) {
+      hideModal("testStats");
+    } else if (target.closest("#test-stats-tab-list")) {
+      // Switch to List tab
+      const listBtn = document.getElementById("test-stats-tab-list");
+      const calBtn = document.getElementById("test-stats-tab-calendar");
+      const listEl = document.getElementById("test-stats-list");
+      const calEl = document.getElementById("test-stats-calendar");
+      if (listBtn) listBtn.setAttribute("aria-selected", "true");
+      if (calBtn) calBtn.setAttribute("aria-selected", "false");
+      if (listEl) listEl.classList.remove("hidden");
+      if (calEl) calEl.classList.add("hidden");
+      // Hide year controls when in List view and show main controls (search/sort)
+      try {
+        const yc = document.getElementById("test-stats-year-controls");
+        if (yc) yc.classList.add("hidden");
+      } catch (e) {}
+      try {
+        const ctrl = document.getElementById("test-stats-controls");
+        if (ctrl) ctrl.classList.remove("hidden");
+      } catch (e) {}
+    } else if (target.closest("#test-stats-tab-calendar")) {
+      // Switch to Calendar tab and ensure calendar is rendered
+      const listBtn = document.getElementById("test-stats-tab-list");
+      const calBtn = document.getElementById("test-stats-tab-calendar");
+      const listEl = document.getElementById("test-stats-list");
+      const calEl = document.getElementById("test-stats-calendar");
+      if (listBtn) listBtn.setAttribute("aria-selected", "false");
+      if (calBtn) calBtn.setAttribute("aria-selected", "true");
+      if (listEl) listEl.classList.add("hidden");
+      if (calEl) calEl.classList.remove("hidden");
+      // Show year controls when Calendar tab is active and hide main controls (search/sort)
+      try {
+        const yc = document.getElementById("test-stats-year-controls");
+        if (yc) yc.classList.remove("hidden");
+      } catch (e) {}
+      try {
+        const ctrl = document.getElementById("test-stats-controls");
+        if (ctrl) ctrl.classList.add("hidden");
+      } catch (e) {}
+      // Rebuild calendar view so hover titles reflect latest data
+      populateTestStats();
     } else if (target.closest("#prev-btn")) {
       navigateQuestion(-1);
     } else if (target.closest("#close-dashboard-help-btn")) {
@@ -1103,8 +1659,68 @@ function addEventListeners() {
       if (btn) hideGlobalTooltip();
     } catch (e) {}
   });
-}
 
+  // --- Test Stats filter popover wiring ---
+  try {
+    const filterToggle = document.getElementById("test-stats-filter-toggle");
+    const filterPopover = document.getElementById("test-stats-filter-popover");
+    const hiddenSort = document.getElementById("test-stats-sort");
+    if (filterToggle && filterPopover && hiddenSort) {
+      // Toggle popover visibility
+      filterToggle.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const isOpen = !filterPopover.classList.contains("hidden");
+        if (isOpen) {
+          filterPopover.classList.add("hidden");
+          filterToggle.setAttribute("aria-expanded", "false");
+        } else {
+          // reflect current selection from hidden select
+          const cur = hiddenSort.value || (hiddenSort.options[0] && hiddenSort.options[0].value);
+          filterPopover.querySelectorAll(".filter-option").forEach((o) => o.classList.remove("selected"));
+          const matched = filterPopover.querySelector('.filter-option[data-value="' + cur + '"]');
+          if (matched) matched.classList.add("selected");
+          filterPopover.classList.remove("hidden");
+          filterToggle.setAttribute("aria-expanded", "true");
+        }
+      });
+
+      // Click on an option sets the hidden select and triggers populate
+      Array.from(filterPopover.querySelectorAll(".filter-option")).forEach((opt) => {
+        opt.addEventListener("click", (e) => {
+          const v = opt.dataset && opt.dataset.value ? opt.dataset.value : null;
+          if (!v) return;
+          // Mark selected visually
+          filterPopover.querySelectorAll(".filter-option").forEach((o) => o.classList.remove("selected"));
+          opt.classList.add("selected");
+          // Set hidden select and trigger change
+          hiddenSort.value = v;
+          try {
+            hiddenSort.dispatchEvent(new Event("change", { bubbles: true }));
+          } catch (e) {
+            populateTestStats();
+          }
+          filterPopover.classList.add("hidden");
+          filterToggle.setAttribute("aria-expanded", "false");
+        });
+      });
+
+      // Close the popover when clicking outside
+      document.addEventListener("click", (ev) => {
+        try {
+          if (!filterPopover.classList.contains("hidden")) {
+            const isInside = ev.target.closest && (ev.target.closest("#test-stats-filter-popover") || ev.target.closest("#test-stats-filter-toggle"));
+            if (!isInside) {
+              filterPopover.classList.add("hidden");
+              filterToggle.setAttribute("aria-expanded", "false");
+            }
+          }
+        } catch (e) {}
+      });
+    }
+  } catch (e) {
+    /* ignore filter wiring errors */
+  }
+}
 /**
  * Handles keyboard shortcuts for navigation during a test.
  */
@@ -1444,8 +2060,14 @@ function handleDashboardAction(action, testId) {
   switch (action) {
     case "start":
       currentTest.testToStartId = testId;
+      try {
+        prepareStartModal(testId);
+      } catch (e) {
+        /* ignore */
+      }
       showModal("time");
-      document.getElementById("time-input-modal").focus();
+      const timeInp = document.getElementById("time-input-modal");
+      if (timeInp) timeInp.focus();
       break;
     case "rename":
       // Open rename modal
@@ -1535,8 +2157,17 @@ function confirmStartTest() {
 
   const testId = currentTest.testToStartId;
   if (testId) {
+    // determine selected set index if provided in the modal
+    let setIndex = 0;
+    try {
+      const sel = document.getElementById("time-modal-set-select");
+      if (sel && sel.value) setIndex = parseInt(sel.value, 10) || 0;
+    } catch (e) {
+      setIndex = 0;
+    }
+
     // startTest now returns true on success, false on failure
-    if (startTest(testId, minutes * 60)) {
+    if (startTest(testId, minutes * 60, setIndex)) {
       hideModal("time"); // Only hide if test started successfully
       timeInput.value = ""; // Clear input
       currentTest.testToStartId = null;
@@ -1545,22 +2176,128 @@ function confirmStartTest() {
 }
 
 /**
+ * Prepares the Start Test modal. If the selected test file contains multiple sets,
+ * populate the set picker so the user can choose which set to run.
+ */
+function prepareStartModal(testId) {
+  const wrapper = document.getElementById("time-modal-set-select-wrapper");
+  const select = document.getElementById("time-modal-set-select");
+  if (!wrapper || !select) return;
+
+  // Clear previous options
+  select.innerHTML = "";
+
+  const raw = inMemoryTestContent[testId];
+  if (!raw) {
+    wrapper.classList.add("hidden");
+    return;
+  }
+
+  // Determine shape and populate options accordingly
+  try {
+    if (Array.isArray(raw) && raw.length > 0 && raw.every((it) => Array.isArray(it) || (it && Array.isArray(it.questions)))) {
+      // array of sets; each set may be either an array or an object with a `questions` array
+      raw.forEach((set, idx) => {
+        let cnt = 0;
+        if (Array.isArray(set)) cnt = set.length;
+        else if (set && Array.isArray(set.questions)) cnt = set.questions.length;
+        const opt = document.createElement("option");
+        opt.value = String(idx);
+        const title = set && set.title ? set.title : `Set ${idx + 1}`;
+        opt.textContent = `${title} — ${cnt} question${cnt === 1 ? "" : "s"}`;
+        select.appendChild(opt);
+      });
+      wrapper.classList.remove("hidden");
+      select.selectedIndex = 0;
+      return;
+    }
+    if (raw && Array.isArray(raw.sets) && raw.sets.length > 0) {
+      raw.sets.forEach((set, idx) => {
+        let cnt = 0;
+        if (Array.isArray(set)) cnt = set.length;
+        else if (set && Array.isArray(set.questions)) cnt = set.questions.length;
+        const opt = document.createElement("option");
+        opt.value = String(idx);
+        const title = set && set.title ? set.title : `Set ${idx + 1}`;
+        opt.textContent = `${title} — ${cnt} question${cnt === 1 ? "" : "s"}`;
+        select.appendChild(opt);
+      });
+      wrapper.classList.remove("hidden");
+      select.selectedIndex = 0;
+      return;
+    }
+  } catch (e) {
+    console.warn("prepareStartModal failed to inspect test content:", e);
+  }
+
+  // Default: hide picker for single-set/plain tests
+  wrapper.classList.add("hidden");
+}
+
+/**
  * Prepares and starts a test.
  * Returns true on success, false on failure.
  */
-function startTest(testId, totalTimeInSeconds) {
+function startTest(testId, totalTimeInSeconds, setIndex = 0) {
   // Get the test content from our reliable in-memory object,
-  // which is populated at startup.
-  const testData = inMemoryTestContent[testId];
+  // which is populated at startup. Normalize supported shapes so
+  // the rest of the function can assume an array of question objects.
+  const rawTestData = inMemoryTestContent[testId];
 
-  if (!testData) {
+  if (!rawTestData) {
     customAlert("Test Error", `Could not find test data for ${testId}. The file might be empty or failed to load.`);
+    return false;
+  }
+
+  // Normalize: support three shapes
+  // 1) Plain array of question objects: [ {question,...}, ... ]
+  // 2) Array of sets: [ [q,q..], [q,q..] ] -> pick first set
+  // 3) Object with sets: { sets: [ [...], [...] ] } -> pick first set
+  let questionsArray = null;
+  // Track which set (if any) was chosen so we can record it with attempts
+  let chosenSetIndex = null;
+  let chosenSetLabel = null;
+  try {
+    if (Array.isArray(rawTestData)) {
+      // Could be: plain array of questions, array-of-arrays, or array-of-set-objects
+      const isArrayOfArrays = rawTestData.length > 0 && rawTestData.every((it) => Array.isArray(it));
+      const isArrayOfSetObjects = rawTestData.length > 0 && rawTestData.every((it) => it && Array.isArray(it.questions));
+      if (isArrayOfArrays) {
+        // Use the selected set index (clamped)
+        const idx = Math.max(0, Math.min(rawTestData.length - 1, Number(setIndex) || 0));
+        questionsArray = rawTestData[idx];
+        chosenSetIndex = idx;
+        chosenSetLabel = String.fromCharCode(65 + idx);
+      } else if (isArrayOfSetObjects) {
+        const idx = Math.max(0, Math.min(rawTestData.length - 1, Number(setIndex) || 0));
+        questionsArray = rawTestData[idx].questions;
+        chosenSetIndex = idx;
+        chosenSetLabel = rawTestData[idx] && rawTestData[idx].title ? rawTestData[idx].title : String.fromCharCode(65 + idx);
+      } else {
+        // Assume it's a plain array of question objects
+        questionsArray = rawTestData;
+      }
+    } else if (rawTestData && Array.isArray(rawTestData.sets)) {
+      const idx = Math.max(0, Math.min(rawTestData.sets.length - 1, Number(setIndex) || 0));
+      const chosen = rawTestData.sets[idx];
+      if (Array.isArray(chosen)) questionsArray = chosen;
+      else if (chosen && Array.isArray(chosen.questions)) questionsArray = chosen.questions;
+      else questionsArray = null;
+      chosenSetIndex = idx;
+      chosenSetLabel = chosen && chosen.title ? chosen.title : String.fromCharCode(65 + idx);
+    }
+  } catch (e) {
+    questionsArray = null;
+  }
+
+  if (!Array.isArray(questionsArray)) {
+    customAlert("Test Error", `Test file "${testId}" is not in a supported format. Expected an array of questions or an array/object containing sets.`);
     return false;
   }
 
   // Flatten the questions
   const flatQuestions = [];
-  testData.forEach((q, index) => {
+  questionsArray.forEach((q, index) => {
     // Validate question structure from your JSON format
     if (q && q.question && Array.isArray(q.options) && q.correctAnswer != null) {
       // Find the 0-based index of the correct answer
@@ -1607,6 +2344,8 @@ function startTest(testId, totalTimeInSeconds) {
     isPaused: false,
     isReviewMode: false,
     testId: testId, // Store which test is being taken
+    setIndex: typeof chosenSetIndex !== "undefined" ? chosenSetIndex : null,
+    setLabel: chosenSetLabel || null,
   };
 
   testTitleHeaderEl.textContent = testMetadata[testId].customName;
@@ -1789,7 +2528,6 @@ function renderNavModal() {
             ${content}
           </button>
         `;
-    customAlert(helpTitle, helpMessage.trim());
   }
   navGridEl.innerHTML = gridHtml;
 }
@@ -1863,20 +2601,17 @@ function toggleStrikethrough(optionIndex) {
 function togglePause() {
   if (currentTest.isReviewMode) return;
 
+  // Only toggle the paused state and show/hide the overlay. Do NOT change
+  // the visual state of the header pause button (#pause-btn) here — the
+  // header control should remain visually consistent with the test view.
   currentTest.isPaused = !currentTest.isPaused;
   if (currentTest.isPaused) {
     stopTimer();
-    pauseBtnText.textContent = "Resume";
-    pauseBtn.classList.replace("bg-yellow-500", "bg-green-500");
-    pauseBtn.classList.replace("hover:bg-yellow-600", "hover:bg-green-600");
-    pauseBtn.querySelector("i").classList.replace("ph-pause", "ph-play");
+    // Show the pause overlay; do not mutate header button text/classes/icon
     showModal("pause");
   } else {
     startTimer();
-    pauseBtnText.textContent = "Pause";
-    pauseBtn.classList.replace("bg-green-500", "bg-yellow-500");
-    pauseBtn.classList.replace("hover:bg-green-600", "hover:bg-yellow-600");
-    pauseBtn.querySelector("i").classList.replace("ph-play", "ph-pause");
+    // Hide the pause overlay; keep header button visuals unchanged
     hideModal("pause");
   }
 }
@@ -1927,6 +2662,8 @@ function finishTest() {
     total: total,
     percentage: percentage,
     awayClicks: currentTest.awayClicks,
+    // Record elapsed time for this attempt (seconds). Prefer explicit duration if available.
+    duration: Math.max(0, (currentTest.totalTime || 0) - (currentTest.timeLeft || 0)),
     timestamp: new Date().toISOString(),
   };
 
@@ -1942,7 +2679,23 @@ function finishTest() {
     testMetadata[currentTest.testId].attempts = [];
   }
 
+  // Include set information if this attempt was taken from a specific set
+  try {
+    if (typeof currentTest.setIndex !== "undefined" && currentTest.setIndex !== null) {
+      attempt.setIndex = currentTest.setIndex;
+      attempt.setLabel = currentTest.setLabel || (Number.isFinite(currentTest.setIndex) ? String.fromCharCode(65 + Number(currentTest.setIndex)) : null);
+    }
+  } catch (e) {
+    /* ignore */
+  }
+
   testMetadata[currentTest.testId].attempts.push(attempt);
+  // Update a convenient lastAttemptDate field on the test metadata for quick access
+  try {
+    testMetadata[currentTest.testId].lastAttemptDate = attempt.timestamp;
+  } catch (e) {
+    /* ignore */
+  }
   saveMetadata();
 
   // Display results
@@ -2129,6 +2882,74 @@ function renderDashboard(filter = "") {
       avgScore = Math.round(totalPercentage / attempts.length);
     }
 
+    // Determine number(s) of questions from the in-memory test content (non-persistent)
+    // Support several shapes:
+    // - Plain array of question objects: [ {q}, {q}, ... ]
+    // - Array of arrays (sets): [ [q,q], [q,q] ]
+    // - Array of set objects: [ { title, questions: [q,q] }, ... ]
+    // - Object with sets: { sets: [ [...], {title,questions:[...]} ] }
+    const testContent = inMemoryTestContent[testId];
+    let questionCount = null; // exact count when fixed
+    let questionRangeText = ""; // human-friendly text like "5–12 questions" or "10 questions"
+    try {
+      if (Array.isArray(testContent)) {
+        // detect array-of-arrays
+        const isArrayOfArrays = testContent.length > 0 && testContent.every((it) => Array.isArray(it));
+        // detect array-of-set-objects (each element has a .questions array)
+        const isArrayOfSetObjects = testContent.length > 0 && testContent.every((it) => it && Array.isArray(it.questions));
+
+        if (isArrayOfArrays) {
+          const counts = testContent.map((s) => (Array.isArray(s) ? s.length : 0)).filter((n) => n > 0);
+          if (counts.length > 0) {
+            const min = Math.min(...counts);
+            const max = Math.max(...counts);
+            questionRangeText = min === max ? `${min} question${min === 1 ? "" : "s"}` : `${min}–${max} questions`;
+          }
+        } else if (isArrayOfSetObjects) {
+          const counts = testContent.map((s) => (s && Array.isArray(s.questions) ? s.questions.length : 0)).filter((n) => n > 0);
+          if (counts.length > 0) {
+            const min = Math.min(...counts);
+            const max = Math.max(...counts);
+            questionRangeText = min === max ? `${min} question${min === 1 ? "" : "s"}` : `${min}–${max} questions`;
+          }
+        } else {
+          // Plain array of questions
+          questionCount = testContent.length;
+          questionRangeText = `${questionCount} question${questionCount === 1 ? "" : "s"}`;
+        }
+      } else if (testContent && Array.isArray(testContent.sets)) {
+        const counts = testContent.sets
+          .map((s) => {
+            if (Array.isArray(s)) return s.length;
+            if (s && Array.isArray(s.questions)) return s.questions.length;
+            return 0;
+          })
+          .filter((n) => n > 0);
+        if (counts.length > 0) {
+          const min = Math.min(...counts);
+          const max = Math.max(...counts);
+          questionRangeText = min === max ? `${min} question${min === 1 ? "" : "s"}` : `${min}–${max} questions`;
+        }
+      }
+    } catch (e) {
+      questionRangeText = "";
+    }
+
+    // Determine how many sets this test contains (if any).
+    // This mirrors the shapes handled above: array-of-arrays, array-of-set-objects, or object.with sets
+    let setsCount = 0;
+    try {
+      if (Array.isArray(testContent)) {
+        const isArrayOfArrays = testContent.length > 0 && testContent.every((it) => Array.isArray(it));
+        const isArrayOfSetObjects = testContent.length > 0 && testContent.every((it) => it && Array.isArray(it.questions));
+        if (isArrayOfArrays || isArrayOfSetObjects) setsCount = testContent.length;
+      } else if (testContent && Array.isArray(testContent.sets)) {
+        setsCount = testContent.sets.length;
+      }
+    } catch (e) {
+      setsCount = 0;
+    }
+
     // Compute best and last scores for richer card summary
     let bestScore = "N/A";
     let lastScore = "N/A";
@@ -2152,6 +2973,11 @@ function renderDashboard(filter = "") {
           <div class="text-sm text-gray-500 mt-1">
             ${attempts.length} attempt(s) • Avg ${attempts.length > 0 ? avgScore + "%" : "N/A"}
           </div>
+          ${
+            questionRangeText
+              ? `<div class="text-sm text-gray-500 mt-1">${escapeHtml(questionRangeText)}${setsCount > 1 ? ` • ${setsCount} sets` : ""}</div>`
+              : ""
+          }
           <div class="text-sm text-gray-500 mt-2">
             Best: <span class="font-medium text-gray-800">${bestScore}</span>
             <span class="mx-2">•</span>
@@ -2164,7 +2990,7 @@ function renderDashboard(filter = "") {
           </div>
           <div class="right-actions">
             <button class="star-btn" data-action="star" data-testid="${testId}" aria-label="Toggle star">${starSvg}</button>
-            <div class="card-menu-container relative" style="z-index:0">
+            <div class="card-menu-container relative">
               <button class="card-menu-button px-2 py-1" aria-label="Open menu">⋮</button>
               <div class="card-menu-dropdown hidden absolute right-0 mt-2 bg-white border rounded shadow">
                 <a href="#" class="card-menu-item" data-action="rename" data-testid="${testId}"><i class="ph ph-pencil w-5 inline-block mr-2"></i> Rename</a>
@@ -2179,7 +3005,34 @@ function renderDashboard(filter = "") {
   };
 
   // Render folders as folder-cards (top-level or nested depending on currentFolderId)
-  const foldersToShow = dashboardLayout.folders.filter((f) => (currentFolderId ? f.parentId === currentFolderId : !f.parentId));
+  // When a search filter is active at the root view, we also include any folder that
+  // contains matching tests so users can see context for results.
+  let foldersToShow = dashboardLayout.folders.filter((f) => (currentFolderId ? f.parentId === currentFolderId : !f.parentId));
+  if (lowerCaseFilter !== "" && !currentFolderId) {
+    try {
+      const matchedFolderIds = new Set();
+      // For every matching test, locate the folder that contains it and add the folder
+      // and its ancestors so the user sees the full path/context.
+      allVisibleTestIds.forEach((tid) => {
+        const folderId = Object.keys(dashboardLayout.testsInFolders || {}).find((k) => (dashboardLayout.testsInFolders[k] || []).includes(tid));
+        if (folderId) {
+          // add this folder and ancestors
+          let walk = folderId;
+          while (walk) {
+            matchedFolderIds.add(walk);
+            const parent = (dashboardLayout.folders.find((ff) => ff.id === walk) || {}).parentId || null;
+            walk = parent || null;
+          }
+        }
+      });
+
+      // Append any matched folders that aren't already in foldersToShow (avoid duplicates)
+      const extra = dashboardLayout.folders.filter((f) => matchedFolderIds.has(f.id) && !foldersToShow.some((x) => x.id === f.id));
+      if (extra.length > 0) foldersToShow = foldersToShow.concat(extra);
+    } catch (e) {
+      // If anything goes wrong, fall back to default folder listing
+    }
+  }
   foldersToShow.forEach((folder) => {
     // Compute basic stats and a short summary list (show up to 4 items)
     const testIdsInFolder = dashboardLayout.testsInFolders[folder.id] || [];
@@ -2258,7 +3111,7 @@ function renderDashboard(filter = "") {
     const folderCard = `
       <div class="folder-card col-span-1 rounded-lg p-4" data-select-id="folder:${folder.id}" data-folder-id="${
       folder.id
-    }" tabindex="0" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
+    }" tabindex="0" draggable="true" ondragstart="drag(event)" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
         <div class="flex justify-between items-start">
           <div>
             <div class="folder-tab mb-2"><i class="ph ph-folder text-2xl"></i></div>
@@ -2267,8 +3120,12 @@ function renderDashboard(filter = "") {
             <div class="mt-3">${summaryHtml}</div>
           </div>
           <div class="folder-card-actions" aria-hidden="false">
+            <!-- Rename button sits to the left of Delete and is keyboard-accessible -->
+            <button class="folder-rename-btn" data-action="rename-folder" data-testid="${folder.id}" aria-label="Rename Folder" data-tooltip="Rename folder">
+              <i class="ph ph-pencil text-lg" aria-hidden="true"></i>
+            </button>
             <!-- Delete button sits left of the hint and is keyboard-accessible -->
-            <button class="folder-delete-btn text-gray-500 hover:text-red-600" data-action="delete-folder" data-testid="${
+            <button class="folder-delete-btn" data-action="delete-folder" data-testid="${
               folder.id
             }" aria-label="Delete Folder" data-tooltip="Delete card and ungroup contents">
               <i class="ph ph-trash text-lg" aria-hidden="true"></i>
@@ -2291,9 +3148,18 @@ function renderDashboard(filter = "") {
     assembledHtml += folderCard;
   });
 
-  // Render tests for the current view: if inside a folder, show its tests; otherwise show ungrouped tests
+  // Render tests for the current view: if inside a folder, show its tests; otherwise show ungrouped tests.
+  // When a search filter is active at the root, surface matching tests from anywhere so they appear
+  // as result cards (while folder cards remain visible for context).
   let testsHtml = "";
-  const testsInView = currentFolderId ? dashboardLayout.testsInFolders[currentFolderId] || [] : dashboardLayout.ungroupedTests;
+  let testsInView = [];
+  if (lowerCaseFilter !== "" && !currentFolderId) {
+    // show matching tests from across the layout (including those inside folders)
+    testsInView = Array.from(new Set(allVisibleTestIds));
+  } else {
+    testsInView = currentFolderId ? dashboardLayout.testsInFolders[currentFolderId] || [] : dashboardLayout.ungroupedTests;
+  }
+
   const visibleTestsInView = (testsInView || [])
     .filter((id) => allVisibleTestIds.includes(id))
     .sort((a, b) => {
