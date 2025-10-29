@@ -8,6 +8,10 @@
     <!-- External libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <!-- App favicon (SVG). For packaging, generate platform icons (ICO/ICNS/PNG) from assets/icon.svg -->
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="assets/icon.svg">
+    <meta name="theme-color" content="#005a9e">
     <!-- Optional vendorized lottie support removed -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -19,42 +23,11 @@
         <div id="dashboard-screen" class="hidden h-full">
             <header class="bg-white shadow-md p-4 flex items-center space-x-6">
                 <div class="flex items-center gap-3">
-                    <!-- Custom app logo (PracticeTests.svg) -->
-                    <svg id="app-logo" width="36" height="36" viewBox="0 0 612 612" xmlns="http://www.w3.org/2000/svg"
-                        aria-hidden="false" role="img" class="flex-shrink-0">
-                        <defs>
-                            <linearGradient id="linear-gradient" x1="349.4" y1="254.9" x2="511.6" y2="254.9"
-                                gradientUnits="userSpaceOnUse">
-                                <stop offset="0" stop-color="#054a75" />
-                                <stop offset="1" stop-color="#026965" />
-                            </linearGradient>
-                            <linearGradient id="linear-gradient1" x1="245.5" y1="505.6" x2="221.7" y2="264.1"
-                                gradientUnits="userSpaceOnUse">
-                                <stop offset="0" stop-color="#0358a4" />
-                                <stop offset="1" stop-color="#4392cf" />
-                            </linearGradient>
-                            <linearGradient id="linear-gradient2" x1="302.4" y1="227.4" x2="384.6" y2="194.2"
-                                gradientUnits="userSpaceOnUse">
-                                <stop offset="0" stop-color="#08a7dd" />
-                                <stop offset="1" stop-color="#00afc7" />
-                            </linearGradient>
-                            <linearGradient id="linear-gradient3" x1="102.1" y1="148.1" x2="511.6" y2="148.1"
-                                gradientUnits="userSpaceOnUse">
-                                <stop offset="0" stop-color="#3e86c6" />
-                                <stop offset="1" stop-color="#01b092" />
-                            </linearGradient>
-                        </defs>
-                        <path fill="url(#linear-gradient)"
-                            d="M511.6,148.8v107.7c0,5.8-3.1,11.1-8,14l-154.1,90.5v-64.2l111.7-61.8v-60.1l50.5-26.1Z" />
-                        <path fill="#19305b"
-                            d="M349.4,238.2v193.5c0,.8-.3,1.6-.7,2.2l-51.1,70-29-42.5c8-13.2,26-38.9,26-38.9l.6-220.9,54.2,36.7Z" />
-                        <path fill="url(#linear-gradient1)"
-                            d="M297.5,503.9l-22.3,30.5c-3.4,4.7-10.5,4.7-13.9,0l-75.2-101.6v-176.8s55-27.7,55-27.7v193.5s23.8,33.3,27.5,39.5l29,42.5Z" />
-                        <path fill="url(#linear-gradient2)"
-                            d="M408.1,206.9l-58.7,31.4-54.2-36.7,41.6-18c8-3.4,17-3.2,24.8.6l46.4,22.7Z" />
-                        <path fill="url(#linear-gradient3)"
-                            d="M511.6,148.8l-50.5,26.1-120.3-59.2-238.8,120.7v-36.4c0-11.1,6.2-21.3,16.1-26.4l222.4-113.9,171,89Z" />
-                    </svg>
+                    <!-- Custom app logo (clickable) -->
+                    <button id="app-logo-btn" aria-label="Go to Dashboard" class="p-0 bg-transparent border-0">
+                        <img id="app-logo-img" src="assets/icon.svg" width="36" height="36" alt="PracticeTests logo"
+                            class="flex-shrink-0" />
+                    </button>
                     <button id="dashboard-title-btn"
                         class="text-2xl font-bold text-gray-800 flex-shrink-0 text-left bg-transparent border-0 p-0">Dashboard</button>
                 </div>
@@ -396,151 +369,164 @@
                         <i class="ph ph-x text-2xl"></i>
                     </button>
                 </div>
-                <!-- Dynamic load summary (populated by renderer.js) -->
-                <div id="load-summary" class="p-4 bg-yellow-50 border-b text-sm text-gray-700 hidden"></div>
-                <div class="p-6 overflow-y-auto space-y-3 text-sm">
+                <!-- Dynamic load summary (populated by renderer.js). Keep visible so users see parse/load issues. -->
+                <div id="load-summary" class="p-4 bg-yellow-50 border-b text-sm text-gray-700" aria-live="polite">
+                    <!-- renderer.js will inject summaries here (errors, skipped files, counts). -->
+                </div>
+
+                <div class="p-6 overflow-y-auto space-y-4 text-sm">
+                    <!-- Keep the help concise: toggleable sections for easy scanning. -->
                     <details class="bg-gray-50 p-3 rounded-lg" open>
-                        <summary class="font-semibold cursor-pointer text-base">About This App</summary>
+                        <summary class="font-semibold cursor-pointer text-base">About Index (TBD)</summary>
                         <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
-                            <p>This is a custom test-taking application designed to help you practice with your own
-                                question sets in <code>.json</code> format. It saves your progress and stats locally in
-                                your browser.</p>
+                            <p><strong>Index (TBD)</strong> is a lightweight study tool that helps students convert
+                                lecture slides and notes into custom practice question sets. Organize, review and
+                                track your progress locally. The app stores data on your machine and does not send
+                                your files anywhere.</p>
+                            <p class="mt-2">Purpose: turn course content into reusable practice questions so you can
+                                study efficiently and monitor improvement over time.</p>
                         </div>
                     </details>
+
                     <details class="bg-gray-50 p-3 rounded-lg">
-                        <summary class="font-semibold cursor-pointer text-base">Adding Tests</summary>
+                        <summary class="font-semibold cursor-pointer text-base">Quick Start</summary>
                         <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
-                            <p>You can add tests in two ways:</p>
-                            <ul>
-                                <li><strong>Auto-Loading:</strong> On startup, the app looks for a
-                                    <code>/json/manifest.json</code> file to load tests automatically. This works best
-                                    when running from a local web server.
-                                </li>
-                                <li><strong>Manual Loading:</strong> Use the <strong>"Add More Files"</strong> or
-                                    <strong>"Load from Folder"</strong> buttons in the header.
-                                </li>
-                            </ul>
-                            <p>Your <code>.json</code> files must be an array of question objects. Here is a basic
-                                example:</p>
-                            <pre class="bg-gray-200 p-2 rounded text-xs whitespace-pre-wrap"><code>[
-  {
-    "passage": "Optional passage text...",
-    "question": "What is the capital of France?",
-    "options": [
-      "A. London", "B. Paris", "C. Berlin"
-    ],
-    "correctAnswer": "B. Paris"
-  }
-]</code></pre>
-                        </div>
-                    </details>
-                    <details class="bg-gray-50 p-3 rounded-lg">
-                        <summary class="font-semibold cursor-pointer text-base">Starting a Test</summary>
-                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
-                            <p>Click the <strong>"Start Test"</strong> button on any card. You will be prompted to enter
-                                a time limit in minutes. During the test, you can use keyboard shortcuts (like arrow
-                                keys, 1-4 for answers, F for flag, P for pause) for faster navigation.</p>
-                        </div>
-                    </details>
-                    <details class="bg-gray-50 p-3 rounded-lg">
-                        <summary class="font-semibold cursor-pointer text-base">Dashboard Features</summary>
-                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
-                            <p>This section explains the core dashboard features and quick workflows so you can get
-                                productive fast.</p>
+                            <ol class="list-decimal pl-5 space-y-2">
+                                <li>Click <strong>Add More Files</strong> and choose one or more <code>.json</code>
+                                    files that contain your questions.</li>
+                                <li>Open any test card and click <strong>Start Test</strong>. You will be asked for a
+                                    time limit (minutes) and — if the file has multiple sets — which set to run.</li>
+                                <li>During tests use keyboard shortcuts (1–4 to answer, ←/→ to navigate, F to flag,
+                                    P to pause) for fast review.</li>
+                            </ol>
 
-                            <h4 class="mt-2">Organization</h4>
-                            <ul>
-                                <li><strong>Create Folder</strong> — Use the <em>Create Folder</em> button in the
-                                    header to group related tests. Folders are local to this machine and stored in the
-                                    app layout.</li>
-                                <li><strong>Drag &amp; Drop</strong> — Drag test cards (or folder summary lines) and
-                                    drop them into folders to move items. You can also drag a folder into another
-                                    folder to nest (self/descendant drops are prevented).</li>
-                                <li><strong>Expanded State</strong> — Folder summaries support a "show more" state
-                                    (the app persists this preference so folders you open remain expanded).</li>
-                            </ul>
-
-                            <h4 class="mt-2">Card Actions & Shortcuts</h4>
-                            <ul>
-                                <li><strong>Start Test</strong> — Click the Start button (or double-click a card) to
-                                    begin. You will be prompted for a time limit.</li>
-                                <li><strong>Card Menu</strong> — Click the kebab menu on a card for actions: Rename,
-                                    Reset stats, Delete and more.</li>
-                                <li><strong>Star / Pin</strong> — Click the star to pin important tests near the top.
-                                </li>
-                                <li><strong>Keyboard</strong> — While taking tests: Arrow keys navigate, 1-4 to answer,
-                                    F to flag, P to pause.</li>
-                            </ul>
-
-                            <h4 class="mt-2">Statistics & Calendar</h4>
-                            <ul>
-                                <li><strong>Per-test stats</strong> — Open <em>Test Statistics</em> to see attempts,
-                                    averages, best score, average time and last attempt date for each test.</li>
-                                <li><strong>Per-set breakdown</strong> — If a test file contains multiple sets,
-                                    the stats list can expand to show a row per set (click the caret on the left).
-                                    The calendar tooltips also include the set label so you can see which set you
-                                    completed on a given day.</li>
-                                <li><strong>Calendar</strong> — Switch to the Calendar view to see a compact month
-                                    grid of your test activity. Hover any day to see details for that date.</li>
-                            </ul>
-
-                            <h4 class="mt-2">Search, Filters & Bulk</h4>
-                            <ul>
-                                <li><strong>Search</strong> — Use the search bar to filter tests by name or filename.
-                                    The Test Statistics view also supports sorting and quick filter options.</li>
-                                <li><strong>Bulk Actions (Planned)</strong> — The app already lays the groundwork for
-                                    bulk operations (move, delete, export). If you want this, tell us which actions
-                                    to prioritize and we’ll implement them next.</li>
-                            </ul>
-
-                            <h4 class="mt-2">JSON Formats Accepted</h4>
-                            <p>The dashboard loads <code>.json</code> test files from the <code>/json</code> folder or
-                                via manual upload. The app accepts a few convenient shapes so you can author tests the
-                                way you prefer:</p>
-                            <div class="mt-2">
-                                <div class="font-medium">1) Simple array of questions (single set)</div>
-                                <pre class="bg-gray-100 p-2 rounded text-xs whitespace-pre-wrap"><code>[
-  {
-    "passage": "Optional passage text...",
-    "question": "What is the capital of France?",
-    "options": ["A. London", "B. Paris", "C. Berlin"],
-    "correctAnswer": "B. Paris"
-  }
-]</code></pre>
-
-                                <div class="font-medium mt-2">2) Array of sets (multiple sets in one file)</div>
-                                <pre class="bg-gray-100 p-2 rounded text-xs whitespace-pre-wrap"><code>[
-  [ { /* questions for set A */ }, { /* ... */ } ],
-  [ { /* questions for set B */ }, { /* ... */ } ]
-]</code></pre>
-
-                                <div class="font-medium mt-2">3) Object with named sets</div>
-                                <pre class="bg-gray-100 p-2 rounded text-xs whitespace-pre-wrap"><code>{
-  "sets": [
-    { "title": "Anatomy A", "questions": [ /* ... */ ] },
-    { "title": "Anatomy B", "questions": [ /* ... */ ] }
-  ]
-}</code></pre>
-                                <p class="text-xs text-gray-500 mt-1">When starting a test from a multi-set file you
-                                    will be
-                                    able to pick which set to run. Attempts record the set index/label so per-set
-                                    statistics and calendar tooltips are accurate.</p>
+                            <div class="mt-3">
+                                <div class="font-medium">Folders & Card actions</div>
+                                <p class="text-sm text-gray-700 mt-2">Use folders to group related tests. Create a
+                                    folder, then drag tests into it or use the folder controls to organize your library.
+                                    Folder expanded/collapsed state is remembered.</p>
+                                <ul class="list-disc pl-5 mt-2">
+                                    <li><strong>Card actions:</strong> use the kebab menu on cards to rename, reset
+                                        stats, delete, or export.</li>
+                                    <li><strong>Star / Pin:</strong> pin important tests for quick access.</li>
+                                </ul>
                             </div>
+                        </div>
+                    </details>
 
-                            <h4 class="mt-2">Tips & Troubleshooting</h4>
-                            <ul>
-                                <li><strong>Missing stats?</strong> If a file fails to parse it will be listed in the
-                                    Load Summary at the top of this modal (populate it by clicking <em>Help</em> in the
-                                    header after loading files).</li>
-                                <li><strong>No questions shown?</strong> Ensure each question object contains
-                                    <code>question</code>, <code>options</code> (array) and <code>correctAnswer</code>.
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Adding Tests (JSON formats)</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <p>The app accepts several simple JSON formats — place files in the <code>/json</code>
+                                folder or upload them using the <strong>Add More Files</strong> control.</p>
+
+                            <div class="mt-2">
+                                <div class="font-medium">Accepted JSON shape — object with named sets</div>
+
+                                <!-- Minimal header bar above the example JSON (label left, small copy icon right) -->
+                                <div class="help-code-header flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-700">Example JSON</span>
+                                    </div>
+                                    <div>
+                                        <button id="copy-json-btn" aria-label="Copy example JSON"
+                                            title="Copy example JSON"
+                                            class="copy-btn-small rounded bg-gray-700 hover:bg-gray-600 text-white focus:outline-none"
+                                            style="padding:6px">
+                                            <i class="ph ph-copy" style="font-size:14px"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <pre class="p-1 rounded text-xs json-code"><code>
+<span class="json-brace-curly">{</span>
+    <span class="json-key">"sets"</span><span class="json-punct">: </span><span class="json-brace-square">[</span>
+        <span class="json-brace-curly">{</span>
+            <span class="json-key">"title"</span><span class="json-punct">: </span><span class="json-string">"Set A"</span><span class="json-punct">,</span>
+            <span class="json-key">"questions"</span><span class="json-punct">: </span><span class="json-brace-square">[</span>
+                <span class="json-brace-curly">{</span>
+                    <span class="json-key">"passage"</span><span class="json-punct">: </span><span class="json-string">"Passage A"</span><span class="json-punct">,</span>
+                    <span class="json-key">"question"</span><span class="json-punct">: </span><span class="json-string">"Question 1"</span><span class="json-punct">,</span>
+                    <span class="json-key">"options"</span><span class="json-punct">: </span><span class="json-brace-square">[</span><span class="json-string">"Option 1"</span><span class="json-punct">, </span><span class="json-string">"Option 2"</span><span class="json-brace-square">]</span><span class="json-punct">,</span>
+                    <span class="json-key">"correctAnswer"</span><span class="json-punct">: </span><span class="json-string">"Option 1"</span>
+                <span class="json-brace-curly">}</span>
+            <span class="json-brace-square">]</span>
+        <span class="json-brace-curly">}</span>
+        <span class="json-punct">,</span>
+        <span class="json-brace-curly">{</span>
+            <span class="json-key">"title"</span><span class="json-punct">: </span><span class="json-string">"Set B"</span><span class="json-punct">,</span>
+            <span class="json-key">"questions"</span><span class="json-punct">: </span><span class="json-brace-square">[</span>
+                <span class="json-brace-curly">{</span>
+                    <span class="json-key">"passage"</span><span class="json-punct">: </span><span class="json-string">"Passage B"</span><span class="json-punct">,</span>
+                    <span class="json-key">"question"</span><span class="json-punct">: </span><span class="json-string">"Question 2"</span><span class="json-punct">,</span>
+                    <span class="json-key">"options"</span><span class="json-punct">: </span><span class="json-brace-square">[</span><span class="json-string">"Option A"</span><span class="json-punct">, </span><span class="json-string">"Option B"</span><span class="json-brace-square">]</span><span class="json-punct">,</span>
+                    <span class="json-key">"correctAnswer"</span><span class="json-punct">: </span><span class="json-string">"Option A"</span>
+                <span class="json-brace-curly">}</span>
+            <span class="json-brace-square">]</span>
+        <span class="json-brace-curly">}</span>
+    <span class="json-brace-square">]</span>
+<span class="json-brace-curly">}</span>
+</code></pre>
+
+                                <!-- Hidden raw JSON template used for copying (pure JSON, no span wrappers) -->
+                                <template id="example-json-template">{
+                                    "sets": [
+                                    {
+                                    "title": "Set A",
+                                    "questions": [
+                                    { "passage": "", "question": "Question 1", "options": ["Option 1","Option 2","Option
+                                    3","Option 4"], "correctAnswer": "Option 1" }
+                                    ]
+                                    },
+                                    {
+                                    "title": "Set B",
+                                    "questions": [
+                                    { "passage": "", "question": "Question 1", "options": ["Option 1","Option 2","Option
+                                    3","Option 4"], "correctAnswer": "Option 1" }
+                                    ]
+                                    }
+                                    ]
+                                    }
+                                </template>
+                            </div>
+                    </details>
+
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Statistics & Calendar</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <p>The <strong>Test Statistics</strong> panel shows aggregated metrics per test and per
+                                set (if applicable): attempts, average score, best score, average time and last
+                                attempt date. Use the calendar view to see activity by day — hover to reveal
+                                details.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Troubleshooting & Tips</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><strong>Load issues:</strong> the top <em>Load Summary</em> shows files the app
+                                    couldn't parse and brief error messages — open it after loading files.</li>
+                                <li><strong>Empty tests:</strong> ensure each question object has
+                                    <code>question</code> and <code>options</code> (array). If using indices for
+                                    answers, use 0-based indexes.
                                 </li>
-                                <li><strong>Want improvements?</strong> The app is designed to evolve. Use the
-                                    suggestions area in the repo or reply to let me know the dashboard features you
-                                    want next (bulk delete, tags, improved search, export/import, etc.).</li>
+                                <li><strong>Accessibility:</strong> keyboard navigation is supported; if you
+                                    prefer a visible focus ring for keyboard users, enable the focus-visible
+                                    behavior in settings (coming soon).</li>
+                                <li><strong>Feature requests:</strong> suggestions are welcome — open an issue or
+                                    reply in the project repo with priority items (bulk actions, tags, export).</li>
                             </ul>
                         </div>
                     </details>
+
+                    <div id="help-last-row" class="pt-3 text-xs text-gray-500 border-t">
+                        <div class="flex items-center justify-between">
+                            <div>Last load: <span id="help-last-load" class="font-medium">—</span></div>
+                            <div class="text-right">Made by <span class="font-semibold">Abeeshan Selvabaskaran</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -638,6 +624,95 @@
         </div>
     </div>
     <!-- Application script -->
+    <script>
+        // Copy example JSON button logic (uses the hidden <template> with raw JSON)
+        document.addEventListener('DOMContentLoaded', function () {
+            const copyBtn = document.getElementById('copy-json-btn');
+            const tpl = document.getElementById('example-json-template');
+            if (!copyBtn || !tpl) return;
+            copyBtn.addEventListener('click', async function () {
+                const raw = tpl.innerText.trim();
+                const orig = copyBtn.innerHTML;
+                const hint = document.getElementById('copy-json-hint');
+                try {
+                    await navigator.clipboard.writeText(raw);
+                    // show success briefly
+                    copyBtn.innerHTML = '<i class="ph ph-check" style="font-size:16px"></i>';
+                    if (hint) hint.textContent = 'Copied!';
+                    setTimeout(() => { copyBtn.innerHTML = orig; if (hint) hint.textContent = 'Click the copy icon to copy the template'; }, 1500);
+                } catch (err) {
+                    // Fallback for environments without navigator.clipboard
+                    const ta = document.createElement('textarea');
+                    ta.value = raw;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try { document.execCommand('copy'); copyBtn.innerHTML = '<i class="ph ph-check" style="font-size:16px"></i>'; if (hint) hint.textContent = 'Copied!'; } catch (e) { alert('Copy failed — select and copy manually'); }
+                    document.body.removeChild(ta);
+                    setTimeout(() => { copyBtn.innerHTML = orig; if (hint) hint.textContent = 'Click the copy icon to copy the template'; }, 1500);
+                }
+            });
+
+            // Bracket pairing: compute matching pairs and highlight only the exact matching pair on hover
+            (function attachBracketPairs() {
+                try {
+                    const code = document.querySelector('#dashboard-help-modal pre.json-code code');
+                    if (!code) return;
+                    const bracketSelector = '.json-brace-curly, .json-brace-square, .json-brace-paren';
+                    const nodes = Array.from(code.querySelectorAll(bracketSelector));
+
+                    // Map closing -> opening
+                    const closes = { '}': '{', ']': '[', ')': '(' };
+
+                    const stack = [];
+                    let pairCounter = 0;
+
+                    nodes.forEach((el) => {
+                        const ch = (el.textContent || '').trim();
+                        if (ch === '{' || ch === '[' || ch === '(') {
+                            stack.push({ ch, el });
+                        } else if (ch === '}' || ch === ']' || ch === ')') {
+                            const want = closes[ch];
+                            // find last opening matching 'want'
+                            for (let i = stack.length - 1; i >= 0; i--) {
+                                if (stack[i].ch === want) {
+                                    const opened = stack.splice(i, 1)[0];
+                                    pairCounter++;
+                                    const id = String(pairCounter);
+                                    opened.el.setAttribute('data-pair-id', id);
+                                    el.setAttribute('data-pair-id', id);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                    // Attach hover handlers that highlight only the matching pair
+                    nodes.forEach((el) => {
+                        el.addEventListener('mouseenter', () => {
+                            const id = el.getAttribute('data-pair-id');
+                            if (id) {
+                                document.querySelectorAll('[data-pair-id="' + id + '"]').forEach((s) => s.classList.add('bracket-highlight'));
+                            } else {
+                                // no pair found: highlight just this element
+                                el.classList.add('bracket-highlight');
+                            }
+                        });
+                        el.addEventListener('mouseleave', () => {
+                            const id = el.getAttribute('data-pair-id');
+                            if (id) {
+                                document.querySelectorAll('[data-pair-id="' + id + '"]').forEach((s) => s.classList.remove('bracket-highlight'));
+                            } else {
+                                el.classList.remove('bracket-highlight');
+                            }
+                        });
+                    });
+                } catch (e) {
+                    // fallback: do nothing
+                    console.warn('attachBracketPairs failed', e);
+                }
+            })();
+        });
+    </script>
     <script src="renderer.js" defer></script>
 
 

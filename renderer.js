@@ -331,6 +331,23 @@ async function init() {
   // Sanity-check important test UI elements to avoid runtime ReferenceErrors
   checkTestUiElements();
 
+  // Make the header app logo clickable: return to dashboard root when clicked
+  try {
+    const appLogoBtn = document.getElementById("app-logo-btn");
+    if (appLogoBtn) {
+      appLogoBtn.addEventListener("click", (ev) => {
+        try {
+          ev.stopPropagation();
+        } catch (e) {}
+        currentFolderId = null;
+        renderDashboard();
+        showScreen("dashboard");
+      });
+    }
+  } catch (e) {
+    /* ignore */
+  }
+
   // Ensure create-folder button clicks are handled even if delegation fails
   // (some environments or DOM changes can prevent delegated listeners from firing)
   const __createFolderBtn = document.getElementById("create-folder-btn");

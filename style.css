@@ -232,6 +232,21 @@ button:focus {
   outline-offset: 2px;
 }
 
+/* Header icon and dashboard title: remove hover drop-shadow and focus outline.
+   Overrides generic button hover/focus styles so the logo and title stay visually stable. */
+#app-logo-btn,
+#dashboard-title-btn {
+  box-shadow: none !important;
+}
+#app-logo-btn:hover,
+#app-logo-btn:focus,
+#dashboard-title-btn:focus {
+  box-shadow: none !important;
+  filter: none !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
 /* Primary action button (Start, Add files, Confirm) */
 .start-large,
 #add-files-btn,
@@ -302,10 +317,80 @@ footer button {
   border: 1px solid rgba(2, 6, 23, 0.06);
 }
 
-/* Ensure help load-summary panel matches modal/card aesthetic */
+/* Ensure help load-summary panel matches modal/card aesthetic - top Last load (toasts) */
 #load-summary {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(243, 246, 251, 0.95));
-  border: 1px solid rgba(0, 90, 158, 0.06);
+  background: linear-gradient(180deg, rgba(236, 246, 255, 0.9), rgba(240, 249, 255, 0.9)); /* pale blue */
+  border: 1px solid rgba(2, 90, 158, 0.06);
+}
+
+/* Last load row styling inside Help modal: pale subtle blue and more breathing room */
+#dashboard-help-modal #help-last-row {
+  margin-top: 18px; /* increase gap from previous content */
+  padding: 12px 16px; /* slightly more interior spacing */
+  background: #f0f7ff; /* pale subtle blue */
+  border: 1px solid rgba(2, 90, 158, 0.04); /* soft blue border */
+  border-radius: 8px;
+  color: #475569; /* neutral slightly darker text */
+}
+
+#dashboard-help-modal #help-last-row .text-right {
+  color: #475569;
+}
+
+/* Keep the help modal's load summary visible when sections expand/collapse.
+   Make it sticky at the top of the modal panel so toggling details won't clip it. */
+#dashboard-help-modal > div > #load-summary {
+  position: sticky;
+  top: 0;
+  z-index: 40; /* above the scrollable content but below modal header */
+  margin: 0; /* avoid double spacing with panel header */
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Help modal content: improve code block legibility and scrolling.
+   Use a readable monospace stack, slightly larger font-size, and allow horizontal
+   scrolling for long examples rather than wrapping them awkwardly. */
+#dashboard-help-modal pre,
+#dashboard-help-modal code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+  font-size: 11px; /* reduced for compactness */
+  line-height: 1.2;
+}
+
+#dashboard-help-modal pre {
+  background: #f3f4f6; /* slightly warmer gray than other panels for contrast */
+  padding: 12px;
+  border-radius: 8px;
+  overflow: auto; /* allow internal scrolling for long blocks */
+  /* wrap long lines for readability while still allowing scroll when needed */
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 100%;
+  max-height: 320px; /* constrain tall examples and make them scrollable */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Make long code examples comfortable on narrow screens */
+@media (max-width: 900px) {
+  #dashboard-help-modal pre {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+/* Small visual tweak: make the help modal content area scroll independently and
+  keep breathing room under the sticky load-summary so the first help section
+  (About Index) doesn't butt up against the top Last load area. */
+#dashboard-help-modal > div > .p-6.overflow-y-auto {
+  padding-top: 18px; /* extra gap between the top load summary and content */
+  position: relative;
+}
+
+/* make the load summary clearly sit above scrolling content */
+#dashboard-help-modal > div > #load-summary {
+  z-index: 9999;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
 }
 
 /* Drag and Drop styles */
@@ -1887,4 +1972,143 @@ footer {
 }
 #abandon-test-btn i {
   color: #ffffff !important;
+}
+
+/* JSON code block styling: colors and visible whitespace for Help modal examples */
+.json-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1; /* compact single line spacing per request */
+  tab-size: 2;
+  -moz-tab-size: 2;
+  color: #e6eef6;
+}
+.json-code .ws {
+  color: #9ca3af; /* light gray for visible indentation */
+}
+.json-key {
+  color: #1e3a8a; /* blue for keys */
+  font-weight: 600;
+}
+.json-string {
+  color: #059669; /* green for strings */
+}
+.json-number {
+  color: #b45309; /* orange for numbers */
+}
+.json-punct {
+  color: #94a3b8; /* muted cyan for commas/colons */
+}
+
+/* Bracket-specific token colors so open/close pairs match visually */
+.json-brace-curly {
+  color: #f472b6; /* pink-ish for curly braces */
+  font-weight: 600;
+}
+.json-brace-square {
+  color: #93c5fd; /* light blue for square brackets */
+  font-weight: 600;
+}
+.json-brace-paren {
+  color: #fbbf24; /* amber for parentheses (placeholder) */
+  font-weight: 600;
+}
+
+/* small visual header for the example JSON area */
+.help-code-header {
+  /* Dark header to match the example code block. Sit flush on top of code block. */
+  background: #0f172a; /* deep navy */
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 6px 10px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-bottom-left-radius: 0; /* flush with code block below */
+  border-bottom-right-radius: 0; /* flush with code block below */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* left-align header content */
+}
+.help-code-header .text-sm {
+  color: #e6eef6; /* light text on dark header */
+}
+.copy-btn-small {
+  padding: 6px;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: #e6eef6;
+  border-radius: 6px;
+}
+
+/* Bracket highlight visuals (per-type tinted background) */
+.bracket-highlight {
+  transition: background-color 140ms ease, transform 120ms ease;
+  transform: translateY(-1px);
+  border-radius: 4px;
+}
+.json-brace-curly.bracket-highlight {
+  background: rgba(244, 114, 182, 0.12); /* pink tint */
+}
+.json-brace-square.bracket-highlight {
+  background: rgba(147, 197, 253, 0.1); /* blue tint */
+}
+.json-brace-paren.bracket-highlight {
+  background: rgba(251, 191, 36, 0.1); /* amber tint */
+}
+/* make the code block look a bit more like a tokenized sample */
+/* Darker code background and compact layout: left-aligned, tight spacing */
+.dashboard-help-modal pre.json-code,
+#dashboard-help-modal pre.json-code {
+  background: #0b1220; /* dark navy for the code block */
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 6px 8px; /* compact padding */
+  border-top-left-radius: 0; /* sit flush beneath header */
+  border-top-right-radius: 0; /* sit flush beneath header */
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  border-top: none; /* avoid double border with header */
+  max-height: none; /* let modal control overall scroll */
+  overflow: visible;
+  white-space: pre-wrap; /* allow wrapping on narrow screens */
+  line-height: 1; /* minimal line spacing */
+  color: #e6eef6; /* light base text for tokens */
+  text-align: left; /* ensure left alignment */
+  tab-size: 2;
+  -moz-tab-size: 2;
+  font-size: 11px;
+}
+
+/* Token color overrides for the code block (kept together) */
+.json-key {
+  color: #9ecbff; /* light blue for keys */
+  font-weight: 600;
+}
+.json-string {
+  color: #8ef0b7; /* light green for strings */
+}
+.json-number {
+  color: #ffd88a; /* warm amber for numbers */
+}
+.json-punct {
+  color: rgba(230, 238, 246, 0.8); /* subtle punctuation on dark bg */
+}
+
+/* Ensure whitespace spans remain subtle on dark bg */
+.json-code .ws {
+  color: rgba(230, 238, 246, 0.12); /* very subtle visible indentation */
+  display: inline-block;
+  width: 0.6ch; /* keep indentation compact */
+}
+
+/* Make code block font adjustments for responsive screens */
+@media (max-width: 640px) {
+  #dashboard-help-modal pre.json-code {
+    white-space: pre;
+    overflow: auto;
+    font-size: 11px;
+  }
 }
