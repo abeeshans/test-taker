@@ -290,6 +290,36 @@ async function init() {
   // Restore persisted expanded folder summaries
   loadExpandedFolderSummaries();
 
+  // If running as a packaged app, optionally clear any lingering developer metadata
+  // to ensure shipped installers start with a clean slate for test statistics.
+  try {
+    const isPackaged = window && window.electronAPI && window.electronAPI.isPackaged;
+    const alreadyReset = localStorage.getItem("packagedResetDone");
+    if (isPackaged && !alreadyReset) {
+      // Clear metadata and layout so users get a fresh state after install
+      testMetadata = {};
+      dashboardLayout = { folders: [], testsInFolders: {}, ungroupedTests: [] };
+      // Clear expanded folder summaries preference
+      try {
+        localStorage.removeItem(EXPANDED_SUMMARIES_KEY);
+      } catch (e) {}
+      // Persist cleared state
+      saveMetadata();
+      saveLayout();
+      // Mark that we've performed the packaged reset so it runs only once
+      try {
+        localStorage.setItem("packagedResetDone", "1");
+      } catch (e) {}
+      // Refresh in-memory expanded set
+      try {
+        expandedFolderSummaries.clear();
+      } catch (e) {}
+      console.log("Packaged app detected — cleared persisted test metadata for fresh install.");
+    }
+  } catch (e) {
+    /* ignore errors during packaged reset */
+  }
+
   // Remove any auto-created test folder from previous automated tests
   try {
     const AUTO_NAME = "__AUTO_FOLDER__";
@@ -885,7 +915,26 @@ function populateTestStats() {
           if (!calElForTab || calElForTab.classList.contains("hidden")) yearControlsEl.classList.add("hidden");
           else yearControlsEl.classList.remove("hidden");
         }
-        // Build a map of date (YYYY-MM-DD) -> array of entries { testId, name, percentage }
+        // Use local date keys (YYYY-MM-DD) so calendar days match the user's local date
+        // even when stored timestamps are ISO/UTC strings. This avoids attempts made
+        // shortly after local midnight appearing on the previous day in the calendar.
+        function localDateKey(dateObj) {
+          const y = dateObj.getFullYear();
+          const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+          const d = String(dateObj.getDate()).padStart(2, "0");
+          return `${y}-${m}-${d}`;
+        }
+
+        function parseLocalDateKey(key) {
+          // Safer parsing: build a local Date from y-m-d parts (avoid Date("yyyy-mm-dd") -> UTC)
+          const parts = (key || "").split("-");
+          if (parts.length !== 3) return new Date(key);
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          const d = parseInt(parts[2], 10);
+          return new Date(y, m, d);
+        }
+
         const dateMap = {};
         Object.keys(testMetadata || {}).forEach((tid) => {
           const meta = testMetadata[tid] || {};
@@ -894,7 +943,7 @@ function populateTestStats() {
             if (!a || !a.timestamp) return;
             const d = new Date(a.timestamp);
             if (isNaN(d.getTime())) return;
-            const key = d.toISOString().slice(0, 10);
+            const key = localDateKey(d);
             if (!dateMap[key]) dateMap[key] = [];
             // Preserve set metadata if present on attempts (newer attempts will have this)
             const setIndex = typeof a.setIndex !== "undefined" && a.setIndex !== null ? a.setIndex : null;
@@ -938,7 +987,9 @@ function populateTestStats() {
 
         // Helper to format a day's tooltip content (HTML)
         function buildDayTooltipHtml(dateKey, entries) {
-          let html = `<div class="cal-tooltip-date">${new Date(dateKey).toLocaleDateString(undefined, {
+          // Parse the YYYY-MM-DD key into a local Date so toLocaleDateString shows the intended day
+          const dateObj = parseLocalDateKey(dateKey);
+          let html = `<div class="cal-tooltip-date">${dateObj.toLocaleDateString(undefined, {
             weekday: "long",
             year: "numeric",
             month: "short",
@@ -995,7 +1046,7 @@ function populateTestStats() {
                 calHtml += `<div class="day-cell empty" aria-hidden="true"></div>`;
                 continue;
               }
-              const key = cell.toISOString().slice(0, 10);
+              const key = localDateKey(cell);
               const entries = dateMap[key] || [];
               const hasEntries = entries.length > 0;
               const dayNumber = cell.getDate();
