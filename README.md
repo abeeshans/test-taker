@@ -1,37 +1,134 @@
-# Test Taker — Local Development & Packaging Notes
+# SelfTest - Modern Study Companion
 
-This repo is a local Electron renderer UI for a small test-taking app. You asked to use the provided PracticeTests SVG as the app logo and the deployed app icon.
+SelfTest is a powerful, web-based application designed to help students master their subjects through active recall. It transforms static lecture notes and JSON question banks into interactive, timed practice tests with detailed analytics.
 
-What I changed in this branch
+![SelfTest Dashboard Screenshot](https://placehold.co/1200x600/png?text=SelfTest+Dashboard+Preview)
 
-- Added `assets/PracticeTests-icon-03.svg` and replaced the inline header logo with a clickable image that returns the user to the Dashboard.
+## 🚀 Features
 
-Packaging / App Icon Notes
+### 📚 Organization & Management
+- **Smart Dashboard:** Organize tests into nested folders for different courses or subjects.
+- **Search & Filter:** Instantly find tests by name or content.
+- **Drag & Drop:** Intuitive file management for organizing your study materials.
+- **File Support:** Upload JSON question banks or PDF lecture notes (future AI integration).
 
-- Electron packaging typically requires platform-specific icon files (ICO for Windows, ICNS for macOS, PNG for Linux). The SVG will work as a favicon in the renderer and as the header logo in the app, but packaging tools need raster/icon formats.
+### 📝 Test Taking Experience
+- **Exam Simulation:** Timed tests with a distraction-free interface.
+- **Interactive Controls:** Keyboard shortcuts (1-4 for options, F to flag, P to pause).
+- **Progress Tracking:** Visual progress bar and question navigation grid.
+- **Responsive Design:** Works seamlessly on desktop, tablet, and mobile.
 
-Recommended quick workflow
+### 📊 Review & Analytics
+- **Detailed Review:** Analyze your performance question-by-question.
+- **Smart Stats:** View correct/incorrect counts, unanswered questions, and flagged items.
+- **History:** Track your improvement over time with attempt history and score trends.
+- **Explanations:** View detailed explanations for every answer.
 
-1. Create platform icons from the SVG (example tools):
+### 🎨 UI/UX
+- **Dark Mode:** Fully supported dark theme for late-night study sessions.
+- **Modern Aesthetics:** Built with a clean, professional design using Tailwind CSS.
+- **Smooth Animations:** Powered by Framer Motion for a polished feel.
 
-   - Use ImageMagick or png2ico to produce an ICO: `magick convert -background transparent assets/PracticeTests-icon-03.svg -resize 256x256 icon.png` then `png2ico app-icon.ico icon.png`.
-   - For macOS, use `iconutil` with an `.iconset` made from multiple PNG sizes to build an ICNS.
+---
 
-2. If you use `electron-builder`, add the icon paths to `package.json` under `build`:
+## 🛠️ Tech Stack
 
-```json
-"build": {
-  "icon": "build/icon.ico"
-}
+### Frontend
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Icons:** [Phosphor Icons](https://phosphoricons.com/)
+- **Animations:** [Framer Motion](https://www.framer.com/motion/)
+- **State Management:** React Hooks & Context
+
+### Backend
+- **Framework:** [FastAPI](https://fastapi.tiangolo.com/) (Python)
+- **Database:** [Supabase](https://supabase.com/) (PostgreSQL)
+- **Authentication:** Supabase Auth
+
+### Deployment
+- **Containerization:** Docker (Frontend & Backend)
+- **Cloud Provider:** Google Cloud Run
+- **CI/CD:** GitHub Actions (Ready for integration)
+
+---
+
+## 🏁 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- Python 3.9+
+- Supabase Account
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/abeeshans/test-taker.git
+cd test-taker
 ```
 
-3. Place the generated icons in a `build/` directory (or update your packager config) and run your packager.
+### 2. Backend Setup
+```bash
+cd backend
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-If you want, I can add a small build script that converts the SVG into PNG sizes (requires ImageMagick) and place them under `build/` so your packager can use them automatically.
+# Install dependencies
+pip install -r requirements.txt
 
-How to preview in the app
+# Run the server
+uvicorn main:app --reload
+```
+The backend will run on `http://localhost:8000`.
 
-- Start the app and click the logo in the header — it will go to the Dashboard root.
-- The header image uses the SVG directly so it should be crisp at any scale.
+### 3. Frontend Setup
+```bash
+cd frontend
+# Install dependencies
+npm install
 
-If you'd like me to also auto-generate ICO/ICNS files from the SVG in this repo (and add `npm` scripts), tell me which platforms you target and I’ll add the scripts and dev-deps.
+# Run the development server
+npm run dev
+```
+The frontend will run on `http://localhost:3000`.
+
+### 4. Environment Variables
+Create a `.env.local` file in `frontend/` and a `.env` file in `backend/` with your Supabase credentials:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key (Backend only)
+```
+
+---
+
+## ☁️ Deployment
+
+This project is optimized for **Google Cloud Run**.
+
+1.  **Frontend:** Built as a standalone Next.js Docker container.
+2.  **Backend:** Built as a lightweight Python FastAPI Docker container.
+
+See the [Deployment Guide](deployment_guide.md) for detailed step-by-step instructions on how to deploy to Google Cloud Run, manage costs, and set up custom domains.
+
+---
+
+## 📂 Project Structure
+
+```
+test-taker/
+├── frontend/           # Next.js Application
+│   ├── src/app/        # App Router Pages
+│   ├── src/components/ # Reusable UI Components
+│   └── public/         # Static Assets
+├── backend/            # FastAPI Application
+│   ├── main.py         # API Endpoints
+│   └── requirements.txt
+├── json/               # Sample Question Banks (Ignored by Git)
+└── PDFs/               # Lecture Notes (Ignored by Git)
+```
+
+## 📄 License
+
+Designed and built by **Abeeshan Selvabaskaran**.
+All rights reserved.
