@@ -1,0 +1,549 @@
+{
+  "id": "09902072-2554-484c-975b-4b889028689f",
+  "sets": [
+    {
+      "title": "A",
+      "questions": [
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which palpable landmark is found at the superior border of the manubrium?",
+          "options": [
+            "A. Sternal angle",
+            "B. Xiphoid process",
+            "C. Suprasternal (jugular) notch",
+            "D. Costal margin"
+          ],
+          "correctAnswer": "C. Suprasternal (jugular) notch"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The sternal angle (angle of Louis) is an important landmark located at the junction of which two structures?",
+          "options": [
+            "A. Manubrium and Body of sternum",
+            "B. Body of sternum and Xiphoid process",
+            "C. Clavicle and Manubrium",
+            "D. Rib 1 and Manubrium"
+          ],
+          "correctAnswer": "A. Manubrium and Body of sternum"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which rib articulates with the sternum at the level of the sternal angle?",
+          "options": [
+            "A. Rib 1",
+            "B. Rib 2",
+            "C. Rib 3",
+            "D. Rib 7"
+          ],
+          "correctAnswer": "B. Rib 2"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What major airway event occurs at the level of the sternal angle (T4/T5 vertebral level)?",
+          "options": [
+            "A. Larynx becomes trachea",
+            "B. Tracheal bifurcation (Carina)",
+            "C. Esophagus enters stomach",
+            "D. Phrenic nerve enters diaphragm"
+          ],
+          "correctAnswer": "B. Tracheal bifurcation (Carina)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "According to the mnemonic RATPLANT, what major vascular structure begins and ends its arch at the sternal angle?",
+          "options": [
+            "A. Superior Vena Cava",
+            "B. Pulmonary Trunk",
+            "C. Aortic Arch",
+            "D. Azygos Vein"
+          ],
+          "correctAnswer": "C. Aortic Arch"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which muscle forms the bulk of the anterior axillary fold?",
+          "options": [
+            "A. Deltoid",
+            "B. Serratus anterior",
+            "C. Pectoralis major",
+            "D. Latissimus dorsi"
+          ],
+          "correctAnswer": "C. Pectoralis major"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which imaginary vertical line runs through the midpoint of the clavicle?",
+          "options": [
+            "A. Mid-sternal line",
+            "B. Anterior axillary line",
+            "C. Mid-clavicular line",
+            "D. Midaxillary line"
+          ],
+          "correctAnswer": "C. Mid-clavicular line"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "At the mid-clavicular line, the inferior margin of the lung typically corresponds to which rib?",
+          "options": [
+            "A. 4th rib",
+            "B. 6th rib",
+            "C. 8th rib",
+            "D. 10th rib"
+          ],
+          "correctAnswer": "B. 6th rib"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "At the mid-clavicular line, the inferior margin of the parietal pleura typically extends down to which rib?",
+          "options": [
+            "A. 6th rib",
+            "B. 8th rib",
+            "C. 10th rib",
+            "D. 12th rib"
+          ],
+          "correctAnswer": "B. 8th rib"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What structure forms the anterior border of the 'Safe Triangle' for chest drain insertion?",
+          "options": [
+            "A. Lateral border of latissimus dorsi",
+            "B. Medial border of pectoralis major",
+            "C. Lateral border of pectoralis major",
+            "D. Anterior axillary line"
+          ],
+          "correctAnswer": "C. Lateral border of pectoralis major"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What structure forms the posterior border of the 'Safe Triangle'?",
+          "options": [
+            "A. Lateral border of latissimus dorsi",
+            "B. Medial border of latissimus dorsi",
+            "C. Lateral border of pectoralis major",
+            "D. Posterior axillary line"
+          ],
+          "correctAnswer": "A. Lateral border of latissimus dorsi"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What forms the inferior border (apex points to axilla) of the 'Safe Triangle'?",
+          "options": [
+            "A. 3rd intercostal space",
+            "B. 4th intercostal space",
+            "C. 5th intercostal space",
+            "D. 6th intercostal space"
+          ],
+          "correctAnswer": "C. 5th intercostal space"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "At the midaxillary line, the inferior margin of the lung typically corresponds to which rib?",
+          "options": [
+            "A. 6th rib",
+            "B. 8th rib",
+            "C. 10th rib",
+            "D. 12th rib"
+          ],
+          "correctAnswer": "B. 8th rib"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "At the midaxillary line, the inferior margin of the parietal pleura typically extends down to which rib?",
+          "options": [
+            "A. 8th rib",
+            "B. 10th rib",
+            "C. 12th rib",
+            "D. L1 vertebra"
+          ],
+          "correctAnswer": "B. 10th rib"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Posteriorly, the inferior margin of the parietal pleura typically extends down to which rib level along the midscapular line?",
+          "options": [
+            "A. 8th rib",
+            "B. 10th rib",
+            "C. 12th rib",
+            "D. 9th rib"
+          ],
+          "correctAnswer": "C. 12th rib"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The oblique fissure of both lungs generally approximates a line running from which spinous process down and anteriorly?",
+          "options": [
+            "A. C7 spinous process to 4th rib",
+            "B. T4 spinous process to 6th costochondral junction",
+            "C. T7 spinous process to 8th rib midaxillary",
+            "D. T10 spinous process to 12th rib"
+          ],
+          "correctAnswer": "B. T4 spinous process to 6th costochondral junction"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which are the primary functions of the bony thoracic cage?",
+          "options": [
+            "A. Digestion and hormone production",
+            "B. Ventilation and protection of organs",
+            "C. Upper limb movement and posture",
+            "D. Blood cell formation and mineral storage"
+          ],
+          "correctAnswer": "B. Ventilation and protection of organs"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What are the three parts of the sternum, from superior to inferior?",
+          "options": [
+            "A. Manubrium, Xiphoid process, Body",
+            "B. Manubrium, Body, Xiphoid process",
+            "C. Body, Manubrium, Xiphoid process",
+            "D. Xiphoid process, Body, Manubrium"
+          ],
+          "correctAnswer": "B. Manubrium, Body, Xiphoid process"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the correct order of the main neurovascular structures within the costal groove, from superior to inferior?",
+          "options": [
+            "A. Nerve, Artery, Vein (NAV)",
+            "B. Artery, Vein, Nerve (AVN)",
+            "C. Vein, Artery, Nerve (VAN)",
+            "D. Artery, Nerve, Vein (ANV)"
+          ],
+          "correctAnswer": "C. Vein, Artery, Nerve (VAN)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The main intercostal neurovascular bundle runs between which two muscle layers?",
+          "options": [
+            "A. External and Internal intercostals",
+            "B. Internal and Innermost intercostals",
+            "C. Innermost intercostals and Endothoracic fascia",
+            "D. Skin and External intercostals"
+          ],
+          "correctAnswer": "B. Internal and Innermost intercostals"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The anterior intercostal arteries supplying the upper 6 intercostal spaces are direct branches of which artery?",
+          "options": [
+            "A. Thoracic aorta",
+            "B. Subclavian artery",
+            "C. Internal thoracic artery",
+            "D. Supreme intercostal artery"
+          ],
+          "correctAnswer": "C. Internal thoracic artery"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The posterior intercostal arteries for spaces 3 through 11 arise directly from which major vessel?",
+          "options": [
+            "A. Internal thoracic artery",
+            "B. Subclavian artery",
+            "C. Costocervical trunk",
+            "D. Thoracic aorta"
+          ],
+          "correctAnswer": "D. Thoracic aorta"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The posterior intercostal veins on the right side (below the superior intercostal vein) primarily drain into which vein?",
+          "options": [
+            "A. Hemiazygos vein",
+            "B. Accessory hemiazygos vein",
+            "C. Azygos vein",
+            "D. Internal thoracic vein"
+          ],
+          "correctAnswer": "C. Azygos vein"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary action of the external intercostal muscles?",
+          "options": [
+            "A. Depress ribs during forced expiration",
+            "B. Elevate ribs during forced inspiration",
+            "C. Rotate the trunk",
+            "D. Compress abdominal contents"
+          ],
+          "correctAnswer": "B. Elevate ribs during forced inspiration"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary action of the internal and innermost intercostal muscles?",
+          "options": [
+            "A. Depress ribs during forced expiration",
+            "B. Elevate ribs during forced inspiration",
+            "C. Laterally flex the trunk",
+            "D. Extend the trunk"
+          ],
+          "correctAnswer": "A. Depress ribs during forced expiration"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What structures form the bony boundaries of the superior thoracic aperture (thoracic inlet)?",
+          "options": [
+            "A. Manubrium, Rib 1, T1 vertebra",
+            "B. Clavicle, Rib 1, Scapula",
+            "C. Sternum, Ribs 1-7, T1-T7 vertebrae",
+            "D. Xiphoid process, Ribs 8-10, T12 vertebra"
+          ],
+          "correctAnswer": "A. Manubrium, Rib 1, T1 vertebra"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "A Pancoast tumour, located at the apex of the lung, can compress the sympathetic trunk causing which syndrome?",
+          "options": [
+            "A. Cushing's syndrome",
+            "B. Horner's syndrome",
+            "C. Thoracic outlet syndrome",
+            "D. Superior vena cava syndrome"
+          ],
+          "correctAnswer": "B. Horner's syndrome"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which ribs are most commonly fractured?",
+          "options": [
+            "A. Ribs 1-3",
+            "B. Ribs 4-10",
+            "C. Ribs 11-12 (Floating ribs)",
+            "D. All ribs fracture with equal frequency"
+          ],
+          "correctAnswer": "B. Ribs 4-10"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "A fracture of ribs 1-3 is significant because it indicates:",
+          "options": [
+            "A. A minor injury",
+            "B. A high-energy trauma, likely with associated internal injuries",
+            "C. Osteoporosis",
+            "D. A typical sports injury"
+          ],
+          "correctAnswer": "B. A high-energy trauma, likely with associated internal injuries"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is 'flail chest'?",
+          "options": [
+            "A. A single rib fracture",
+            "B. Fracture of the sternum",
+            "C. Consecutive, segmental fractures of multiple ribs causing paradoxical movement",
+            "D. Dislocation of a rib from the vertebra"
+          ],
+          "correctAnswer": "C. Consecutive, segmental fractures of multiple ribs causing paradoxical movement"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What describes the paradoxical movement seen in flail chest during inspiration?",
+          "options": [
+            "A. The flail segment moves outward with the rest of the chest wall",
+            "B. The flail segment moves inward while the rest of the chest wall expands",
+            "C. The entire chest wall fails to move",
+            "D. Only the diaphragm moves"
+          ],
+          "correctAnswer": "B. The flail segment moves inward while the rest of the chest wall expands"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the first-line imaging modality typically used for suspected rib fractures in trauma patients?",
+          "options": [
+            "A. MRI",
+            "B. Ultrasound",
+            "C. CT Scan",
+            "D. Chest X-ray (CXR)"
+          ],
+          "correctAnswer": "D. Chest X-ray (CXR)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which chest wall variation is characterized by a protrusion of the sternum (pigeon chest)?",
+          "options": [
+            "A. Barrel chest",
+            "B. Pectus excavatum",
+            "C. Pectus carinatum",
+            "D. Scoliosis"
+          ],
+          "correctAnswer": "C. Pectus carinatum"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The thoracic duct drains lymph from which parts of the body?",
+          "options": [
+            "A. Right head, neck, arm, and thorax",
+            "B. Left head, neck, arm, thorax, and all lower body parts",
+            "C. Only the lower limbs and pelvis",
+            "D. Only the head and neck"
+          ],
+          "correctAnswer": "B. Left head, neck, arm, thorax, and all lower body parts"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The thoracic duct typically empties into the venous system near the junction of which two veins?",
+          "options": [
+            "A. Right internal jugular and right subclavian veins",
+            "B. Left internal jugular and left subclavian veins",
+            "C. Superior vena cava and azygos vein",
+            "D. Inferior vena cava and renal veins"
+          ],
+          "correctAnswer": "B. Left internal jugular and left subclavian veins"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What anatomical plane divides the mediastinum into superior and inferior parts?",
+          "options": [
+            "A. A transverse plane through the xiphoid process",
+            "B. A transverse plane from the sternal angle to the T4/T5 intervertebral disc",
+            "C. A sagittal plane through the midline",
+            "D. A coronal plane through the midaxillary lines"
+          ],
+          "correctAnswer": "B. A transverse plane from the sternal angle to the T4/T5 intervertebral disc"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which subdivision of the inferior mediastinum contains the pericardium and heart?",
+          "options": [
+            "A. Anterior mediastinum",
+            "B. Middle mediastinum",
+            "C. Posterior mediastinum",
+            "D. Superior mediastinum"
+          ],
+          "correctAnswer": "B. Middle mediastinum"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which structures are primarily located in the superior mediastinum?",
+          "options": [
+            "A. Heart, Ascending Aorta, Pulmonary Trunk",
+            "B. Thymus, Aortic Arch, Trachea, Esophagus, SVC",
+            "C. Descending Aorta, Esophagus, Azygos vein, Thoracic duct",
+            "D. Diaphragm, Inferior Vena Cava"
+          ],
+          "correctAnswer": "B. Thymus, Aortic Arch, Trachea, Esophagus, SVC"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which structures are primarily located in the posterior mediastinum?",
+          "options": [
+            "A. Heart, Pericardium, Phrenic nerves",
+            "B. Thymus remnant, Lymph nodes, Internal thoracic vessels",
+            "C. Aortic Arch, Trachea, Superior Vena Cava",
+            "D. Descending Thoracic Aorta, Esophagus, Azygos system, Thoracic duct"
+          ],
+          "correctAnswer": "D. Descending Thoracic Aorta, Esophagus, Azygos system, Thoracic duct"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "A widened mediastinum on a chest X-ray is often defined as being greater than what width?",
+          "options": [
+            "A. 2-4 cm",
+            "B. 4-6 cm",
+            "C. 6-8 cm",
+            "D. 8-10 cm"
+          ],
+          "correctAnswer": "C. 6-8 cm"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which dome of the diaphragm is typically higher?",
+          "options": [
+            "A. Left dome",
+            "B. Right dome",
+            "C. Both are at the same level",
+            "D. It varies randomly"
+          ],
+          "correctAnswer": "B. Right dome"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Why is the right dome of the diaphragm usually higher than the left?",
+          "options": [
+            "A. Presence of the stomach below the left dome",
+            "B. Presence of the liver below the right dome",
+            "C. Stronger muscle fibers on the right",
+            "D. Larger lung volume on the left"
+          ],
+          "correctAnswer": "B. Presence of the liver below the right dome"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "At which thoracic vertebral level does the inferior vena cava pass through the diaphragm (Caval Opening)?",
+          "options": [
+            "A. T8",
+            "B. T10",
+            "C. T12",
+            "D. L1"
+          ],
+          "correctAnswer": "A. T8"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which structures pass through the esophageal hiatus in the diaphragm at the T10 level?",
+          "options": [
+            "A. Aorta and Thoracic duct",
+            "B. Inferior Vena Cava only",
+            "C. Esophagus and Vagus nerves",
+            "D. Phrenic nerves"
+          ],
+          "correctAnswer": "C. Esophagus and Vagus nerves"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which structures pass through the aortic hiatus in the diaphragm at the T12 level?",
+          "options": [
+            "A. Esophagus and Vagus nerves",
+            "B. Inferior Vena Cava and Phrenic nerve",
+            "C. Aorta, Thoracic duct, and Azygos vein system",
+            "D. Pulmonary trunk and Pulmonary veins"
+          ],
+          "correctAnswer": "C. Aorta, Thoracic duct, and Azygos vein system"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Congenital diaphragmatic hernias, resulting from failure of pleuroperitoneal fold closure, most commonly occur on which side?",
+          "options": [
+            "A. Right side",
+            "B. Left side",
+            "C. Midline",
+            "D. Bilaterally"
+          ],
+          "correctAnswer": "B. Left side"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary motor nerve supply to the diaphragm?",
+          "options": [
+            "A. Vagus nerve (CN X)",
+            "B. Intercostal nerves (T7-T11)",
+            "C. Phrenic nerve (C3, C4, C5)",
+            "D. Sympathetic trunk"
+          ],
+          "correctAnswer": "C. Phrenic nerve (C3, C4, C5)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The spinal cord segments that contribute nerve fibers to the phrenic nerve are famously remembered by the mnemonic:",
+          "options": [
+            "A. C1, C2 - Keep you alive too",
+            "B. C3, C4, C5 - Keep the diaphragm alive",
+            "C. C5, C6, C7 - Raise your arms to heaven",
+            "D. T1 to T4 - Sympathetics galore"
+          ],
+          "correctAnswer": "B. C3, C4, C5 - Keep the diaphragm alive"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Irritation of the diaphragm (e.g., by blood, infection, or adjacent organ inflammation) can cause referred pain to which region, due to shared innervation via the phrenic nerve?",
+          "options": [
+            "A. Lower back",
+            "B. Umbilicus",
+            "C. Shoulder tip (C3, C4, C5 dermatomes)",
+            "D. Foot"
+          ],
+          "correctAnswer": "C. Shoulder tip (C3, C4, C5 dermatomes)"
+        }
+      ]
+    }
+  ]
+}

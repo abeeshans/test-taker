@@ -136,21 +136,32 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
             <li><strong>Import Data:</strong> Click the <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium">Add More Files</span> button to upload your <code>.json</code> question files.</li>
             <li><strong>Organize:</strong> Create folders to categorize your tests by subject or course. Drag and drop tests into folders to keep your dashboard clean.</li>
             <li><strong>Take a Test:</strong> Click on any test card to begin. Set a timer if you want to simulate exam conditions.</li>
-            <li><strong>Review:</strong> After completing a test, review your answers and see where you can improve.</li>
+            <li><strong>Review:</strong> After completing a test, review your answers. You can also use the <strong>Review Last Test</strong> option in the test card menu to revisit your most recent attempt.</li>
+            <li><strong>Views:</strong> Toggle between <strong>Grid View</strong> and <strong>List View</strong> using the icons in the top right to find tests easier.</li>
           </ol>
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800">
             <div className="font-medium text-blue-900 dark:text-blue-200 mb-1">Pro Tips:</div>
             <ul className="list-disc pl-5 text-blue-800 dark:text-blue-300 space-y-1">
               <li>Use keyboard shortcuts (<strong>1-4</strong>) to select answers quickly.</li>
               <li>Use <strong>F</strong> to flag questions for review and <strong>P</strong> to pause the timer.</li>
-              <li>Use the kebab menu (<DotsThreeVertical size={16} weight="bold" className="inline-block align-middle" />) on test cards to <strong>Rename</strong>, <strong>Reset Stats</strong>, or <strong>Delete</strong> them.</li>
+              <li>Use the kebab menu (<DotsThreeVertical size={16} weight="bold" className="inline-block align-middle" />) on test cards to <strong>Rename</strong>, <strong>Reset Stats</strong>, <strong>Download JSON</strong>, or <strong>Delete</strong> them.</li>
             </ul>
           </div>
         </AccordionItem>
 
         <AccordionItem title="JSON Format & Examples">
-          <p>SelfTest uses a simple, flexible JSON format for questions. You can include multiple "sets" of questions in a single file, which is great for grouping related topics.</p>
+          <p>SelfTest uses a simple, flexible JSON format. You can create these manually or use AI to generate them for you.</p>
           
+          <div className="mt-4 mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-100 dark:border-purple-800">
+            <div className="font-medium text-purple-900 dark:text-purple-200 mb-1">✨ Generate Tests with AI</div>
+            <p className="text-purple-800 dark:text-purple-300 text-xs leading-relaxed">
+              Upload your lecture notes or slides to an LLM like <strong>ChatGPT</strong> or <strong>Gemini</strong>, copy the example JSON below, and ask:
+            </p>
+            <div className="mt-2 p-2 bg-white dark:bg-slate-900 rounded border border-purple-200 dark:border-purple-700 text-xs font-mono text-gray-600 dark:text-slate-400 select-all">
+              "Create a multiple choice test based on my uploaded lecture following this JSON file format with 20 questions."
+            </div>
+          </div>
+
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
               <span className="font-medium text-gray-900 dark:text-white">Accepted JSON Structure</span>

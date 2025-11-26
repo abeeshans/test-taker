@@ -28,10 +28,26 @@ export async function GET(request: Request) {
     )
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+      // Always prefer the configured site URL in production
+      let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin
+      
+      // Fix for 0.0.0.0 redirect issue
+      if (siteUrl.includes('0.0.0.0')) {
+        console.warn('Redirect URL contains 0.0.0.0, this will likely fail on client side. Please set NEXT_PUBLIC_SITE_URL.')
+        // If we are on 0.0.0.0, we can't really guess the real domain without config.
+        // But we can try to fallback to something else if needed, or just log it.
+      }
+
+      return NextResponse.redirect(`${siteUrl}${next}`)
+    } else {
+        console.error('Auth code exchange error:', error)
     }
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  let siteUrl = process.env.NEXT_PUBLIC_SITE_URL || origin
+  if (siteUrl.includes('0.0.0.0')) {
+      console.warn('Redirect URL contains 0.0.0.0. Please set NEXT_PUBLIC_SITE_URL.')
+  }
+  return NextResponse.redirect(`${siteUrl}/auth/auth-code-error`)
 }

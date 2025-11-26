@@ -1,0 +1,538 @@
+{
+  "id": "bb90d804-7713-4528-8ebe-ddbdc745e8b2",
+  "sets": [
+    {
+      "title": "A",
+      "questions": [
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The breast is primarily composed of mammary glands, which are modified versions of what type of gland?",
+          "options": [
+            "A. Sebaceous glands",
+            "B. Apocrine glands",
+            "C. Sweat glands",
+            "D. Salivary glands"
+          ],
+          "correctAnswer": "C. Sweat glands"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical vertical extent of the breast base on the anterior thoracic wall?",
+          "options": [
+            "A. 1st to 4th costal cartilages",
+            "B. 2nd to 6th costal cartilages",
+            "C. 3rd to 7th costal cartilages",
+            "D. 4th to 8th costal cartilages"
+          ],
+          "correctAnswer": "B. 2nd to 6th costal cartilages"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical horizontal extent of the breast base?",
+          "options": [
+            "A. Mid-clavicular line to posterior axillary line",
+            "B. Mid-sternal line to mid-axillary line",
+            "C. Lateral border of sternum to mid-axillary line",
+            "D. Anterior axillary line to posterior axillary line"
+          ],
+          "correctAnswer": "C. Lateral border of sternum to mid-axillary line"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the name of the space that separates the breast from the chest wall muscles, allowing movement?",
+          "options": [
+            "A. Subclavian space",
+            "B. Interpectoral space",
+            "C. Submammary/retromammary space",
+            "D. Prepectoral space"
+          ],
+          "correctAnswer": "C. Submammary/retromammary space"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the extension of breast tissue towards the axilla called?",
+          "options": [
+            "A. Axillary process",
+            "B. Tail of Spence",
+            "C. Mammary ridge",
+            "D. Glandular extension"
+          ],
+          "correctAnswer": "B. Tail of Spence"
+        },
+        {
+          "passage": "Refer to the diagram on Page 5 of '[25-56] UM2010 - Breast Lecture.pdf'.<br><img src='https://snipboard.io/1Rx0Lp.jpg' alt='Page 5 [25-56] UM2010 - Breast Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "What are the fibrous bands that extend from the deep fascia over the pectoral muscle to the skin, providing support to the breast?",
+          "options": [
+            "A. Retinacula cutis",
+            "B. Suspensory ligaments (of Cooper)",
+            "C. Lactiferous ducts",
+            "D. Pectoral fascia"
+          ],
+          "correctAnswer": "B. Suspensory ligaments (of Cooper)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "How many secretory lobes does each breast typically contain?",
+          "options": [
+            "A. 1-5",
+            "B. 5-10",
+            "C. 12-20",
+            "D. 25-30"
+          ],
+          "correctAnswer": "C. 12-20"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the basic functional unit of the breast responsible for milk production?",
+          "options": [
+            "A. Lactiferous sinus",
+            "B. Mammary lobe",
+            "C. Acinus/Alveolus within a lobule",
+            "D. Terminal duct"
+          ],
+          "correctAnswer": "C. Acinus/Alveolus within a lobule"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What structure is formed by the combination of a terminal duct and its associated lobule?",
+          "options": [
+            "A. Lactiferous sinus",
+            "B. Segmental duct",
+            "C. Mammary lobe",
+            "D. Terminal duct lobular unit (TDLU)"
+          ],
+          "correctAnswer": "D. Terminal duct lobular unit (TDLU)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of epithelial cell within the breast acini is responsible for milk secretion?",
+          "options": [
+            "A. Myoepithelial cells",
+            "B. Luminal epithelial cells",
+            "C. Basal cells",
+            "D. Stromal cells"
+          ],
+          "correctAnswer": "B. Luminal epithelial cells"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the function of myoepithelial cells in the breast?",
+          "options": [
+            "A. Milk production",
+            "B. Contraction to assist milk expression",
+            "C. Hormone secretion",
+            "D. Structural support"
+          ],
+          "correctAnswer": "B. Contraction to assist milk expression"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the histological significance of tumour cells transgressing the myoepithelial layer and basement membrane in the breast?",
+          "options": [
+            "A. It defines a benign lesion.",
+            "B. It indicates in situ carcinoma.",
+            "C. It defines invasive carcinoma.",
+            "D. It is a normal finding."
+          ],
+          "correctAnswer": "C. It defines invasive carcinoma."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of stroma surrounds the acini within the TDLUs and contains fibroblasts/inflammatory cells?",
+          "options": [
+            "A. Interlobular stroma",
+            "B. Intralobular stroma",
+            "C. Periductal stroma",
+            "D. Subepithelial stroma"
+          ],
+          "correctAnswer": "B. Intralobular stroma"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of stroma surrounds the large ducts and TDLUs and is dense and collagenous?",
+          "options": [
+            "A. Interlobular stroma",
+            "B. Intralobular stroma",
+            "C. Acinar stroma",
+            "D. Basement membrane"
+          ],
+          "correctAnswer": "A. Interlobular stroma"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What structures converge and open onto the surface of the nipple?",
+          "options": [
+            "A. Sebaceous glands",
+            "B. Lactiferous ducts",
+            "C. Montgomery glands",
+            "D. Suspensory ligaments"
+          ],
+          "correctAnswer": "B. Lactiferous ducts"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What type of muscle is found within the nipple and areola, responsible for nipple erection?",
+          "options": [
+            "A. Skeletal muscle",
+            "B. Smooth muscle",
+            "C. Cardiac muscle",
+            "D. No muscle is present"
+          ],
+          "correctAnswer": "B. Smooth muscle"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What are the small sebaceous glands located on the areola called?",
+          "options": [
+            "A. Apocrine glands",
+            "B. Cooper's glands",
+            "C. Montgomery glands",
+            "D. Acinar glands"
+          ],
+          "correctAnswer": "C. Montgomery glands"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "During puberty, what primary histological changes occur in the breast parenchyma?",
+          "options": [
+            "A. Ducts shorten and lobules shrink",
+            "B. Ducts elongate, branch, and alveoli increase",
+            "C. Only stroma increases, parenchyma remains unchanged",
+            "D. Myoepithelial cells proliferate significantly"
+          ],
+          "correctAnswer": "B. Ducts elongate, branch, and alveoli increase"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary change in breast stroma during puberty?",
+          "options": [
+            "A. Decrease in adipose tissue",
+            "B. Thickening and hardening of connective tissue",
+            "C. Increase in connective tissue elasticity, vascularity, and adiposity",
+            "D. Formation of scar tissue"
+          ],
+          "correctAnswer": "C. Increase in connective tissue elasticity, vascularity, and adiposity"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What significant microscopic change occurs in the breast parenchyma during pregnancy?",
+          "options": [
+            "A. Reduction in ductal branching",
+            "B. Atrophy of secretory acini",
+            "C. Further duct/lobule formation and increased number/size of secretory acini/alveoli",
+            "D. Increase in stromal adipose tissue"
+          ],
+          "correctAnswer": "C. Further duct/lobule formation and increased number/size of secretory acini/alveoli"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What happens to the stromal adipose tissue during pregnancy and lactation?",
+          "options": [
+            "A. It significantly increases",
+            "B. It remains unchanged",
+            "C. It is reduced",
+            "D. It becomes fibrotic"
+          ],
+          "correctAnswer": "C. It is reduced"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which two hormones are primarily responsible for lactation post-partum?",
+          "options": [
+            "A. Estrogen and Progesterone",
+            "B. Prolactin and Oxytocin",
+            "C. FSH and LH",
+            "D. Cortisol and Adrenaline"
+          ],
+          "correctAnswer": "B. Prolactin and Oxytocin"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What process occurs in the breast glandular tissue when lactation ceases?",
+          "options": [
+            "A. Hypertrophy",
+            "B. Hyperplasia",
+            "C. Involution and atrophy due to apoptosis",
+            "D. Metaplasia"
+          ],
+          "correctAnswer": "C. Involution and atrophy due to apoptosis"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "How does the structure of the male breast typically differ from the post-pubertal female breast?",
+          "options": [
+            "A. It has fully developed lobules but lacks ducts.",
+            "B. It consists mainly of adipose tissue with no ducts.",
+            "C. It has small ducts that do not extend beyond the areola and lacks developed lobules.",
+            "D. It is identical but smaller."
+          ],
+          "correctAnswer": "C. It has small ducts that do not extend beyond the areola and lacks developed lobules."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What structural changes typically occur in the female breast after menopause?",
+          "options": [
+            "A. Increase in glandular tissue and decrease in fat",
+            "B. Involution of glandular tissue and increase in fatty tissue",
+            "C. Thickening of suspensory ligaments",
+            "D. Enlargement of the nipple and areola"
+          ],
+          "correctAnswer": "B. Involution of glandular tissue and increase in fatty tissue"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Arterial blood supply to the medial aspect of the breast primarily comes from branches of which artery?",
+          "options": [
+            "A. Axillary artery",
+            "B. Lateral thoracic artery",
+            "C. Internal thoracic artery",
+            "D. Thoracoacromial artery"
+          ],
+          "correctAnswer": "C. Internal thoracic artery"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Arterial blood supply to the lateral aspect of the breast primarily comes from branches of which artery?",
+          "options": [
+            "A. Internal thoracic artery",
+            "B. Axillary artery (including lateral thoracic)",
+            "C. Subclavian artery",
+            "D. Intercostal arteries directly"
+          ],
+          "correctAnswer": "B. Axillary artery (including lateral thoracic)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is Batson's venous plexus, relevant to breast cancer metastasis?",
+          "options": [
+            "A. A network of veins in the brain",
+            "B. A plexus of veins surrounding the spinal cord and vertebral bodies",
+            "C. Superficial veins of the lower limb",
+            "D. Veins draining the heart muscle"
+          ],
+          "correctAnswer": "B. A plexus of veins surrounding the spinal cord and vertebral bodies"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which intercostal nerve primarily provides sensory innervation to the nipple and areola?",
+          "options": [
+            "A. 2nd intercostal nerve",
+            "B. 3rd intercostal nerve",
+            "C. 4th intercostal nerve",
+            "D. 6th intercostal nerve"
+          ],
+          "correctAnswer": "C. 4th intercostal nerve"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Sensory innervation to the superior aspect of the breast receives contributions from which nerves?",
+          "options": [
+            "A. Intercostal nerves T1-T2",
+            "B. Supraclavicular nerves (from cervical plexus)",
+            "C. Axillary nerve",
+            "D. Phrenic nerve"
+          ],
+          "correctAnswer": "B. Supraclavicular nerves (from cervical plexus)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What percentage of lymphatic drainage from the breast typically flows towards the axillary lymph nodes?",
+          "options": [
+            "A. < 25%",
+            "B. Around 50%",
+            "C. > 75%",
+            "D. Exactly 100%"
+          ],
+          "correctAnswer": "C. > 75%"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Lymphatic drainage from the medial quadrants of the breast primarily flows towards which group of lymph nodes?",
+          "options": [
+            "A. Axillary nodes",
+            "B. Parasternal (internal mammary) nodes",
+            "C. Supraclavicular nodes",
+            "D. Subdiaphragmatic nodes"
+          ],
+          "correctAnswer": "B. Parasternal (internal mammary) nodes"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The subareolar plexus, located beneath the areola, is also known as:",
+          "options": [
+            "A. Cooper's plexus",
+            "B. Batson's plexus",
+            "C. Sappey's plexus",
+            "D. Montgomery's plexus"
+          ],
+          "correctAnswer": "C. Sappey's plexus"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Surgically, axillary lymph nodes are divided into levels based on their relationship to which muscle?",
+          "options": [
+            "A. Pectoralis major",
+            "B. Serratus anterior",
+            "C. Pectoralis minor",
+            "D. Latissimus dorsi"
+          ],
+          "correctAnswer": "C. Pectoralis minor"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Level I axillary lymph nodes are located where relative to the pectoralis minor muscle?",
+          "options": [
+            "A. Superior and medial",
+            "B. Posterior (deep)",
+            "C. Lateral or inferior",
+            "D. Anterior"
+          ],
+          "correctAnswer": "C. Lateral or inferior"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Level II axillary lymph nodes are located where relative to the pectoralis minor muscle?",
+          "options": [
+            "A. Lateral or inferior",
+            "B. Posterior (deep)",
+            "C. Superior and medial",
+            "D. Within the muscle"
+          ],
+          "correctAnswer": "B. Posterior (deep)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Level III axillary lymph nodes are located where relative to the pectoralis minor muscle?",
+          "options": [
+            "A. Lateral or inferior",
+            "B. Posterior (deep)",
+            "C. Superior and medial",
+            "D. Anterior"
+          ],
+          "correctAnswer": "C. Superior and medial"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Dissection or biopsy of axillary lymph nodes carries a risk of damaging nerves, potentially leading to weakness or paralysis of muscles. What is a common clinical consequence mentioned?",
+          "options": [
+            "A. Loss of sensation in the fingers",
+            "B. Lymphedema (swelling) of the arm",
+            "C. Difficulty swallowing",
+            "D. Foot drop"
+          ],
+          "correctAnswer": "B. Lymphedema (swelling) of the arm"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Metastasis of breast cancer to the contralateral breast typically occurs via which lymphatic route?",
+          "options": [
+            "A. Axillary nodes",
+            "B. Parasternal nodes",
+            "C. Supraclavicular nodes",
+            "D. Direct extension"
+          ],
+          "correctAnswer": "B. Parasternal nodes"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Metastasis of breast cancer to the liver can occur via lymphatics draining to which group of nodes?",
+          "options": [
+            "A. Axillary nodes",
+            "B. Parasternal nodes",
+            "C. Supraclavicular nodes",
+            "D. Subdiaphragmatic nodes"
+          ],
+          "correctAnswer": "D. Subdiaphragmatic nodes"
+        },
+        {
+          "passage": "Refer to the diagram on Page 19 of '[25-56] UM2010 - Breast Lecture.pdf'.<br><img src='https://snipboard.io/cUBiLp.jpg' alt='Page 19 [25-56] UM2010 - Breast Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "What causes the 'peau d'orange' (orange peel) appearance of the skin in some breast cancers?",
+          "options": [
+            "A. Direct invasion of the skin by tumor cells",
+            "B. Dilated superficial veins",
+            "C. Obstruction of subcutaneous lymphatics leading to edema",
+            "D. Retraction of Cooper's ligaments"
+          ],
+          "correctAnswer": "C. Obstruction of subcutaneous lymphatics leading to edema"
+        },
+        {
+          "passage": "Refer to the diagram on Page 19 of '[25-56] UM2010 - Breast Lecture.pdf'.<br><img src='https://snipboard.io/CnhtPr.jpg' alt='Page 19 [25-56] UM2010 - Breast Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "What causes skin dimpling or retraction over a breast carcinoma?",
+          "options": [
+            "A. Edema from lymphatic obstruction",
+            "B. Involvement and retraction of Cooper's (suspensory) ligaments",
+            "C. Dilation of superficial veins",
+            "D. Inflammation of the skin"
+          ],
+          "correctAnswer": "B. Involvement and retraction of Cooper's (suspensory) ligaments"
+        },
+        {
+          "passage": "Refer to the diagram on Page 19 of '[25-56] UM2010 - Breast Lecture.pdf'.<br><img src='https://snipboard.io/7cJHWw.jpg' alt='Page 19 [25-56] UM2010 - Breast Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "Why might dilated superficial veins become prominent over a breast tumor?",
+          "options": [
+            "A. Obstruction of lymphatic drainage",
+            "B. Retraction of Cooper's ligaments",
+            "C. Increased vascular demand from a fast-growing tumor",
+            "D. Normal anatomical variation"
+          ],
+          "correctAnswer": "C. Increased vascular demand from a fast-growing tumor"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Besides the local lymph nodes (axillary, parasternal), what are common distant sites for hematogenous (blood-borne) metastasis of breast cancer?",
+          "options": [
+            "A. Skin, muscle, kidney",
+            "B. Lungs, bone, liver, brain",
+            "C. Stomach, colon, small intestine",
+            "D. Spleen, pancreas, adrenal glands"
+          ],
+          "correctAnswer": "B. Lungs, bone, liver, brain"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which benign breast condition is listed as a possible cause for a breast lump?",
+          "options": [
+            "A. Ductal carcinoma in situ",
+            "B. Metastatic cancer",
+            "C. Fibroadenoma",
+            "D. Paget's disease of the nipple"
+          ],
+          "correctAnswer": "C. Fibroadenoma"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Cyclical mastalgia refers to what type of breast pain?",
+          "options": [
+            "A. Pain associated with infection",
+            "B. Pain related to the menstrual cycle",
+            "C. Pain caused by trauma",
+            "D. Pain associated with cancer"
+          ],
+          "correctAnswer": "B. Pain related to the menstrual cycle"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which condition is listed as a potential cause of nipple discharge?",
+          "options": [
+            "A. Fibrocystic change",
+            "B. Lipoma",
+            "C. Duct papilloma",
+            "D. Fat necrosis"
+          ],
+          "correctAnswer": "C. Duct papilloma"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Bone pain in the context of breast pathology could be indicative of what condition?",
+          "options": [
+            "A. Fibrocystic change",
+            "B. Mastitis",
+            "C. Cyclical mastalgia",
+            "D. Metastatic breast cancer"
+          ],
+          "correctAnswer": "D. Metastatic breast cancer"
+        }
+      ]
+    }
+  ]
+}

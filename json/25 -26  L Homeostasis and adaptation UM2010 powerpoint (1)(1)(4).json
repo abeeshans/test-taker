@@ -1,0 +1,549 @@
+{
+  "id": "654a9d96-8dba-4dcd-99aa-fe22c1d22eba",
+  "sets": [
+    {
+      "title": "A",
+      "questions": [
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary definition of homeostasis?",
+          "options": [
+            "A. The body's response to external stress",
+            "B. The maintenance of a relatively constant internal environment despite external changes",
+            "C. The process of cell division and growth",
+            "D. The fluctuation of physiological variables throughout the day"
+          ],
+          "correctAnswer": "B. The maintenance of a relatively constant internal environment despite external changes"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Cell function relies on several factors being maintained within narrow limits. Which of the following is NOT explicitly listed as one of these conditions on page 5?",
+          "options": [
+            "A. Temperature",
+            "B. Osmolarity",
+            "C. pH",
+            "D. Blood pressure"
+          ],
+          "correctAnswer": "D. Blood pressure"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The body's 'internal environment', which homeostasis seeks to keep constant, primarily corresponds to which fluid compartment?",
+          "options": [
+            "A. Intracellular fluid (ICF)",
+            "B. Blood plasma",
+            "C. Interstitial fluid",
+            "D. Transcellular fluid"
+          ],
+          "correctAnswer": "C. Interstitial fluid"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which fluid compartment constitutes the largest volume in the body?",
+          "options": [
+            "A. Intracellular fluid (ICF)",
+            "B. Interstitial fluid",
+            "C. Blood plasma",
+            "D. Transcellular fluid"
+          ],
+          "correctAnswer": "A. Intracellular fluid (ICF)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Extracellular fluid (ECF) is composed mainly of which two sub-compartments?",
+          "options": [
+            "A. Intracellular fluid and Interstitial fluid",
+            "B. Interstitial fluid and Blood plasma",
+            "C. Blood plasma and Transcellular fluid",
+            "D. Interstitial fluid and Transcellular fluid"
+          ],
+          "correctAnswer": "B. Interstitial fluid and Blood plasma"
+        },
+        {
+          "passage": "Refer to the diagram on Page 7 of '25 -26 L Homeostasis and adaptation UM2010 powerpoint (1)(1)(4).pdf'.<br><img src='https://snipboard.io/EoWJ0n.jpg' alt='Page 7 25 -26 L Homeostasis and adaptation UM2010 powerpoint (1)(1)(4).pdf' class='mt-2 rounded-md'>",
+          "question": "Compared to extracellular fluid (ECF), intracellular fluid (ICF) typically has:",
+          "options": [
+            "A. High [Na+], Low [K+]",
+            "B. Low [Na+], High [K+]",
+            "C. High [Na+], High [K+]",
+            "D. Low [Na+], Low [K+]"
+          ],
+          "correctAnswer": "B. Low [Na+], High [K+]"
+        },
+        {
+          "passage": "Refer to the diagram on Page 7 of '25 -26 L Homeostasis and adaptation UM2010 powerpoint (1)(1)(4).pdf'.<br><img src='https://snipboard.io/EoWJ0n.jpg' alt='Page 7 25 -26 L Homeostasis and adaptation UM2010 powerpoint (1)(1)(4).pdf' class='mt-2 rounded-md'>",
+          "question": "What is the typical osmolarity value given for all major body fluid compartments at steady state?",
+          "options": [
+            "A. 145 mOsM",
+            "B. 200 mOsM",
+            "C. 285 mOsM",
+            "D. 300 mOsM"
+          ],
+          "correctAnswer": "C. 285 mOsM"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "According to the summary diagram on page 9, what happens if the body's attempts to compensate for a loss of homeostasis are inadequate?",
+          "options": [
+            "A. Health is maintained",
+            "B. A new set point is established",
+            "C. There is a health risk",
+            "D. The integrating center shuts down"
+          ],
+          "correctAnswer": "C. There is a health risk"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical set point value for arterial blood pH?",
+          "options": [
+            "A. 7.0",
+            "B. 7.2",
+            "C. 7.4",
+            "D. 7.6"
+          ],
+          "correctAnswer": "C. 7.4"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical set point value for core body temperature in degrees Celsius?",
+          "options": [
+            "A. 35\u00b0C",
+            "B. 36\u00b0C",
+            "C. 37\u00b0C",
+            "D. 38\u00b0C"
+          ],
+          "correctAnswer": "C. 37\u00b0C"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In a basic feedback loop, what component detects a change or stimulus?",
+          "options": [
+            "A. Effector",
+            "B. Control center",
+            "C. Receptor (Sensor)",
+            "D. Response"
+          ],
+          "correctAnswer": "C. Receptor (Sensor)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In a homeostatic feedback loop, what component compares the current value to the set point and determines the response?",
+          "options": [
+            "A. Receptor (Sensor)",
+            "B. Effector",
+            "C. Stimulus",
+            "D. Integrating center (Control center/Error detector)"
+          ],
+          "correctAnswer": "D. Integrating center (Control center/Error detector)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What component carries out the response dictated by the control center to counteract the stimulus?",
+          "options": [
+            "A. Receptor (Sensor)",
+            "B. Effector",
+            "C. Set point",
+            "D. Integrating center"
+          ],
+          "correctAnswer": "B. Effector"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Most homeostatic control mechanisms operate via which type of feedback loop?",
+          "options": [
+            "A. Positive feedback",
+            "B. Negative feedback",
+            "C. Feed-forward control",
+            "D. Intrinsic control"
+          ],
+          "correctAnswer": "B. Negative feedback"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary characteristic of a negative feedback loop?",
+          "options": [
+            "A. The response enhances the original stimulus.",
+            "B. The response opposes or negates the original stimulus.",
+            "C. The response occurs independently of the stimulus.",
+            "D. The response requires an external factor to stop."
+          ],
+          "correctAnswer": "B. The response opposes or negates the original stimulus."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary characteristic of a positive feedback loop?",
+          "options": [
+            "A. The response enhances or amplifies the original stimulus.",
+            "B. The response opposes or negates the original stimulus.",
+            "C. The response always leads back to homeostasis.",
+            "D. The response involves hormonal control only."
+          ],
+          "correctAnswer": "A. The response enhances or amplifies the original stimulus."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of receptor monitors blood pressure?",
+          "options": [
+            "A. Chemoreceptors",
+            "B. Thermoreceptors",
+            "C. Osmoreceptors",
+            "D. Baroreceptors"
+          ],
+          "correctAnswer": "D. Baroreceptors"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of receptor monitors oxygen, carbon dioxide, and pH levels?",
+          "options": [
+            "A. Chemoreceptors",
+            "B. Thermoreceptors",
+            "C. Osmoreceptors",
+            "D. Baroreceptors"
+          ],
+          "correctAnswer": "A. Chemoreceptors"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of receptor monitors solute concentration (osmolarity)?",
+          "options": [
+            "A. Chemoreceptors",
+            "B. Thermoreceptors",
+            "C. Osmoreceptors",
+            "D. Glucoreceptors"
+          ],
+          "correctAnswer": "C. Osmoreceptors"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The operation of negative feedback typically results in the controlled variable doing what around the set point?",
+          "options": [
+            "A. Remaining absolutely constant",
+            "B. Oscillating within a normal range",
+            "C. Continuously increasing",
+            "D. Continuously decreasing"
+          ],
+          "correctAnswer": "B. Oscillating within a normal range"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which of the following is an example of a physiological process involving positive feedback?",
+          "options": [
+            "A. Regulation of body temperature",
+            "B. Regulation of blood glucose",
+            "C. Blood clotting cascade or uterine contractions during childbirth",
+            "D. Control of blood pressure"
+          ],
+          "correctAnswer": "C. Blood clotting cascade or uterine contractions during childbirth"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is usually required to break a positive feedback cycle?",
+          "options": [
+            "A. Negative feedback initiation",
+            "B. An external influence or event",
+            "C. Depletion of resources",
+            "D. Reaching a new set point"
+          ],
+          "correctAnswer": "B. An external influence or event"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Does everyone have the exact same 'normal' set point for variables like body temperature?",
+          "options": [
+            "A. Yes, set points are identical in all healthy individuals.",
+            "B. No, set points can vary between individuals within a normal range.",
+            "C. Set points only vary based on age.",
+            "D. Set points only vary based on sex."
+          ],
+          "correctAnswer": "B. No, set points can vary between individuals within a normal range."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What term describes the daily high-low rhythm observed for some physiological variables like body temperature and hormone levels?",
+          "options": [
+            "A. Homeostatic oscillation",
+            "B. Positive feedback",
+            "C. Circadian cycles",
+            "D. Adaptive homeostasis"
+          ],
+          "correctAnswer": "C. Circadian cycles"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which hormone is primarily responsible for lowering blood glucose levels after a meal?",
+          "options": [
+            "A. Glucagon",
+            "B. Insulin",
+            "C. Cortisol",
+            "D. Growth Hormone"
+          ],
+          "correctAnswer": "B. Insulin"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which hormone is primarily responsible for raising blood glucose levels when they are low (e.g., between meals)?",
+          "options": [
+            "A. Glucagon",
+            "B. Insulin",
+            "C. Melatonin",
+            "D. ACTH"
+          ],
+          "correctAnswer": "A. Glucagon"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Why is maintaining homeostasis critical for proteins within cells?",
+          "options": [
+            "A. Proteins are the main energy source.",
+            "B. Changes in conditions like pH or temperature can cause protein denaturation.",
+            "C. Proteins regulate DNA replication.",
+            "D. Proteins form the cell membrane."
+          ],
+          "correctAnswer": "B. Changes in conditions like pH or temperature can cause protein denaturation."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of homeostatic mechanism involves regulation within a tissue without external nervous or endocrine input?",
+          "options": [
+            "A. Reflex/extrinsic mechanisms",
+            "B. Intracellular mechanisms",
+            "C. Local/intrinsic mechanisms",
+            "D. Adaptive homeostasis"
+          ],
+          "correctAnswer": "C. Local/intrinsic mechanisms"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of homeostatic mechanism involves the nervous or endocrine systems controlling an organ or tissue from outside?",
+          "options": [
+            "A. Reflex/extrinsic mechanisms",
+            "B. Intracellular mechanisms",
+            "C. Local/intrinsic mechanisms",
+            "D. Feed-forward control"
+          ],
+          "correctAnswer": "A. Reflex/extrinsic mechanisms"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "During a fever, what happens to the hypothalamic set point for body temperature?",
+          "options": [
+            "A. It decreases.",
+            "B. It remains the same.",
+            "C. It increases.",
+            "D. It fluctuates rapidly."
+          ],
+          "correctAnswer": "C. It increases."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What substances, secreted by macrophages during infection, can cause the hypothalamic set point to increase, leading to fever?",
+          "options": [
+            "A. Antibodies",
+            "B. Histamines",
+            "C. Endogenous pyrogens",
+            "D. Antigens"
+          ],
+          "correctAnswer": "C. Endogenous pyrogens"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "How might a fever be beneficial in fighting infection?",
+          "options": [
+            "A. It decreases antibody production.",
+            "B. It inhibits white blood cell activity.",
+            "C. It may stimulate white blood cells and inhibit/kill some microbes.",
+            "D. It lowers the body's metabolic rate."
+          ],
+          "correctAnswer": "C. It may stimulate white blood cells and inhibit/kill some microbes."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Untreated diabetes, a failure of glucose homeostasis, can lead to damage in which systems?",
+          "options": [
+            "A. Only the pancreas",
+            "B. Only the kidneys",
+            "C. Blood vessels, nerves, and organs like kidneys",
+            "D. Primarily the respiratory system"
+          ],
+          "correctAnswer": "C. Blood vessels, nerves, and organs like kidneys"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is adaptive homeostasis?",
+          "options": [
+            "A. The same as basal homeostasis but in different species.",
+            "B. The failure of homeostatic mechanisms.",
+            "C. The transient expansion or contraction of the homeostatic range in response to non-damaging signals or stresses.",
+            "D. The permanent change in a set point due to chronic disease."
+          ],
+          "correctAnswer": "C. The transient expansion or contraction of the homeostatic range in response to non-damaging signals or stresses."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which of the following is listed as a type of stress exposure that can induce adaptive homeostasis?",
+          "options": [
+            "A. Normal room temperature",
+            "B. Regular breathing",
+            "C. Oxidative stress, Heat stress, Exercise",
+            "D. Stable blood glucose"
+          ],
+          "correctAnswer": "C. Oxidative stress, Heat stress, Exercise"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "'Positive adaptation' in adaptive homeostasis refers to:",
+          "options": [
+            "A. A shift 'down' to decrease cellular pathways.",
+            "B. A failure to adapt.",
+            "C. A shift 'up' to increase resistance pathways against greater insult.",
+            "D. A permanent increase in the basal homeostatic range."
+          ],
+          "correctAnswer": "C. A shift 'up' to increase resistance pathways against greater insult."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "'Negative adaptation' in adaptive homeostasis refers to:",
+          "options": [
+            "A. A shift 'down' to decrease cellular pathways when they are less needed.",
+            "B. Damage caused by excessive stress.",
+            "C. A shift 'up' to increase resistance pathways.",
+            "D. A decrease in the basal set point."
+          ],
+          "correctAnswer": "A. A shift 'down' to decrease cellular pathways when they are less needed."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "How does aging generally affect adaptive homeostasis?",
+          "options": [
+            "A. It improves adaptive responses.",
+            "B. It has no effect.",
+            "C. It leads to a decline in adaptive homeostasis.",
+            "D. It only affects temperature adaptation."
+          ],
+          "correctAnswer": "C. It leads to a decline in adaptive homeostasis."
+        },
+        {
+          "passage": "Refer to the diagram on Page 34 of '25 -26 L Homeostasis and adaptation UM2010 powerpoint (1)(1)(4).pdf'.<br><img src='https://snipboard.io/FQkfiG.jpg' alt='Page 34 25 -26 L Homeostasis and adaptation UM2010 powerpoint (1)(1)(4).pdf' class='mt-2 rounded-md'>",
+          "question": "According to the diagram, how does the range of adaptive homeostasis change from young to middle-aged to aged individuals?",
+          "options": [
+            "A. It increases with age.",
+            "B. It stays the same.",
+            "C. It compresses or decreases with age.",
+            "D. It becomes wider only in middle age."
+          ],
+          "correctAnswer": "C. It compresses or decreases with age."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In the context of aging and heart disease, reduced adaptive homeostasis in response to hypoxia (e.g., from plaque formation) can lead to:",
+          "options": [
+            "A. Increased protective angiogenesis and less cardiac damage.",
+            "B. Decreased response (e.g., less angiogenesis) and greater vulnerability to damage.",
+            "C. Complete reversal of plaque formation.",
+            "D. Lowering of the body temperature set point."
+          ],
+          "correctAnswer": "B. Decreased response (e.g., less angiogenesis) and greater vulnerability to damage."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Exercise training is an example of adaptive homeostasis. What cellular change is mentioned as a key adaptation leading to increased endurance?",
+          "options": [
+            "A. Decreased number of mitochondria",
+            "B. Mitochondrial biogenesis (increase in mitochondria)",
+            "C. Increased fat storage in muscle cells",
+            "D. Reduced muscle protein synthesis"
+          ],
+          "correctAnswer": "B. Mitochondrial biogenesis (increase in mitochondria)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What happens to the adaptive changes gained from exercise training if training is discontinued (detraining)?",
+          "options": [
+            "A. The changes become permanent.",
+            "B. The range of adaptive homeostasis continues to expand.",
+            "C. Adaptive homeostasis returns the capacity towards pre-training levels.",
+            "D. Only muscle strength is lost, endurance capacity remains high."
+          ],
+          "correctAnswer": "C. Adaptive homeostasis returns the capacity towards pre-training levels."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Preterm infants may have difficulty with homeostasis due to immature organ systems. Which issue is mentioned related to immature liver development?",
+          "options": [
+            "A. Hyperglycemia",
+            "B. Hypoproteinemic oedema",
+            "C. Respiratory alkalosis",
+            "D. Hypercalcemia"
+          ],
+          "correctAnswer": "B. Hypoproteinemic oedema"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Hypocalcemia (low calcium levels) in infants can lead to spontaneous twitching of hands and feet, known as:",
+          "options": [
+            "A. Oedema",
+            "B. Hypoglycemia",
+            "C. Tetany",
+            "D. Jaundice"
+          ],
+          "correctAnswer": "C. Tetany"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the term for a homeostatic response being triggered *before* any change in the internal environment has actually occurred (e.g., heart rate increasing before exercise)?",
+          "options": [
+            "A. Negative feedback",
+            "B. Positive feedback",
+            "C. Anticipation (Feed-Forward Control)",
+            "D. Acclimatization"
+          ],
+          "correctAnswer": "C. Anticipation (Feed-Forward Control)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What term describes long-term physiological adaptations in response to exposure to *natural* changes in the environment (e.g., living at high altitude)?",
+          "options": [
+            "A. Accommodation",
+            "B. Acclimation",
+            "C. Acclimatization",
+            "D. Genetic adaptation"
+          ],
+          "correctAnswer": "C. Acclimatization"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What term describes long-term physiological adaptations in response to exposure to *artificial* or simulated changes in the environment (e.g., in a lab)?",
+          "options": [
+            "A. Accommodation",
+            "B. Acclimation",
+            "C. Acclimatization",
+            "D. Genetic adaptation"
+          ],
+          "correctAnswer": "B. Acclimation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical set point value for mean arterial blood pressure?",
+          "options": [
+            "A. 70 mm Hg",
+            "B. 90 mm Hg",
+            "C. 120 mm Hg",
+            "D. 140 mm Hg"
+          ],
+          "correctAnswer": "B. 90 mm Hg"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What type of adaptation involves inherited physiological or morphological changes resulting from 'survival of the fittest'?",
+          "options": [
+            "A. Accommodation",
+            "B. Acclimation",
+            "C. Acclimatization",
+            "D. Genetic adaptation"
+          ],
+          "correctAnswer": "D. Genetic adaptation"
+        }
+      ]
+    }
+  ]
+}

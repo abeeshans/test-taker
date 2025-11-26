@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-100">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Test Taker</title>
+    <!-- External libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
+    <!-- App favicon (SVG). For packaging, generate platform icons (ICO/ICNS/PNG) from assets/icon.svg -->
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="shortcut icon" href="assets/icon.svg">
+    <meta name="theme-color" content="#005a9e">
+    <!-- Optional vendorized lottie support removed -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="h-full font-sans antialiased">
+
+    <div id="app" class="h-full">
+        <!-- === SCREEN 2: TEST DASHBOARD === -->
+        <div id="dashboard-screen" class="hidden h-full">
+            <header class="bg-white shadow-md p-4 flex items-center space-x-6">
+                <div class="flex items-center gap-3">
+                    <!-- Custom app logo (clickable) -->
+                    <button id="app-logo-btn" aria-label="Go to Dashboard" class="p-0 bg-transparent border-0">
+                        <img id="app-logo-img" src="assets/icon.svg" width="36" height="36" alt="PracticeTests logo"
+                            class="flex-shrink-0" />
+                    </button>
+                    <button id="dashboard-title-btn"
+                        class="text-2xl font-bold text-gray-800 flex-shrink-0 text-left bg-transparent border-0 p-0">Dashboard</button>
+                </div>
+                <div class="relative flex-grow">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="search" id="search-bar" placeholder="Search tests..."
+                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-center space-x-4 flex-shrink-0">
+                    <button id="create-folder-btn"
+                        class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md flex items-center">
+                        <i class="ph ph-folder-plus text-lg mr-1"></i>
+                        Create Folder
+                    </button>
+                    <button id="add-files-btn"
+                        class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center btn-primary">
+                        <i class="ph ph-plus-circle text-lg mr-1"></i>
+                        Add More Files
+                    </button>
+                    <input type="file" id="add-files-input" class="hidden" multiple accept=".json">
+
+                    <button id="test-stats-btn"
+                        class="text-sm font-medium flex items-center p-2 rounded-md bg-yellow-600 hover:bg-yellow-700 text-white"
+                        title="Test Statistics">
+                        <i class="ph ph-chart-bar text-lg mr-1"></i>
+                        <span>Test Statistics</span>
+                    </button>
+                    <button id="dashboard-help-btn"
+                        class="text-sm text-gray-600 hover:text-blue-800 font-medium flex items-center p-2 rounded-full bg-gray-100 hover:bg-gray-200"
+                        title="Help">
+                        <i class="ph ph-question text-xl"></i>
+                    </button>
+                </div>
+            </header>
+            <main class="p-8 h-full overflow-y-auto bg-gray-100">
+                <div id="test-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Test cards will be injected here -->
+                    <!-- A 'How to Use' card will be injected here by renderDashboard -->
+                </div>
+            </main>
+        </div>
+
+        <!-- === SCREEN 3: TEST TAKER === -->
+        <div id="test-screen" class="hidden h-full">
+            <!-- Header Bar -->
+            <header class="bg-white shadow-md flex items-center justify-between p-4 h-16">
+                <div class="flex items-center">
+                    <h1 id="test-title-header" class="text-xl font-bold text-gray-800">Test In Progress...</h1>
+                </div>
+                <div class="flex-1 mx-8">
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="flex items-center text-gray-700">
+                        <i class="ph ph-timer text-xl align-middle mr-1"></i>
+                        <span id="timer" class="font-medium text-lg">00:00:00</span>
+                    </div>
+                    <div id="away-clicks-counter-container" class="flex items-center text-red-600"
+                        title="Away clicks counter">
+                        <i class="ph ph-warning-circle text-xl align-middle mr-1"></i>
+                        <span id="away-clicks-counter" class="font-medium text-lg">0</span>
+                    </div>
+                    <div class="flex items-center text-gray-700">
+                        <button id="help-btn" class="text-gray-700 hover:text-blue-600" title="Text interface guide">
+                            <i class="ph ph-question text-xl align-middle mr-1"></i>
+                        </button>
+                        <span id="question-counter" class="font-medium text-lg">1 / 10</span>
+                    </div>
+                    <button id="review-dashboard-btn"
+                        class="hidden bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-md flex items-center">
+                        <i class="ph ph-squares-four text-lg mr-1"></i> Dashboard
+                    </button>
+                    <button id="finish-btn-header"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex items-center btn-success">
+                        <i class="ph ph-check-circle text-lg mr-1"></i> Finish
+                    </button>
+                    <button id="pause-btn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md flex items-center btn-primary">
+                        <i class="ph ph-pause text-lg mr-1"></i>
+                        <span id="pause-btn-text">Pause</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Test Layout (2-col) -->
+            <div class="main-layout flex w-full" style="height: calc(100vh - 8rem);">
+                <!-- Left: Passage -->
+                <div id="passage-container" class="w-1/2 p-6 overflow-y-auto border-r border-gray-300 bg-white">
+                    <!-- Passage content injected here -->
+                </div>
+
+                <!-- Right: Question -->
+                <div id="question-container" class="w-1/2 p-6 overflow-y-auto bg-gray-50 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 id="question-number" class="text-xl font-semibold text-gray-800">Question 1</h2>
+                        <button id="flag-btn"
+                            class="border border-gray-300 hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-md flex items-center">
+                            <i class="ph ph-flag text-lg mr-1"></i>
+                            <span>Flag for Review</span>
+                        </button>
+                    </div>
+                    <p id="question-text" class="text-gray-700 text-lg mb-6 leading-relaxed">Question text...</p>
+                    <div id="options-container" class="space-y-4">
+                        <!-- Options injected here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bar -->
+            <footer class="bg-white shadow-inner flex justify-between items-center p-4 h-16 border-t border-gray-200">
+                <button id="prev-btn"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="ph ph-arrow-left text-lg mr-1"></i>
+                    Previous
+                </button>
+                <button id="nav-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md flex items-center btn-primary">
+                    <i class="ph ph-navigation-arrow text-lg mr-1"></i>
+                    Navigation
+                </button>
+                <button id="next-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed btn-primary">
+                    Next
+                    <i class="ph ph-arrow-right text-lg ml-1"></i>
+                </button>
+            </footer>
+        </div>
+
+        <!-- === SCREEN 4: RESULTS SCREEN === -->
+        <div id="results-screen" class="hidden flex items-center justify-center h-full">
+            <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-2xl w-full">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">Test Complete!</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-8 text-lg">
+                    <div class="bg-blue-100 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-blue-800">SCORE</div>
+                        <div id="results-score" class="text-3xl font-bold text-blue-900">10 / 12</div>
+                    </div>
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-green-800">PERCENTAGE</div>
+                        <div id="results-percentage" class="text-3xl font-bold text-green-900">83%</div>
+                    </div>
+                    <div class="bg-red-100 p-4 rounded-lg">
+                        <div class="text-sm font-semibold text-red-800">AWAY CLICKS</div>
+                        <div id="results-away-clicks" class="text-3xl font-bold text-red-900">2</div>
+                    </div>
+                </div>
+                <div class="flex justify-center space-x-4">
+                    <button id="review-btn"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 btn-primary">
+                        <i class="ph ph-eye text-xl mr-2"></i>
+                        Review Test
+                    </button>
+                    <button id="dashboard-btn"
+                        class="w-full inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i class="ph ph-squares-four text-xl mr-2"></i>
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- === MODALS / OVERLAYS === -->
+
+        <!-- Navigation Modal -->
+        <div id="nav-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-xl font-semibold text-gray-800">Question Navigation</h2>
+                    <button id="close-nav-modal-btn" class="text-gray-500 hover:text-gray-700">
+                        <i class="ph ph-x text-2xl"></i>
+                    </button>
+                </div>
+                <div id="nav-grid" class="p-6 overflow-y-auto grid grid-cols-10 gap-2">
+                    <!-- Nav items injected here -->
+                </div>
+                <div id="nav-legend-test" class="p-4 bg-gray-50 border-t flex justify-start space-x-4">
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full bg-blue-600 mr-2"></div>
+                        <span class="text-sm text-gray-700">Current</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+                        <span class="text-sm text-gray-700">Answered</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full bg-gray-300 mr-2"></div>
+                        <span class="text-sm text-gray-700">Unanswered</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-4 h-4 rounded-full bg-yellow-300 mr-2"></div>
+                        <span class="text-sm text-gray-700">Flagged</span>
+                    </div>
+                </div>
+                <div id="nav-legend-review" class="hidden p-4 bg-gray-50 border-t grid grid-cols-2 gap-x-4 gap-y-2">
+                    <div class="flex items-center"><i class="ph-fill ph-check-circle text-green-600 mr-2"></i><span
+                            class="text-sm">Correct</span></div>
+                    <div class="flex items-center"><i class="ph-fill ph-x-circle text-red-600 mr-2"></i><span
+                            class="text-sm">Incorrect</span></div>
+                    <div class="flex items-center"><i class="ph-fill ph-minus-circle text-yellow-600 mr-2"></i><span
+                            class="text-sm">Unanswered</span></div>
+                    <div class="flex items-center"><i class="ph-fill ph-flag text-blue-600 mr-2"></i><span
+                            class="text-sm">Ever Flagged</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay"
+            class="hidden fixed inset-0 bg-gray-900 bg-opacity-40 flex items-center justify-center z-40 p-6">
+            <div class="pause-panel">
+                <h1 class="text-4xl font-bold mb-2">Test Paused</h1>
+                <div class="pause-actions">
+                    <button id="resume-overlay-btn"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-md flex items-center text-2xl btn-success">
+                        <i class="ph ph-play text-3xl mr-2"></i>
+                        Resume Test
+                    </button>
+                    <button id="abandon-test-btn"
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-md flex items-center text-lg btn-danger">
+                        <i class="ph ph-trash text-xl mr-2"></i>
+                        Abandon Test
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Time Input Modal -->
+        <div id="time-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 class="text-xl font-semibold mb-4">Set Test Time</h2>
+                <p class="text-gray-600 mb-4">How many minutes for this test?</p>
+                <input type="number" id="time-input-modal" class="w-full border border-gray-300 p-2 rounded-md mb-4"
+                    placeholder="e.g., 180">
+                <!-- Set picker (appears when the loaded test file contains multiple sets) -->
+                <div id="time-modal-set-select-wrapper" class="hidden text-left mb-3">
+                    <label for="time-modal-set-select" class="text-sm font-medium text-gray-700 block mb-1">Choose
+                        set</label>
+                    <select id="time-modal-set-select" class="w-full border border-gray-300 p-2 rounded-md">
+                        <!-- Options populated dynamically -->
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button id="cancel-time-btn"
+                        class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
+                    <button id="start-test-confirm-btn"
+                        class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 btn-primary">Start</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Folder Modal -->
+        <div id="create-folder-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 class="text-xl font-semibold mb-4">Create Folder</h2>
+                <p class="text-gray-600 mb-4">Enter a name for the new folder.</p>
+                <input id="create-folder-input" type="text" class="w-full border border-gray-300 p-2 rounded-md mb-4"
+                    placeholder="Folder name">
+                <div class="flex justify-end space-x-2">
+                    <button id="cancel-create-folder-btn"
+                        class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
+                    <button id="confirm-create-folder-btn"
+                        class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rename Modal -->
+        <div id="rename-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 class="text-xl font-semibold mb-4">Rename Test</h2>
+                <p class="text-gray-600 mb-4">Enter a new name for the test.</p>
+                <input id="rename-input" type="text" class="w-full border border-gray-300 p-2 rounded-md mb-4"
+                    placeholder="New test name">
+                <div class="flex justify-end space-x-2">
+                    <button id="rename-cancel-btn"
+                        class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
+                    <button id="rename-confirm-btn"
+                        class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 btn-primary">Rename</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Stats Modal -->
+        <div id="reset-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 class="text-xl font-semibold mb-4">Reset Stats</h2>
+                <p id="reset-modal-message" class="text-gray-700 mb-6">Are you sure you want to reset stats for this
+                    test? This cannot be undone.</p>
+                <div class="flex justify-end space-x-2">
+                    <button id="reset-cancel-btn"
+                        class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
+                    <button id="reset-confirm-btn"
+                        class="px-4 py-2 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 btn-warning">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Test Modal -->
+        <div id="delete-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 class="text-xl font-semibold mb-4">Delete Test</h2>
+                <p id="delete-modal-message" class="text-gray-700 mb-6">Are you sure you want to permanently delete this
+                    test? This cannot be undone.</p>
+                <div class="flex justify-end space-x-2">
+                    <button id="delete-cancel-btn"
+                        class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
+                    <button id="delete-confirm-btn"
+                        class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div id="alert-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 id="alert-title" class="text-xl font-semibold mb-2">Alert</h2>
+                <div id="alert-message" class="text-gray-600 mb-6 text-sm">This is an alert message.</div>
+                <button id="alert-ok-btn"
+                    class="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 btn-primary">OK</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Help Modal -->
+        <div id="dashboard-help-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-xl font-semibold text-gray-800">Help & Information</h2>
+                    <button id="close-dashboard-help-btn" class="text-gray-500 hover:text-gray-700">
+                        <i class="ph ph-x text-2xl"></i>
+                    </button>
+                </div>
+                <!-- Dynamic load summary (populated by renderer.js). Keep visible so users see parse/load issues. -->
+                <div id="load-summary" class="p-4 bg-yellow-50 border-b text-sm text-gray-700" aria-live="polite">
+                    <!-- renderer.js will inject summaries here (errors, skipped files, counts). -->
+                </div>
+
+                <div class="p-6 overflow-y-auto space-y-4 text-sm">
+                    <!-- Keep the help concise: toggleable sections for easy scanning. -->
+                    <details class="bg-gray-50 p-3 rounded-lg" open>
+                        <summary class="font-semibold cursor-pointer text-base">About Index (TBD)</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <p><strong>Index (TBD)</strong> is a lightweight study tool that helps students convert
+                                lecture slides and notes into custom practice question sets. Organize, review and
+                                track your progress locally. The app stores data on your machine and does not send
+                                your files anywhere.</p>
+                            <p class="mt-2">Purpose: turn course content into reusable practice questions so you can
+                                study efficiently and monitor improvement over time.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Quick Start</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <ol class="list-decimal pl-5 space-y-2">
+                                <li>Click <strong>Add More Files</strong> and choose one or more <code>.json</code>
+                                    files that contain your questions.</li>
+                                <li>Open any test card and click <strong>Start Test</strong>. You will be asked for a
+                                    time limit (minutes) and — if the file has multiple sets — which set to run.</li>
+                                <li>During tests use keyboard shortcuts (1–4 to answer, ←/→ to navigate, F to flag,
+                                    P to pause) for fast review.</li>
+                            </ol>
+
+                            <div class="mt-3">
+                                <div class="font-medium">Folders & Card actions</div>
+                                <p class="text-sm text-gray-700 mt-2">Use folders to group related tests. Create a
+                                    folder, then drag tests into it or use the folder controls to organize your library.
+                                    Folder expanded/collapsed state is remembered.</p>
+                                <ul class="list-disc pl-5 mt-2">
+                                    <li><strong>Card actions:</strong> use the kebab menu on cards to rename, reset
+                                        stats, delete, or export.</li>
+                                    <li><strong>Star / Pin:</strong> pin important tests for quick access.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Adding Tests (JSON formats)</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <p>The app accepts several simple JSON formats — place files in the <code>/json</code>
+                                folder or upload them using the <strong>Add More Files</strong> control.</p>
+
+                            <div class="mt-2">
+                                <div class="font-medium">Accepted JSON shape — object with named sets</div>
+
+                                <!-- Minimal header bar above the example JSON (label left, small copy icon right) -->
+                                <div class="help-code-header flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-gray-700">Example JSON</span>
+                                    </div>
+                                    <div>
+                                        <button id="copy-json-btn" aria-label="Copy example JSON"
+                                            title="Copy example JSON"
+                                            class="copy-btn-small rounded bg-gray-700 hover:bg-gray-600 text-white focus:outline-none"
+                                            style="padding:6px">
+                                            <i class="ph ph-copy" style="font-size:14px"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <pre class="p-1 rounded text-xs json-code"><code>
+<span class="json-brace-curly">{</span>
+    <span class="json-key">"sets"</span><span class="json-punct">: </span><span class="json-brace-square">[</span>
+        <span class="json-brace-curly">{</span>
+            <span class="json-key">"title"</span><span class="json-punct">: </span><span class="json-string">"Set A"</span><span class="json-punct">,</span>
+            <span class="json-key">"questions"</span><span class="json-punct">: </span><span class="json-brace-square">[</span>
+                <span class="json-brace-curly">{</span>
+                    <span class="json-key">"passage"</span><span class="json-punct">: </span><span class="json-string">"Passage A"</span><span class="json-punct">,</span>
+                    <span class="json-key">"question"</span><span class="json-punct">: </span><span class="json-string">"Question 1"</span><span class="json-punct">,</span>
+                    <span class="json-key">"options"</span><span class="json-punct">: </span><span class="json-brace-square">[</span><span class="json-string">"Option 1"</span><span class="json-punct">, </span><span class="json-string">"Option 2"</span><span class="json-brace-square">]</span><span class="json-punct">,</span>
+                    <span class="json-key">"correctAnswer"</span><span class="json-punct">: </span><span class="json-string">"Option 1"</span>
+                <span class="json-brace-curly">}</span>
+            <span class="json-brace-square">]</span>
+        <span class="json-brace-curly">}</span>
+        <span class="json-punct">,</span>
+        <span class="json-brace-curly">{</span>
+            <span class="json-key">"title"</span><span class="json-punct">: </span><span class="json-string">"Set B"</span><span class="json-punct">,</span>
+            <span class="json-key">"questions"</span><span class="json-punct">: </span><span class="json-brace-square">[</span>
+                <span class="json-brace-curly">{</span>
+                    <span class="json-key">"passage"</span><span class="json-punct">: </span><span class="json-string">"Passage B"</span><span class="json-punct">,</span>
+                    <span class="json-key">"question"</span><span class="json-punct">: </span><span class="json-string">"Question 2"</span><span class="json-punct">,</span>
+                    <span class="json-key">"options"</span><span class="json-punct">: </span><span class="json-brace-square">[</span><span class="json-string">"Option A"</span><span class="json-punct">, </span><span class="json-string">"Option B"</span><span class="json-brace-square">]</span><span class="json-punct">,</span>
+                    <span class="json-key">"correctAnswer"</span><span class="json-punct">: </span><span class="json-string">"Option A"</span>
+                <span class="json-brace-curly">}</span>
+            <span class="json-brace-square">]</span>
+        <span class="json-brace-curly">}</span>
+    <span class="json-brace-square">]</span>
+<span class="json-brace-curly">}</span>
+</code></pre>
+
+                                <!-- Hidden raw JSON template used for copying (pure JSON, no span wrappers) -->
+                                <template id="example-json-template">{
+                                    "sets": [
+                                    {
+                                    "title": "Set A",
+                                    "questions": [
+                                    { "passage": "", "question": "Question 1", "options": ["Option 1","Option 2","Option
+                                    3","Option 4"], "correctAnswer": "Option 1" }
+                                    ]
+                                    },
+                                    {
+                                    "title": "Set B",
+                                    "questions": [
+                                    { "passage": "", "question": "Question 1", "options": ["Option 1","Option 2","Option
+                                    3","Option 4"], "correctAnswer": "Option 1" }
+                                    ]
+                                    }
+                                    ]
+                                    }
+                                </template>
+                            </div>
+                    </details>
+
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Statistics & Calendar</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <p>The <strong>Test Statistics</strong> panel shows aggregated metrics per test and per
+                                set (if applicable): attempts, average score, best score, average time and last
+                                attempt date. Use the calendar view to see activity by day — hover to reveal
+                                details.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-gray-50 p-3 rounded-lg">
+                        <summary class="font-semibold cursor-pointer text-base">Troubleshooting & Tips</summary>
+                        <div class="mt-3 text-gray-700 prose prose-sm max-w-none">
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><strong>Load issues:</strong> the top <em>Load Summary</em> shows files the app
+                                    couldn't parse and brief error messages — open it after loading files.</li>
+                                <li><strong>Empty tests:</strong> ensure each question object has
+                                    <code>question</code> and <code>options</code> (array). If using indices for
+                                    answers, use 0-based indexes.
+                                </li>
+                                <li><strong>Accessibility:</strong> keyboard navigation is supported; if you
+                                    prefer a visible focus ring for keyboard users, enable the focus-visible
+                                    behavior in settings (coming soon).</li>
+                                <li><strong>Feature requests:</strong> suggestions are welcome — open an issue or
+                                    reply in the project repo with priority items (bulk actions, tags, export).</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <div id="help-last-row" class="pt-3 text-xs text-gray-500 border-t">
+                        <div class="flex items-center justify-between">
+                            <div>Last load: <span id="help-last-load" class="font-medium">—</span></div>
+                            <div class="text-right">Made by <span class="font-semibold">Abeeshan Selvabaskaran</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Statistics Modal -->
+        <div id="test-stats-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[85vh] flex flex-col">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h2 class="text-xl font-semibold text-gray-800">Test Statistics</h2>
+                        <button id="close-test-stats-btn" class="text-gray-500 hover:text-gray-700">
+                            <i class="ph ph-x text-2xl"></i>
+                        </button>
+                    </div>
+                    <div class="p-4 border-b bg-gray-50">
+                        <!-- Tabs moved above controls so calendar view can hide search/sort cleanly -->
+                        <div class="tabs" role="tablist" aria-label="Test stats views">
+                            <button id="test-stats-tab-list" class="px-3 py-1 rounded-md bg-white text-sm font-medium"
+                                role="tab" aria-selected="true">List</button>
+                            <button id="test-stats-tab-calendar" class="px-3 py-1 rounded-md text-sm font-medium"
+                                role="tab" aria-selected="false">Calendar</button>
+                        </div>
+                        <div id="test-stats-controls" class="flex items-center gap-3 mt-3 p-2">
+                            <div class="relative flex items-center">
+                                <!-- Filter toggle on the LEFT of the search input -->
+                                <button id="test-stats-filter-toggle" aria-haspopup="true" aria-expanded="false"
+                                    title="Filter"
+                                    class="mr-2 p-2 bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50">
+                                    <i class="ph ph-funnel simple-filter-icon"></i>
+                                </button>
+                                <input id="test-stats-search" type="search" placeholder="Search tests..."
+                                    class="px-3 py-2 border border-gray-300 rounded-md w-96" />
+                                <!-- Filter popover positioned relative to this wrapper; top-left aligns with the filter button -->
+                                <div id="test-stats-filter-popover"
+                                    class="hidden absolute z-40 bg-white border rounded-md shadow-lg p-2 text-sm w-48">
+                                    <div class="font-medium mb-2">Sort by</div>
+                                    <div class="filter-option p-1 hover:bg-gray-50 cursor-pointer" data-value="name">
+                                        Name (A→Z)</div>
+                                    <div class="filter-option p-1 hover:bg-gray-50 cursor-pointer"
+                                        data-value="attempts">Attempts (desc)</div>
+                                    <div class="filter-option p-1 hover:bg-gray-50 cursor-pointer"
+                                        data-value="avgPercent">Avg % (desc)</div>
+                                    <div class="filter-option p-1 hover:bg-gray-50 cursor-pointer"
+                                        data-value="bestPercent">Best % (desc)</div>
+                                    <div class="filter-option p-1 hover:bg-gray-50 cursor-pointer" data-value="avgTime">
+                                        Avg Time (desc)</div>
+                                </div>
+                            </div>
+                            <!-- Hidden select kept for JS compatibility -->
+                            <select id="test-stats-sort" class="hidden" aria-hidden="true">
+                                <option value="name">Name (A→Z)</option>
+                                <option value="attempts">Attempts (desc)</option>
+                                <option value="avgPercent">Avg % (desc)</option>
+                                <option value="bestPercent">Best % (desc)</option>
+                                <option value="avgTime">Avg Time (desc)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-4 border-b bg-gray-50 justify-center">
+                        <div id="test-stats-year-controls" class="flex items-center gap-2">
+                            <div class="flex items-center gap-2" role="group" aria-label="Calendar year controls">
+                                <button id="test-stats-year-prev" class="px-3 py-1 rounded-md text-sm"
+                                    aria-label="Previous year">‹</button>
+                                <div id="test-stats-year-label" class="px-3 py-1 text-sm font-medium" data-year=""
+                                    aria-live="polite">2025</div>
+                                <button id="test-stats-year-next" class="px-3 py-1 rounded-md text-sm"
+                                    aria-label="Next year">›</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="test-stats-list" class="p-4 overflow-y-auto text-sm">
+                        <!-- Stats table injected here -->
+                    </div>
+                    <div id="test-stats-calendar" class="p-4 overflow-y-auto text-sm hidden">
+                        <!-- Calendar view injected here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generic Confirm Modal -->
+        <div id="confirm-modal"
+            class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center w-full max-w-sm">
+                <h2 id="confirm-modal-title" class="text-lg font-semibold mb-2">Please Confirm</h2>
+                <p id="confirm-modal-message" class="text-gray-700 mb-6">Are you sure?</p>
+                <div class="flex justify-end space-x-2">
+                    <button id="confirm-modal-cancel"
+                        class="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
+                    <button id="confirm-modal-confirm"
+                        class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Application script -->
+    <script>
+        // Copy example JSON button logic (uses the hidden <template> with raw JSON)
+        document.addEventListener('DOMContentLoaded', function () {
+            const copyBtn = document.getElementById('copy-json-btn');
+            const tpl = document.getElementById('example-json-template');
+            if (!copyBtn || !tpl) return;
+            copyBtn.addEventListener('click', async function () {
+                const raw = tpl.innerText.trim();
+                const orig = copyBtn.innerHTML;
+                const hint = document.getElementById('copy-json-hint');
+                try {
+                    await navigator.clipboard.writeText(raw);
+                    // show success briefly
+                    copyBtn.innerHTML = '<i class="ph ph-check" style="font-size:16px"></i>';
+                    if (hint) hint.textContent = 'Copied!';
+                    setTimeout(() => { copyBtn.innerHTML = orig; if (hint) hint.textContent = 'Click the copy icon to copy the template'; }, 1500);
+                } catch (err) {
+                    // Fallback for environments without navigator.clipboard
+                    const ta = document.createElement('textarea');
+                    ta.value = raw;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try { document.execCommand('copy'); copyBtn.innerHTML = '<i class="ph ph-check" style="font-size:16px"></i>'; if (hint) hint.textContent = 'Copied!'; } catch (e) { alert('Copy failed — select and copy manually'); }
+                    document.body.removeChild(ta);
+                    setTimeout(() => { copyBtn.innerHTML = orig; if (hint) hint.textContent = 'Click the copy icon to copy the template'; }, 1500);
+                }
+            });
+
+            // Bracket pairing: compute matching pairs and highlight only the exact matching pair on hover
+            (function attachBracketPairs() {
+                try {
+                    const code = document.querySelector('#dashboard-help-modal pre.json-code code');
+                    if (!code) return;
+                    const bracketSelector = '.json-brace-curly, .json-brace-square, .json-brace-paren';
+                    const nodes = Array.from(code.querySelectorAll(bracketSelector));
+
+                    // Map closing -> opening
+                    const closes = { '}': '{', ']': '[', ')': '(' };
+
+                    const stack = [];
+                    let pairCounter = 0;
+
+                    nodes.forEach((el) => {
+                        const ch = (el.textContent || '').trim();
+                        if (ch === '{' || ch === '[' || ch === '(') {
+                            stack.push({ ch, el });
+                        } else if (ch === '}' || ch === ']' || ch === ')') {
+                            const want = closes[ch];
+                            // find last opening matching 'want'
+                            for (let i = stack.length - 1; i >= 0; i--) {
+                                if (stack[i].ch === want) {
+                                    const opened = stack.splice(i, 1)[0];
+                                    pairCounter++;
+                                    const id = String(pairCounter);
+                                    opened.el.setAttribute('data-pair-id', id);
+                                    el.setAttribute('data-pair-id', id);
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                    // Attach hover handlers that highlight only the matching pair
+                    nodes.forEach((el) => {
+                        el.addEventListener('mouseenter', () => {
+                            const id = el.getAttribute('data-pair-id');
+                            if (id) {
+                                document.querySelectorAll('[data-pair-id="' + id + '"]').forEach((s) => s.classList.add('bracket-highlight'));
+                            } else {
+                                // no pair found: highlight just this element
+                                el.classList.add('bracket-highlight');
+                            }
+                        });
+                        el.addEventListener('mouseleave', () => {
+                            const id = el.getAttribute('data-pair-id');
+                            if (id) {
+                                document.querySelectorAll('[data-pair-id="' + id + '"]').forEach((s) => s.classList.remove('bracket-highlight'));
+                            } else {
+                                el.classList.remove('bracket-highlight');
+                            }
+                        });
+                    });
+                } catch (e) {
+                    // fallback: do nothing
+                    console.warn('attachBracketPairs failed', e);
+                }
+            })();
+        });
+    </script>
+    <script src="renderer.js" defer></script>
+
+
+</body>
+
+</html>

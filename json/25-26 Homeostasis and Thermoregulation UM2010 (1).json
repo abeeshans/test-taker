@@ -1,0 +1,560 @@
+{
+  "id": "c0927b55-6a8f-4667-8a88-5dfb775e207f",
+  "sets": [
+    {
+      "title": "A",
+      "questions": [
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Humans maintain their body temperature independently of environmental temperature. What term describes this characteristic?",
+          "options": [
+            "A. Poikilothermic",
+            "B. Ectothermic",
+            "C. Homeothermic",
+            "D. Heterothermic"
+          ],
+          "correctAnswer": "C. Homeothermic"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical range for human 'core' body temperature?",
+          "options": [
+            "A. 33.0-35.0\u00b0C",
+            "B. 35.1-36.0\u00b0C",
+            "C. 36.1-37.8\u00b0C",
+            "D. 38.0-39.5\u00b0C"
+          ],
+          "correctAnswer": "C. 36.1-37.8\u00b0C"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Hypothermia is clinically defined as a core body temperature below what threshold?",
+          "options": [
+            "A. 37.0\u00b0C",
+            "B. 36.0\u00b0C",
+            "C. 35.0\u00b0C",
+            "D. 34.0\u00b0C"
+          ],
+          "correctAnswer": "C. 35.0\u00b0C"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "At approximately what core body temperature does shivering typically stop during progressive hypothermia?",
+          "options": [
+            "A. 36\u00b0C",
+            "B. 34\u00b0C",
+            "C. 33\u00b0C",
+            "D. 31\u00b0C"
+          ],
+          "correctAnswer": "C. 33\u00b0C"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Death due to arrhythmia or cardiac arrest commonly occurs when core body temperature falls below:",
+          "options": [
+            "A. 32\u00b0C",
+            "B. 30\u00b0C",
+            "C. 28\u00b0C",
+            "D. 26\u00b0C"
+          ],
+          "correctAnswer": "D. 26\u00b0C"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Hyperthermia, if not caused by fever, is typically classified as a core body temperature above:",
+          "options": [
+            "A. 37.0\u00b0C",
+            "B. 37.5\u00b0C",
+            "C. 38.0\u00b0C",
+            "D. 39.0\u00b0C"
+          ],
+          "correctAnswer": "C. 38.0\u00b0C"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "At approximately what core body temperature does heatstroke become a medical emergency, often associated with fainting, confusion, and vomiting?",
+          "options": [
+            "A. 38\u00b0C",
+            "B. 39\u00b0C",
+            "C. 40\u00b0C",
+            "D. 41\u00b0C"
+          ],
+          "correctAnswer": "D. 41\u00b0C"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Temperatures above which threshold are almost certainly fatal?",
+          "options": [
+            "A. 41\u00b0C",
+            "B. 42\u00b0C",
+            "C. 43\u00b0C",
+            "D. 44\u00b0C"
+          ],
+          "correctAnswer": "D. 44\u00b0C"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Even at rest in a thermoneutral environment, basal metabolism produces heat. Without heat loss, approximately how much would core temperature rise per hour?",
+          "options": [
+            "A. 0.1\u00b0C/h",
+            "B. 0.5\u00b0C/h",
+            "C. 1.0\u00b0C/h",
+            "D. 2.0\u00b0C/h"
+          ],
+          "correctAnswer": "C. 1.0\u00b0C/h"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which process involves the transfer of heat energy via infrared rays between objects not in physical contact?",
+          "options": [
+            "A. Conduction",
+            "B. Convection",
+            "C. Evaporation",
+            "D. Radiation"
+          ],
+          "correctAnswer": "D. Radiation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which process involves heat transfer through direct physical contact between surfaces?",
+          "options": [
+            "A. Conduction",
+            "B. Convection",
+            "C. Evaporation",
+            "D. Radiation"
+          ],
+          "correctAnswer": "A. Conduction"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which process involves heat transfer to a moving fluid (like air or water) in contact with the body?",
+          "options": [
+            "A. Conduction",
+            "B. Convection",
+            "C. Evaporation",
+            "D. Radiation"
+          ],
+          "correctAnswer": "B. Convection"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which process involves heat loss through the conversion of liquid sweat to vapor?",
+          "options": [
+            "A. Conduction",
+            "B. Convection",
+            "C. Evaporation",
+            "D. Radiation"
+          ],
+          "correctAnswer": "C. Evaporation"
+        },
+        {
+          "passage": "Refer to the chart on Page 11 of '25-26 Homeostasis and Thermoregulation UM2010 (1).pdf'.<br><img src='https://snipboard.io/m5Wd8e.jpg' alt='Page 11 25-26 Homeostasis and Thermoregulation UM2010 (1).pdf' class='mt-2 rounded-md'>",
+          "question": "Under resting, hot, and dry conditions, which is the dominant mechanism of heat loss?",
+          "options": [
+            "A. Evaporation",
+            "B. Radiation and convection",
+            "C. Conduction",
+            "D. Metabolism"
+          ],
+          "correctAnswer": "B. Radiation and convection"
+        },
+        {
+          "passage": "Refer to the chart on Page 11 of '25-26 Homeostasis and Thermoregulation UM2010 (1).pdf'.<br><img src='https://snipboard.io/m5Wd8e.jpg' alt='Page 11 25-26 Homeostasis and Thermoregulation UM2010 (1).pdf' class='mt-2 rounded-md'>",
+          "question": "Under strenuous exercise in hot and humid conditions, which mechanism becomes the *least* effective for heat loss compared to dry conditions?",
+          "options": [
+            "A. Evaporation",
+            "B. Radiation",
+            "C. Convection",
+            "D. Conduction"
+          ],
+          "correctAnswer": "A. Evaporation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What happens to the sweating mechanism above a core temperature of approximately 41\u00b0C during heat stroke?",
+          "options": [
+            "A. It increases dramatically",
+            "B. It remains unchanged",
+            "C. It stops",
+            "D. It produces salty sweat"
+          ],
+          "correctAnswer": "C. It stops"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which central nervous system structure acts as the primary integration center for thermoregulation?",
+          "options": [
+            "A. Cerebellum",
+            "B. Thalamus",
+            "C. Hypothalamus",
+            "D. Spinal Cord"
+          ],
+          "correctAnswer": "C. Hypothalamus"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What are the two main physiological responses initiated by the hypothalamus to increase heat loss when the body is too hot?",
+          "options": [
+            "A. Shivering and vasoconstriction",
+            "B. Sweating and vasodilation",
+            "C. Increased metabolism and vasoconstriction",
+            "D. Decreased sweating and vasodilation"
+          ],
+          "correctAnswer": "B. Sweating and vasodilation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is non-shivering thermogenesis primarily mediated by?",
+          "options": [
+            "A. Muscle contractions",
+            "B. Hormones increasing metabolic rate (e.g., adrenalin, thyroxin)",
+            "C. Vasodilation",
+            "D. Sweating"
+          ],
+          "correctAnswer": "B. Hormones increasing metabolic rate (e.g., adrenalin, thyroxin)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is shivering thermogenesis?",
+          "options": [
+            "A. Heat production via hormonal increase in metabolism",
+            "B. Heat loss via sweating",
+            "C. Heat production via involuntary muscle contractions",
+            "D. Heat conservation via vasoconstriction"
+          ],
+          "correctAnswer": "C. Heat production via involuntary muscle contractions"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary mechanism for decreasing heat loss in response to cold?",
+          "options": [
+            "A. Sweating",
+            "B. Vasodilation of skin blood vessels",
+            "C. Vasoconstriction of skin blood vessels",
+            "D. Shivering"
+          ],
+          "correctAnswer": "C. Vasoconstriction of skin blood vessels"
+        },
+        {
+          "passage": "Refer to the diagram on Page 17 of '25-26 Homeostasis and Thermoregulation UM2010 (1).pdf'.<br><img src='https://snipboard.io/iatK3j.jpg' alt='Page 17 25-26 Homeostasis and Thermoregulation UM2010 (1).pdf' class='mt-2 rounded-md'>",
+          "question": "Afferent signals regarding cold temperatures are sent to the hypothalamus from receptors located in:",
+          "options": [
+            "A. Skin only",
+            "B. Internal organs only",
+            "C. Spinal cord only",
+            "D. Skin, Internal organs, and Spinal Cord"
+          ],
+          "correctAnswer": "D. Skin, Internal organs, and Spinal Cord"
+        },
+        {
+          "passage": "Refer to the diagram on Page 17 of '25-26 Homeostasis and Thermoregulation UM2010 (1).pdf'.<br><img src='https://snipboard.io/iatK3j.jpg' alt='Page 17 25-26 Homeostasis and Thermoregulation UM2010 (1).pdf' class='mt-2 rounded-md'>",
+          "question": "Which endocrine glands are involved in the hormonal response to cold, as integrated by the hypothalamus/pituitary?",
+          "options": [
+            "A. Adrenal medulla, Adrenal cortex, Thyroid gland",
+            "B. Pancreas, Ovaries, Testes",
+            "C. Pineal gland, Parathyroid gland",
+            "D. Thymus, Spleen"
+          ],
+          "correctAnswer": "A. Adrenal medulla, Adrenal cortex, Thyroid gland"
+        },
+        {
+          "passage": "Refer to the graph on Page 19 of '25-26 Homeostasis and Thermoregulation UM2010 (1).pdf'.<br><img src='https://snipboard.io/T7JteI.jpg' alt='Page 19 25-26 Homeostasis and Thermoregulation UM2010 (1).pdf' class='mt-2 rounded-md'>",
+          "question": "According to the graph, how does Resting Metabolic Rate (RMR) generally change as environmental temperature decreases below the thermoneutral zone?",
+          "options": [
+            "A. RMR decreases",
+            "B. RMR stays the same",
+            "C. RMR increases",
+            "D. RMR fluctuates randomly"
+          ],
+          "correctAnswer": "C. RMR increases"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What term describes an immediate physiological change in the sensitivity of cells to environmental changes?",
+          "options": [
+            "A. Accommodation",
+            "B. Acclimation",
+            "C. Acclimatization",
+            "D. Genetic adaptation"
+          ],
+          "correctAnswer": "A. Accommodation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What term describes long-term physiological changes resulting from exposure to *natural* changes in the environment (e.g., seasonal changes)?",
+          "options": [
+            "A. Accommodation",
+            "B. Acclimation",
+            "C. Acclimatization",
+            "D. Habituation"
+          ],
+          "correctAnswer": "C. Acclimatization"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What term describes long-term physiological adaptations resulting from exposure to *artificial* or simulated environmental changes (e.g., in a lab)?",
+          "options": [
+            "A. Accommodation",
+            "B. Acclimation",
+            "C. Acclimatization",
+            "D. Genetic adaptation"
+          ],
+          "correctAnswer": "B. Acclimation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "According to Young's Model of Cold Acclimatisation, 'cold habituation' involves which physiological changes?",
+          "options": [
+            "A. Enhanced shivering and enhanced non-shivering thermogenesis",
+            "B. Blunted shivering and blunted cutaneous vasoconstriction",
+            "C. Enhanced cutaneous vasoconstriction and improved muscle blood flow",
+            "D. Increased metabolic rate only"
+          ],
+          "correctAnswer": "B. Blunted shivering and blunted cutaneous vasoconstriction"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "According to Young's Model, if increased metabolic heat production is *insufficient* to defend body temperature during chronic cold stress, which type of acclimatisation occurs?",
+          "options": [
+            "A. Cold habituation",
+            "B. Metabolic acclimatisation",
+            "C. Insulative acclimatisation",
+            "D. Genetic adaptation"
+          ],
+          "correctAnswer": "C. Insulative acclimatisation"
+        },
+        {
+          "passage": "Refer to the chart on Page 25 of '25-26 Homeostasis and Thermoregulation UM2010 (1).pdf'.<br><img src='https://snipboard.io/ScsI71.jpg' alt='Page 25 25-26 Homeostasis and Thermoregulation UM2010 (1).pdf' class='mt-2 rounded-md'>",
+          "question": "During heat acclimatisation over 14 days, what happens to the sweat rate?",
+          "options": [
+            "A. It decreases significantly",
+            "B. It remains unchanged",
+            "C. It increases",
+            "D. It becomes saltier"
+          ],
+          "correctAnswer": "C. It increases"
+        },
+        {
+          "passage": "Refer to the chart on Page 25 of '25-26 Homeostasis and Thermoregulation UM2010 (1).pdf'.<br><img src='https://snipboard.io/ScsI71.jpg' alt='Page 25 25-26 Homeostasis and Thermoregulation UM2010 (1).pdf' class='mt-2 rounded-md'>",
+          "question": "During heat acclimatisation, what happens to the concentration of Na+ and Cl- in sweat?",
+          "options": [
+            "A. It increases",
+            "B. It decreases",
+            "C. It remains unchanged",
+            "D. It fluctuates unpredictably"
+          ],
+          "correctAnswer": "B. It decreases"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of freezing injury involves only the outer skin layer?",
+          "options": [
+            "A. Frostnip",
+            "B. Superficial frostbite",
+            "C. Severe frostbite",
+            "D. Hypothermia"
+          ],
+          "correctAnswer": "A. Frostnip"
+        },
+        {
+          "passage": "Refer to the diagram on Page 27 of '25-26 Homeostasis and Thermoregulation UM2010 (1).pdf'.<br><img src='https://snipboard.io/qMOdjy.jpg' alt='Page 27 25-26 Homeostasis and Thermoregulation UM2010 (1).pdf' class='mt-2 rounded-md'>",
+          "question": "According to the pathophysiology diagram, the formation of ice crystals during frostbite leads directly to what cellular condition?",
+          "options": [
+            "A. Cell swelling",
+            "B. Cell dehydration",
+            "C. Increased metabolic rate",
+            "D. Vasodilation"
+          ],
+          "correctAnswer": "B. Cell dehydration"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Cold exposure can lead to local vasoconstriction and increased blood viscosity, both contributing to what immediate problem?",
+          "options": [
+            "A. Increased heat loss",
+            "B. Reduced blood flow",
+            "C. Increased sweating",
+            "D. Shivering"
+          ],
+          "correctAnswer": "B. Reduced blood flow"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Cold-induced diuresis (increased urine output) occurs partly because cold reduces the kidney tubules' sensitivity to which hormone?",
+          "options": [
+            "A. Aldosterone",
+            "B. Insulin",
+            "C. Antidiuretic Hormone (ADH)",
+            "D. Thyroxin"
+          ],
+          "correctAnswer": "C. Antidiuretic Hormone (ADH)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the 'Hunter reflex' or cold-induced vasodilation (CIVD)?",
+          "options": [
+            "A. Continuous severe vasoconstriction in the cold",
+            "B. Cyclical vasoconstriction and vasodilation in peripheral tissues during cold exposure",
+            "C. A sudden drop in core body temperature upon entering cold water",
+            "D. The shivering response"
+          ],
+          "correctAnswer": "B. Cyclical vasoconstriction and vasodilation in peripheral tissues during cold exposure"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Hypothermia resulting from prolonged exposure where energy reserves become depleted (e.g., a lost hill walker) is classified as:",
+          "options": [
+            "A. Acute hypothermia",
+            "B. Subacute (exhaustion) hypothermia",
+            "C. Subchronic (urban) hypothermia",
+            "D. Chronic hypothermia"
+          ],
+          "correctAnswer": "B. Subacute (exhaustion) hypothermia"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Why might rapid rewarming be dangerous in subchronic (urban) hypothermia?",
+          "options": [
+            "A. It causes severe shivering.",
+            "B. It can reverse fluid shifts too quickly, potentially causing pulmonary oedema.",
+            "C. It leads to hyperthermia.",
+            "D. It prevents the kidneys from functioning."
+          ],
+          "correctAnswer": "B. It can reverse fluid shifts too quickly, potentially causing pulmonary oedema."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In the classification of hypothermia, which stage is characterized by impaired consciousness and potentially the absence of shivering?",
+          "options": [
+            "A. Stage I",
+            "B. Stage II",
+            "C. Stage III",
+            "D. Stage IV"
+          ],
+          "correctAnswer": "B. Stage II"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Heat exhaustion is often due to depletion of what?",
+          "options": [
+            "A. Oxygen or Glucose",
+            "B. Water or Salt",
+            "C. Muscle glycogen only",
+            "D. Body fat"
+          ],
+          "correctAnswer": "B. Water or Salt"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is a key difference between heat exhaustion and heatstroke regarding core temperature and CNS function?",
+          "options": [
+            "A. Heat exhaustion has higher core temp (>40\u00b0C) and CNS dysfunction; heatstroke does not.",
+            "B. Heatstroke has higher core temp (>40\u00b0C) and CNS dysfunction; heat exhaustion usually does not.",
+            "C. Both have similar core temperatures, but only heatstroke involves sweating.",
+            "D. Both involve CNS dysfunction, but only heat exhaustion has high core temperatures."
+          ],
+          "correctAnswer": "B. Heatstroke has higher core temp (>40\u00b0C) and CNS dysfunction; heat exhaustion usually does not."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What happens to the basal metabolic rate during hypothermia?",
+          "options": [
+            "A. It increases significantly.",
+            "B. It decreases.",
+            "C. It remains unchanged.",
+            "D. It fluctuates wildly."
+          ],
+          "correctAnswer": "B. It decreases."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In hyperthermia, what damaging process occurs to proteins, impairing cellular function?",
+          "options": [
+            "A. Glycosylation",
+            "B. Phosphorylation",
+            "C. Denaturation",
+            "D. Hydrolysis"
+          ],
+          "correctAnswer": "C. Denaturation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the most effective behavioural response to feeling cold?",
+          "options": [
+            "A. Reducing physical activity",
+            "B. Removing layers of clothing",
+            "C. Adding layers of clothing or seeking shelter",
+            "D. Standing near a fan"
+          ],
+          "correctAnswer": "C. Adding layers of clothing or seeking shelter"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Vasodilation of subcutaneous vessels primarily aids in which process?",
+          "options": [
+            "A. Increasing heat production",
+            "B. Decreasing heat loss",
+            "C. Increasing heat loss",
+            "D. Increasing blood pressure"
+          ],
+          "correctAnswer": "C. Increasing heat loss"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What mechanism accounts for the largest proportion (approx. 60%) of heat loss under normal conditions?",
+          "options": [
+            "A. Conduction",
+            "B. Convection",
+            "C. Evaporation",
+            "D. Radiation"
+          ],
+          "correctAnswer": "D. Radiation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Why might thermogenesis be reduced in the elderly?",
+          "options": [
+            "A. Increased skeletal muscle mass",
+            "B. Reduced skeletal muscle mass and endocrine changes",
+            "C. Increased sensitivity to cold",
+            "D. Hyperactive thyroid gland"
+          ],
+          "correctAnswer": "B. Reduced skeletal muscle mass and endocrine changes"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Why are newborns particularly susceptible to heat loss?",
+          "options": [
+            "A. High body fat percentage",
+            "B. Large surface area-to-body mass ratio and less subcutaneous fat",
+            "C. Overactive shivering mechanism",
+            "D. Low body water content"
+          ],
+          "correctAnswer": "B. Large surface area-to-body mass ratio and less subcutaneous fat"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary mechanism newborns use for heat production, since they cannot shiver effectively?",
+          "options": [
+            "A. Crying",
+            "B. Vasoconstriction",
+            "C. Non-shivering thermogenesis in brown fat",
+            "D. Increased muscle activity"
+          ],
+          "correctAnswer": "C. Non-shivering thermogenesis in brown fat"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Why is the average core body temperature difference between young and elderly adults clinically relevant when assessing for fever?",
+          "options": [
+            "A. It's irrelevant as fever definitions are absolute.",
+            "B. Elderly adults have a higher baseline, making fever harder to detect.",
+            "C. Elderly adults have a lower baseline, so a lower temperature may indicate fever.",
+            "D. Fever doesn't occur in elderly adults."
+          ],
+          "correctAnswer": "C. Elderly adults have a lower baseline, so a lower temperature may indicate fever."
+        }
+      ]
+    }
+  ]
+}

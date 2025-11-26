@@ -1,0 +1,1082 @@
+{
+  "id": "61fb90ab-2628-4fc3-9232-8db6bbcbd580",
+  "sets": [
+    {
+      "title": "A",
+      "questions": [
+        {
+          "passage": "This question does not have a passage.",
+          "question": "How many cervical vertebrae are typically present in the human vertebral column?",
+          "options": [
+            "A. 5",
+            "B. 7",
+            "C. 12",
+            "D. 4"
+          ],
+          "correctAnswer": "B. 7"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "How many thoracic vertebrae are typically present?",
+          "options": [
+            "A. 7",
+            "B. 10",
+            "C. 12",
+            "D. 5"
+          ],
+          "correctAnswer": "C. 12"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "How many lumbar vertebrae are typically present?",
+          "options": [
+            "A. 5",
+            "B. 7",
+            "C. 12",
+            "D. 3"
+          ],
+          "correctAnswer": "A. 5"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The sacrum is typically formed by the fusion of how many vertebrae?",
+          "options": [
+            "A. 3",
+            "B. 4",
+            "C. 5",
+            "D. 7"
+          ],
+          "correctAnswer": "C. 5"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of spinal curvature curves outwards (posteriorly)?",
+          "options": [
+            "A. Lordosis",
+            "B. Kyphosis",
+            "C. Scoliosis",
+            "D. Extension"
+          ],
+          "correctAnswer": "B. Kyphosis"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of spinal curvature curves inwards (anteriorly)?",
+          "options": [
+            "A. Lordosis",
+            "B. Kyphosis",
+            "C. Scoliosis",
+            "D. Flexion"
+          ],
+          "correctAnswer": "A. Lordosis"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which two regions of the spine exhibit a primary curvature (kyphosis) that exists in the fetus?",
+          "options": [
+            "A. Cervical and Lumbar",
+            "B. Thoracic and Sacral",
+            "C. Cervical and Thoracic",
+            "D. Lumbar and Sacral"
+          ],
+          "correctAnswer": "B. Thoracic and Sacral"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which two regions of the spine exhibit a secondary curvature (lordosis) that develops after birth?",
+          "options": [
+            "A. Cervical and Lumbar",
+            "B. Thoracic and Sacral",
+            "C. Cervical and Thoracic",
+            "D. Lumbar and Sacral"
+          ],
+          "correctAnswer": "A. Cervical and Lumbar"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Extreme kyphosis can be accelerated by which of the following factors mentioned?",
+          "options": [
+            "A. Good posture",
+            "B. Strong bones",
+            "C. Osteoporosis",
+            "D. Regular exercise"
+          ],
+          "correctAnswer": "C. Osteoporosis"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which symptom is listed as potentially resulting from extreme kyphosis?",
+          "options": [
+            "A. Increased height",
+            "B. Difficulty breathing",
+            "C. Increased appetite",
+            "D. Improved flexibility"
+          ],
+          "correctAnswer": "B. Difficulty breathing"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Scoliosis is defined as a lateral curvature of the spine, typically measured by the Cobb angle. What is the minimum Cobb angle required for a diagnosis of scoliosis?",
+          "options": [
+            "A. 5 degrees",
+            "B. 10 degrees",
+            "C. 15 degrees",
+            "D. 20 degrees"
+          ],
+          "correctAnswer": "B. 10 degrees"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which type of scoliosis is described as being 'fixed' and cannot be corrected with lateral flexion?",
+          "options": [
+            "A. Postural",
+            "B. Structural",
+            "C. Asymmetry",
+            "D. Lordotic"
+          ],
+          "correctAnswer": "B. Structural"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What test involves the patient bending forward to assess for scoliosis?",
+          "options": [
+            "A. Cobb angle test",
+            "B. Plumb line test",
+            "C. Adams forward bend test",
+            "D. Kyphosis test"
+          ],
+          "correctAnswer": "C. Adams forward bend test"
+        },
+        {
+          "passage": "Refer to the diagram on Page 8 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.<br><img src='https://snipboard.io/OkW1TG.jpg' alt='Page 8 [23-24] MBBS2 Vertebral Column Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "In thoracic scoliosis, how are the ribs typically positioned on the convex side of the curve?",
+          "options": [
+            "A. Pushed anteriorly and laterally",
+            "B. Pushed posteriorly, forming a rib hump",
+            "C. Pulled closer together",
+            "D. Unaffected by the curvature"
+          ],
+          "correctAnswer": "B. Pushed posteriorly, forming a rib hump"
+        },
+        {
+          "passage": "Refer to the diagram on Page 8 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.<br><img src='https://snipboard.io/OkW1TG.jpg' alt='Page 8 [23-24] MBBS2 Vertebral Column Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "In thoracic scoliosis, towards which side (concave or convex) does the spinous process typically deviate?",
+          "options": [
+            "A. Towards the convex side",
+            "B. Towards the concave side",
+            "C. It remains in the midline",
+            "D. It deviates anteriorly"
+          ],
+          "correctAnswer": "B. Towards the concave side"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What surgical procedure is commonly used for severe scoliosis, involving fusing vertebrae together?",
+          "options": [
+            "A. Laminectomy",
+            "B. Discectomy",
+            "C. Spinal fusion",
+            "D. Kyphoplasty"
+          ],
+          "correctAnswer": "C. Spinal fusion"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which ligament extends along the anterior aspect of the vertebral bodies from the skull base to the sacrum?",
+          "options": [
+            "A. Posterior longitudinal ligament",
+            "B. Ligamentum flavum",
+            "C. Anterior longitudinal ligament",
+            "D. Supraspinous ligament"
+          ],
+          "correctAnswer": "C. Anterior longitudinal ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which ligament extends along the posterior aspect of the vertebral bodies within the vertebral canal?",
+          "options": [
+            "A. Anterior longitudinal ligament",
+            "B. Ligamentum flavum",
+            "C. Posterior longitudinal ligament",
+            "D. Interspinous ligament"
+          ],
+          "correctAnswer": "C. Posterior longitudinal ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The posterior longitudinal ligament broadens at C2 and attaches to the base of the skull as which membrane?",
+          "options": [
+            "A. Dura mater",
+            "B. Tectorial membrane",
+            "C. Arachnoid mater",
+            "D. Pia mater"
+          ],
+          "correctAnswer": "B. Tectorial membrane"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which ligaments interconnect the laminae of adjacent vertebrae and are composed mostly of elastic tissue?",
+          "options": [
+            "A. Interspinous ligaments",
+            "B. Supraspinous ligaments",
+            "C. Ligamenta flava",
+            "D. Anterior longitudinal ligament"
+          ],
+          "correctAnswer": "C. Ligamenta flava"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which ligaments interconnect the spinous processes of adjacent vertebrae?",
+          "options": [
+            "A. Interspinous ligaments",
+            "B. Supraspinous ligaments",
+            "C. Ligamenta flava",
+            "D. Posterior longitudinal ligament"
+          ],
+          "correctAnswer": "A. Interspinous ligaments"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which ligament connects the tips (apices) of the spinous processes?",
+          "options": [
+            "A. Interspinous ligaments",
+            "B. Supraspinous ligament",
+            "C. Ligamentum flavum",
+            "D. Anterior longitudinal ligament"
+          ],
+          "correctAnswer": "B. Supraspinous ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In the cervical region, the supraspinous ligament blends with and is structurally distinct from which triangular structure?",
+          "options": [
+            "A. Tectorial membrane",
+            "B. Ligamentum nuchae",
+            "C. Ligamentum flavum",
+            "D. Alar ligament"
+          ],
+          "correctAnswer": "B. Ligamentum nuchae"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The ligamentum nuchae connects the spinous process of C7 to the base of the skull (external occipital protuberance to foramen magnum) and other cervical spinous processes. What is one of its functions?",
+          "options": [
+            "A. Facilitate rotation of the head",
+            "B. Support the head and resist flexion",
+            "C. Protect the vertebral artery",
+            "D. Anchor the spinal cord"
+          ],
+          "correctAnswer": "B. Support the head and resist flexion"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In the three-column concept of spinal stability, which structures are part of the anterior column?",
+          "options": [
+            "A. Posterior vertebral body, posterior disc, posterior longitudinal ligament",
+            "B. Pedicles, lamina, facet joints",
+            "C. Anterior longitudinal ligament, anterior vertebral body, anterior disc",
+            "D. Ligamentum flavum, spinous ligaments, erector spinae"
+          ],
+          "correctAnswer": "C. Anterior longitudinal ligament, anterior vertebral body, anterior disc"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In the three-column concept, which structures are part of the middle column?",
+          "options": [
+            "A. Posterior vertebral body, posterior disc, posterior longitudinal ligament",
+            "B. Pedicles, lamina, facet joints",
+            "C. Anterior longitudinal ligament, anterior vertebral body, anterior disc",
+            "D. Ligamentum flavum, spinous ligaments, erector spinae"
+          ],
+          "correctAnswer": "A. Posterior vertebral body, posterior disc, posterior longitudinal ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In the three-column concept, which structures are part of the posterior column?",
+          "options": [
+            "A. Posterior vertebral body, posterior disc, posterior longitudinal ligament",
+            "B. Bony features (processes, lamina, pedicles), ligamentum flava, spinous ligaments, muscles",
+            "C. Anterior longitudinal ligament, anterior vertebral body, anterior disc",
+            "D. Intervertebral foramen and spinal nerves"
+          ],
+          "correctAnswer": "B. Bony features (processes, lamina, pedicles), ligamentum flava, spinous ligaments, muscles"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the most common direction for an intervertebral disc herniation?",
+          "options": [
+            "A. Directly anterior",
+            "B. Directly posterior",
+            "C. Posterolateral",
+            "D. Superior"
+          ],
+          "correctAnswer": "C. Posterolateral"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Why do disc herniations commonly occur posterolaterally rather than directly posteriorly?",
+          "options": [
+            "A. The anterior longitudinal ligament is weak.",
+            "B. The posterior longitudinal ligament prevents direct posterior herniation.",
+            "C. The ligamentum flavum pushes the disc sideways.",
+            "D. The nucleus pulposus naturally shifts laterally."
+          ],
+          "correctAnswer": "B. The posterior longitudinal ligament prevents direct posterior herniation."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What are the two most common regions for disc herniation?",
+          "options": [
+            "A. Cervical (C5-C7) and Lumbar (L4-S1)",
+            "B. Thoracic (T1-T12) and Sacral (S1-S5)",
+            "C. Cervical (C1-C3) and Thoracic (T1-T3)",
+            "D. Lumbar (L1-L3) and Coccygeal"
+          ],
+          "correctAnswer": "A. Cervical (C5-C7) and Lumbar (L4-S1)"
+        },
+        {
+          "passage": "Refer to the MRI image on Page 19 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.<br><img src='https://snipboard.io/WkmVQF.jpg' alt='Page 19 [23-24] MBBS2 Vertebral Column Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "The MRI on page 19 shows a herniated disc compressing which structure?",
+          "options": [
+            "A. The vertebral artery",
+            "B. The esophagus",
+            "C. The spinal cord",
+            "D. The trachea"
+          ],
+          "correctAnswer": "C. The spinal cord"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What are the two main components of an intervertebral disc?",
+          "options": [
+            "A. Anulus fibrosus and Nucleus pulposus",
+            "B. Hyaline cartilage and Fibrocartilage",
+            "C. Cortical bone and Cancellous bone",
+            "D. Ligamentum flavum and Dura mater"
+          ],
+          "correctAnswer": "A. Anulus fibrosus and Nucleus pulposus"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary function of the nucleus pulposus within the intervertebral disc?",
+          "options": [
+            "A. Limit rotation",
+            "B. Provide blood supply",
+            "C. Absorb compression forces",
+            "D. Transmit nerve signals"
+          ],
+          "correctAnswer": "C. Absorb compression forces"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the strong outer ring of collagen and fibrocartilage surrounding the nucleus pulposus called?",
+          "options": [
+            "A. Hyaline cartilage endplate",
+            "B. Ligamentum flavum",
+            "C. Anulus fibrosus",
+            "D. Periosteum"
+          ],
+          "correctAnswer": "C. Anulus fibrosus"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Whiplash injury, often occurring in car crashes, involves rapid hyperextension followed by extreme flexion of which spinal region?",
+          "options": [
+            "A. Thoracic",
+            "B. Lumbar",
+            "C. Sacral",
+            "D. Cervical"
+          ],
+          "correctAnswer": "D. Cervical"
+        },
+        {
+          "passage": "Refer to the MRI image on Page 22 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.<br><img src='https://snipboard.io/8kq4u0.jpg' alt='Page 22 [23-24] MBBS2 Vertebral Column Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "The MRI on page 22 shows a disc herniation in which spinal region and at which level?",
+          "options": [
+            "A. Cervical, C5-C6",
+            "B. Thoracic, T8-T9",
+            "C. Lumbar, L4-L5",
+            "D. Sacral, S1-S2"
+          ],
+          "correctAnswer": "C. Lumbar, L4-L5"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In the cervical spine, a disc herniation typically compresses the nerve root exiting at which level relative to the herniation?",
+          "options": [
+            "A. The nerve root exiting at the same level (e.g., C5-C6 herniation compresses C6 root)",
+            "B. The nerve root exiting one level below (e.g., C5-C6 herniation compresses C7 root)",
+            "C. The nerve root exiting one level above (e.g., C5-C6 herniation compresses C5 root)",
+            "D. The nerve root exiting two levels below"
+          ],
+          "correctAnswer": "A. The nerve root exiting at the same level (e.g., C5-C6 herniation compresses C6 root)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In the lumbar spine, due to the course of the nerve roots, a posterolateral disc herniation typically compresses the nerve root exiting at which level relative to the herniation?",
+          "options": [
+            "A. The nerve root exiting at the same level (e.g., L4-L5 herniation compresses L4 root)",
+            "B. The nerve root exiting one level below (e.g., L4-L5 herniation compresses L5 root)",
+            "C. The nerve root exiting one level above (e.g., L4-L5 herniation compresses L3 root)",
+            "D. The nerve root exiting two levels below"
+          ],
+          "correctAnswer": "B. The nerve root exiting one level below (e.g., L4-L5 herniation compresses L5 root)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which spinal nerve exits through the C7-T1 intervertebral foramen?",
+          "options": [
+            "A. C6",
+            "B. C7",
+            "C. C8",
+            "D. T1"
+          ],
+          "correctAnswer": "C. C8"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which spinal nerve exits through the L5-S1 intervertebral foramen?",
+          "options": [
+            "A. L4",
+            "B. L5",
+            "C. S1",
+            "D. S2"
+          ],
+          "correctAnswer": "B. L5"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Ankylosing spondylitis (AS) is an inflammatory condition that often begins in which joint?",
+          "options": [
+            "A. Shoulder joint",
+            "B. Hip joint",
+            "C. Sacroiliac joint",
+            "D. Knee joint"
+          ],
+          "correctAnswer": "C. Sacroiliac joint"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What are the radiological lesions called that represent inflammation and bone damage at the anterior/posterior corners of vertebrae in early Ankylosing Spondylitis?",
+          "options": [
+            "A. Osteophytes",
+            "B. Syndesmophytes",
+            "C. Romanus lesions",
+            "D. Schmorl's nodes"
+          ],
+          "correctAnswer": "C. Romanus lesions"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What are the 'bridges' of bone that extend between adjacent vertebral bodies in Ankylosing Spondylitis called?",
+          "options": [
+            "A. Osteophytes",
+            "B. Syndesmophytes",
+            "C. Romanus lesions",
+            "D. Pedicles"
+          ],
+          "correctAnswer": "B. Syndesmophytes"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The fusion of the spine in advanced Ankylosing Spondylitis, often due to syndesmophytes and ligament ossification, can lead to a characteristic X-ray appearance known as:",
+          "options": [
+            "A. Cobblestone spine",
+            "B. Bamboo spine",
+            "C. Question mark spine",
+            "D. Butterfly vertebra"
+          ],
+          "correctAnswer": "B. Bamboo spine"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which genetic marker is strongly associated with susceptibility to Ankylosing Spondylitis?",
+          "options": [
+            "A. HLA-A1",
+            "B. HLA-B27",
+            "C. HLA-DR4",
+            "D. HLA-DQ2"
+          ],
+          "correctAnswer": "B. HLA-B27"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "In Ankylosing Spondylitis, is back pain typically worse with rest or exercise?",
+          "options": [
+            "A. Worse with exercise",
+            "B. Worse with rest, improves with exercise",
+            "C. No change with either",
+            "D. Only occurs at night"
+          ],
+          "correctAnswer": "B. Worse with rest, improves with exercise"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Loss of chest expansion in Ankylosing Spondylitis indicates involvement of which regions?",
+          "options": [
+            "A. Cervical spine only",
+            "B. Lumbar spine and sacroiliac joints",
+            "C. Thoracic spine and rib cage",
+            "D. Peripheral joints only"
+          ],
+          "correctAnswer": "C. Thoracic spine and rib cage"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What eye condition has an increased incidence (30-40% lifetime prevalence) in patients with Ankylosing Spondylitis?",
+          "options": [
+            "A. Cataracts",
+            "B. Glaucoma",
+            "C. Macular degeneration",
+            "D. Anterior uveitis or iritis"
+          ],
+          "correctAnswer": "D. Anterior uveitis or iritis"
+        },
+        {
+          "passage": "Refer to the diagram on Page 26 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.<br><img src='https://snipboard.io/SDr6gV.jpg' alt='Page 26 [23-24] MBBS2 Vertebral Column Lecture.pdf' class='mt-2 rounded-md'>",
+          "question": "The characteristic posture in late-stage Ankylosing Spondylitis, with thoracic kyphosis and compensatory changes, is sometimes referred to as the:",
+          "options": [
+            "A. Straight spine appearance",
+            "B. S-curve appearance",
+            "C. Question mark appearance",
+            "D. Swan neck appearance"
+          ],
+          "correctAnswer": "C. Question mark appearance"
+        }
+      ]
+    },
+    {
+      "title": "B",
+      "questions": [
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which specific regions of the vertebral column develop secondary curvatures (lordosis) primarily to support the weight of the head and the trunk respectively?",
+          "options": [
+            "A. Thoracic and Sacral",
+            "B. Cervical and Thoracic",
+            "C. Cervical and Lumbar",
+            "D. Lumbar and Sacral"
+          ],
+          "correctAnswer": "C. Cervical and Lumbar"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "While osteoporosis can accelerate kyphosis, what other factor related to vertebral shape is mentioned as contributing?",
+          "options": [
+            "A. Increased vertebral height",
+            "B. Abnormal vertebral body shape (e.g., wedging)",
+            "C. Fusion of vertebral bodies",
+            "D. Increased disc height"
+          ],
+          "correctAnswer": "B. Abnormal vertebral body shape (e.g., wedging)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What distinguishes structural scoliosis from postural scoliosis?",
+          "options": [
+            "A. Structural scoliosis has a Cobb angle less than 10 degrees.",
+            "B. Structural scoliosis is always caused by injury.",
+            "C. Structural scoliosis is fixed and cannot be corrected by lateral flexion.",
+            "D. Structural scoliosis only occurs in the lumbar region."
+          ],
+          "correctAnswer": "C. Structural scoliosis is fixed and cannot be corrected by lateral flexion."
+        },
+        {
+          "passage": "Refer to the diagram on Page 8 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.",
+          "question": "In thoracic scoliosis, what structural change occurs to the vertebral canal on the concave side of the curve?",
+          "options": [
+            "A. It becomes wider",
+            "B. It remains unchanged",
+            "C. It becomes narrower",
+            "D. It shifts anteriorly"
+          ],
+          "correctAnswer": "C. It becomes narrower"
+        },
+        {
+          "passage": "Refer to the diagram on Page 8 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.",
+          "question": "In the context of thoracic scoliosis, how are the ribs positioned relative to each other on the concave side of the curve?",
+          "options": [
+            "A. Widely separated",
+            "B. Close together",
+            "C. Pushed posteriorly",
+            "D. Unaffected"
+          ],
+          "correctAnswer": "B. Close together"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "During spinal fusion surgery for scoliosis, what is the primary purpose of the metal rods inserted along the spine?",
+          "options": [
+            "A. To permanently replace the vertebrae",
+            "B. To stimulate bone growth",
+            "C. To provide temporary support and alignment while bony fusion occurs",
+            "D. To anchor muscles"
+          ],
+          "correctAnswer": "C. To provide temporary support and alignment while bony fusion occurs"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which spinal ligament is primarily responsible for preventing hyperextension of the vertebral column?",
+          "options": [
+            "A. Posterior longitudinal ligament",
+            "B. Ligamentum flavum",
+            "C. Anterior longitudinal ligament",
+            "D. Supraspinous ligament"
+          ],
+          "correctAnswer": "C. Anterior longitudinal ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The posterior longitudinal ligament extends superiorly from C2 to the base of the skull as which structure?",
+          "options": [
+            "A. Ligamentum nuchae",
+            "B. Tectorial membrane",
+            "C. Alar ligament",
+            "D. Apical ligament"
+          ],
+          "correctAnswer": "B. Tectorial membrane"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the primary tissue composition of the ligamenta flava, contributing to their function in spinal extension?",
+          "options": [
+            "A. Dense collagen fibers",
+            "B. Elastic tissue",
+            "C. Hyaline cartilage",
+            "D. Adipose tissue"
+          ],
+          "correctAnswer": "B. Elastic tissue"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which ligament connects adjacent spinous processes and blends anteriorly with the ligamentum flavum?",
+          "options": [
+            "A. Anterior longitudinal ligament",
+            "B. Posterior longitudinal ligament",
+            "C. Supraspinous ligament",
+            "D. Interspinous ligament"
+          ],
+          "correctAnswer": "D. Interspinous ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The ligamentum nuchae is a structurally distinct, triangular expansion primarily related to which ligament in the cervical region?",
+          "options": [
+            "A. Anterior longitudinal ligament",
+            "B. Posterior longitudinal ligament",
+            "C. Ligamentum flavum",
+            "D. Supraspinous ligament"
+          ],
+          "correctAnswer": "D. Supraspinous ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Besides supporting the head and resisting flexion, the ligamentum nuchae also serves as an attachment site for:",
+          "options": [
+            "A. Neck extensor muscles",
+            "B. Vertebral arteries",
+            "C. Spinal nerves",
+            "D. Intervertebral discs"
+          ],
+          "correctAnswer": "A. Neck extensor muscles"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "According to the three-column concept, disruption of which two columns generally indicates spinal instability?",
+          "options": [
+            "A. Any single column",
+            "B. The anterior column only",
+            "C. The posterior column only",
+            "D. Two or more columns"
+          ],
+          "correctAnswer": "D. Two or more columns"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which specific component distinguishes the middle column from the anterior column in the three-column concept?",
+          "options": [
+            "A. Anterior longitudinal ligament",
+            "B. Posterior longitudinal ligament",
+            "C. Ligamentum flavum",
+            "D. Interspinous ligament"
+          ],
+          "correctAnswer": "B. Posterior longitudinal ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which muscles are explicitly listed as part of the posterior column in the three-column concept?",
+          "options": [
+            "A. Psoas major",
+            "B. Rectus abdominis",
+            "C. Erector spinae muscles",
+            "D. Diaphragm"
+          ],
+          "correctAnswer": "C. Erector spinae muscles"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "While posterolateral herniations are most common, what structure primarily resists direct posterior herniation of the nucleus pulposus?",
+          "options": [
+            "A. Ligamentum flavum",
+            "B. Anterior longitudinal ligament",
+            "C. Posterior longitudinal ligament",
+            "D. Pedicles"
+          ],
+          "correctAnswer": "C. Posterior longitudinal ligament"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What property of the nucleus pulposus allows it to absorb compression forces?",
+          "options": [
+            "A. Its high collagen content",
+            "B. Its bony structure",
+            "C. Its gelatinous, water-rich composition",
+            "D. Its direct connection to ligaments"
+          ],
+          "correctAnswer": "C. Its gelatinous, water-rich composition"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What type of cartilage forms the endplates covering the superior and inferior surfaces of the vertebral bodies, adjacent to the disc?",
+          "options": [
+            "A. Fibrocartilage",
+            "B. Elastic cartilage",
+            "C. Hyaline cartilage",
+            "D. Articular cartilage"
+          ],
+          "correctAnswer": "C. Hyaline cartilage"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Whiplash injury involves rapid acceleration/deceleration. Which phase is typically associated with tearing muscles/ligaments or disc herniation?",
+          "options": [
+            "A. The initial impact",
+            "B. The hyperextension phase",
+            "C. The extreme flexion (recoil) phase",
+            "D. Both hyperextension and extreme flexion phases can cause injury"
+          ],
+          "correctAnswer": "D. Both hyperextension and extreme flexion phases can cause injury"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What structural characteristic of the lumbar spine contributes to the pattern of nerve root compression seen in disc herniations?",
+          "options": [
+            "A. The small size of the intervertebral foramina",
+            "B. The oblique downward course of the nerve roots before exiting",
+            "C. The fusion of lumbar vertebrae",
+            "D. The absence of the posterior longitudinal ligament"
+          ],
+          "correctAnswer": "B. The oblique downward course of the nerve roots before exiting"
+        },
+        {
+          "passage": "Refer to the spinal cord diagram on Page 23 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.",
+          "question": "At approximately which vertebral level does the adult spinal cord typically terminate?",
+          "options": [
+            "A. T10",
+            "B. T12",
+            "C. L1-L2",
+            "D. L3-L4"
+          ],
+          "correctAnswer": "C. L1-L2"
+        },
+        {
+          "passage": "Refer to the table on Page 24 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.",
+          "question": "Which spinal nerve exits the vertebral column *above* the C1 vertebra (between the skull and C1)?",
+          "options": [
+            "A. C1",
+            "B. C2",
+            "C. Occipital nerve",
+            "D. There is no nerve exiting above C1 in the table"
+          ],
+          "correctAnswer": "A. C1"
+        },
+        {
+          "passage": "Refer to the table on Page 24 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.",
+          "question": "A posterolateral disc herniation occurs at the C6-C7 level. Which spinal nerve root is most likely compressed?",
+          "options": [
+            "A. C5",
+            "B. C6",
+            "C. C7",
+            "D. C8"
+          ],
+          "correctAnswer": "C. C7"
+        },
+        {
+          "passage": "Refer to the table on Page 24 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.",
+          "question": "A posterolateral disc herniation occurs at the L5-S1 level. Which spinal nerve root is most likely compressed?",
+          "options": [
+            "A. L4",
+            "B. L5",
+            "C. S1",
+            "D. S2"
+          ],
+          "correctAnswer": "C. S1"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the term for inflammation of the sacroiliac joint, often the first sign of Ankylosing Spondylitis?",
+          "options": [
+            "A. Spondylosis",
+            "B. Spondylitis",
+            "C. Sacroiliitis",
+            "D. Disciitis"
+          ],
+          "correctAnswer": "C. Sacroiliitis"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the characteristic change to the vertebral body shape in Ankylosing Spondylitis as a result of healing after Romanus lesions?",
+          "options": [
+            "A. Increased anterior concavity",
+            "B. Wedge-shaped deformity",
+            "C. Squaring of the vertebral body (loss of anterior concavity)",
+            "D. Formation of bony spurs (osteophytes)"
+          ],
+          "correctAnswer": "C. Squaring of the vertebral body (loss of anterior concavity)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Syndesmophytes in Ankylosing Spondylitis primarily form due to ossification within which structure?",
+          "options": [
+            "A. Nucleus pulposus",
+            "B. Periphery of the anulus fibrosus",
+            "C. Ligamentum flavum",
+            "D. Vertebral body marrow"
+          ],
+          "correctAnswer": "B. Periphery of the anulus fibrosus"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Besides syndesmophyte formation, what other process contributes significantly to the 'bamboo spine' appearance in advanced Ankylosing Spondylitis?",
+          "options": [
+            "A. Disc herniation",
+            "B. Ossification of spinal ligaments (e.g., ALL, interspinous)",
+            "C. Scoliotic curvature",
+            "D. Vertebral body collapse"
+          ],
+          "correctAnswer": "B. Ossification of spinal ligaments (e.g., ALL, interspinous)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is a major consequence of spinal fusion in Ankylosing Spondylitis regarding spinal mechanics?",
+          "options": [
+            "A. Increased flexibility",
+            "B. Increased risk of disc herniation",
+            "C. Increased brittleness and fracture risk",
+            "D. Improved posture"
+          ],
+          "correctAnswer": "C. Increased brittleness and fracture risk"
+        },
+        {
+          "passage": "Refer to the diagram on Page 26 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.",
+          "question": "What compensatory changes contribute to the 'question mark' posture in late-stage Ankylosing Spondylitis, besides thoracic kyphosis?",
+          "options": [
+            "A. Cervical flexion and knee extension",
+            "B. Cervical hyperextension and flexion of the hips/knees",
+            "C. Lumbar hyperlordosis",
+            "D. Scoliosis"
+          ],
+          "correctAnswer": "B. Cervical hyperextension and flexion of the hips/knees"
+        },
+        {
+          "passage": "Refer to the diagram on Page 26 of '[23-24] MBBS2 Vertebral Column Lecture.pdf'.",
+          "question": "Ossification of which specific ligaments limits chest expansion in Ankylosing Spondylitis?",
+          "options": [
+            "A. Anterior and posterior longitudinal ligaments",
+            "B. Ligamentum nuchae",
+            "C. Radiate and costotransverse ligaments",
+            "D. Ligamentum flavum"
+          ],
+          "correctAnswer": "C. Radiate and costotransverse ligaments"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "While the exact cause of AS is unknown, it's often classified broadly under which category of diseases?",
+          "options": [
+            "A. Degenerative",
+            "B. Infectious",
+            "C. Autoimmune / Inflammatory",
+            "D. Neoplastic"
+          ],
+          "correctAnswer": "C. Autoimmune / Inflammatory"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The presence of the HLA-B27 gene indicates what regarding Ankylosing Spondylitis?",
+          "options": [
+            "A. It guarantees the development of AS.",
+            "B. It rules out the possibility of developing AS.",
+            "C. It indicates an increased vulnerability or susceptibility to developing AS.",
+            "D. It is only relevant for monitoring treatment response."
+          ],
+          "correctAnswer": "C. It indicates an increased vulnerability or susceptibility to developing AS."
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Enthesitis, inflammation at tendon/ligament insertion sites, is common in AS. Which specific site is mentioned as often being tender?",
+          "options": [
+            "A. Patellar tendon",
+            "B. Biceps tendon",
+            "C. Achilles tendon",
+            "D. Rotator cuff tendons"
+          ],
+          "correctAnswer": "C. Achilles tendon"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which term describes nail separation from the nail bed, sometimes seen in spondyloarthropathies like AS?",
+          "options": [
+            "A. Onychomycosis",
+            "B. Onycholysis",
+            "C. Paronychia",
+            "D. Koilonychia"
+          ],
+          "correctAnswer": "B. Onycholysis"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which rare pulmonary complication is associated with Ankylosing Spondylitis?",
+          "options": [
+            "A. Pneumonia",
+            "B. Asthma",
+            "C. Apical lung fibrosis",
+            "D. Pulmonary embolism"
+          ],
+          "correctAnswer": "C. Apical lung fibrosis"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Inflammation of the aorta (aortitis) in AS can lead to which cardiac valve problem?",
+          "options": [
+            "A. Aortic stenosis",
+            "B. Aortic regurgitation",
+            "C. Mitral stenosis",
+            "D. Mitral regurgitation"
+          ],
+          "correctAnswer": "B. Aortic regurgitation"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Amyloidosis, a potential complication of chronic inflammation like AS, involves the deposition of what?",
+          "options": [
+            "A. Calcium crystals",
+            "B. Uric acid crystals",
+            "C. Abnormal proteins (amyloid)",
+            "D. Cholesterol plaques"
+          ],
+          "correctAnswer": "C. Abnormal proteins (amyloid)"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which primary curvature is specifically adapted to accommodate thoracic organs?",
+          "options": [
+            "A. Cervical Lordosis",
+            "B. Thoracic Kyphosis",
+            "C. Lumbar Lordosis",
+            "D. Sacral Kyphosis"
+          ],
+          "correctAnswer": "B. Thoracic Kyphosis"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical approximate range of flexion in the thoracic spine?",
+          "options": [
+            "A. 5-10 degrees",
+            "B. 10-20 degrees",
+            "C. 20-30 degrees",
+            "D. 30-40 degrees"
+          ],
+          "correctAnswer": "D. 30-40 degrees"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical approximate range of extension in the thoracic spine?",
+          "options": [
+            "A. 10-15 degrees",
+            "B. 20-30 degrees",
+            "C. 30-40 degrees",
+            "D. 40-50 degrees"
+          ],
+          "correctAnswer": "B. 20-30 degrees"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the approximate range of axial rotation (to one side) possible in the thoracic spine?",
+          "options": [
+            "A. 15 degrees",
+            "B. 25 degrees",
+            "C. 35 degrees",
+            "D. 45 degrees"
+          ],
+          "correctAnswer": "C. 35 degrees"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What is the typical approximate range of lateral flexion (to one side) in the thoracic spine?",
+          "options": [
+            "A. 10-15 degrees",
+            "B. 20-25 degrees",
+            "C. 30-35 degrees",
+            "D. 40-45 degrees"
+          ],
+          "correctAnswer": "B. 20-25 degrees"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which component of the intervertebral disc is primarily responsible for limiting rotation between vertebrae?",
+          "options": [
+            "A. Nucleus pulposus",
+            "B. Anulus fibrosus",
+            "C. Hyaline cartilage endplate",
+            "D. Vertebral body"
+          ],
+          "correctAnswer": "B. Anulus fibrosus"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which vertebral region generally allows the greatest range of rotation?",
+          "options": [
+            "A. Cervical",
+            "B. Thoracic",
+            "C. Lumbar",
+            "D. Sacral"
+          ],
+          "correctAnswer": "A. Cervical"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "Which vertebral region is most restricted in rotation, partly due to rib attachments?",
+          "options": [
+            "A. Cervical",
+            "B. Thoracic",
+            "C. Lumbar",
+            "D. Coccygeal"
+          ],
+          "correctAnswer": "B. Thoracic"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "What structure is formed by the fusion of the laminae and pedicles posteriorly?",
+          "options": [
+            "A. Vertebral body",
+            "B. Transverse process",
+            "C. Spinous process",
+            "D. Vertebral arch"
+          ],
+          "correctAnswer": "D. Vertebral arch"
+        },
+        {
+          "passage": "This question does not have a passage.",
+          "question": "The intervertebral foramen, through which spinal nerves exit, is formed by the notches of which adjacent structures?",
+          "options": [
+            "A. Spinous processes",
+            "B. Laminae",
+            "C. Pedicles",
+            "D. Transverse processes"
+          ],
+          "correctAnswer": "C. Pedicles"
+        }
+      ]
+    }
+  ]
+}
