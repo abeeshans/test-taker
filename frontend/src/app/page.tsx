@@ -349,8 +349,9 @@ export default function Home() {
         </div>
       </motion.div>
       
-      <div className="fixed bottom-4 text-xs text-slate-600 font-medium">
-        © {new Date().getFullYear()} SelfTest. All rights reserved.
+      <div className="fixed bottom-4 flex gap-4 text-xs text-slate-600 font-medium">
+        <span>© {new Date().getFullYear()} SelfTest. All rights reserved.</span>
+        <a href="/privacy" className="hover:text-slate-400 transition-colors">Privacy Policy</a>
       </div>
     </div>
   )
