@@ -32,6 +32,7 @@ import HelpModal from "@/components/Modals/HelpModal";
 import TestStatsModal from "@/components/Modals/TestStatsModal";
 import ReviewTestModal from "@/components/Modals/ReviewTestModal";
 import UploadResultsModal from "@/components/Modals/UploadResultsModal";
+import AlertModal from "@/components/Modals/AlertModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { API_URL } from "@/lib/api";
 import { Test, Folder } from "@/types";
@@ -78,6 +79,7 @@ export default function Dashboard() {
   const [reviewTestId, setReviewTestId] = useState<string | null>(null);
   const [reviewTestTitle, setReviewTestTitle] = useState<string>("");
   const [uploadResults, setUploadResults] = useState<any[]>([]);
+  const [alertMessage, setAlertMessage] = useState<string>("");
 
   const handleCardClick = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -918,6 +920,11 @@ export default function Dashboard() {
                     <TestCard
                       test={test}
                       onStart={() => {
+                        if (test.question_count === 0) {
+                          setAlertMessage("This test has no questions and needs to be updated.");
+                          setActiveModal("alert");
+                          return;
+                        }
                         setTestToStart(test);
                         setActiveModal("time-input");
                       }}
@@ -944,6 +951,11 @@ export default function Dashboard() {
                       isSelected={selectedCardId === test.id}
                       onClick={(e) => handleCardClick(test.id, e)}
                       onDoubleClick={() => {
+                        if (test.question_count === 0) {
+                          setAlertMessage("This test has no questions and needs to be updated.");
+                          setActiveModal("alert");
+                          return;
+                        }
                         setTestToStart(test);
                         setActiveModal("time-input");
                       }}
@@ -997,6 +1009,12 @@ export default function Dashboard() {
           itemName={selectedItem?.name || ""}
           isFolder={selectedItem?.type === "folder"}
           isSubmitting={isSubmitting}
+        />
+
+        <AlertModal
+          isOpen={activeModal === "alert"}
+          onClose={() => setActiveModal(null)}
+          message={alertMessage}
         />
 
         <ResetStatsModal

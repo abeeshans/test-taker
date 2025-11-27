@@ -22,10 +22,13 @@ export default function TimeInputModal({ isOpen, onClose, onConfirm, test }: Tim
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     if (isOpen && test) {
       setMinutes(''); // Reset time input
       setSelectedSet(0); // Default to first
+      setError(null);
       // Fetch immediately to prevent sequential loading
       fetchTestDetails();
     }
@@ -61,10 +64,19 @@ export default function TimeInputModal({ isOpen, onClose, onConfirm, test }: Tim
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const mins = parseInt(minutes, 10);
-    if (!isNaN(mins) && mins > 0) {
-      onConfirm(mins, selectedSet);
-      onClose();
+    if (!minutes || isNaN(mins) || mins <= 0) {
+      setError("Please enter a valid time limit (greater than 0).");
+      return;
     }
+    
+    // Check if selected set has questions
+    if (sets.length > 0 && sets[selectedSet] && sets[selectedSet].questions.length === 0) {
+      setError("This set has no questions. Please choose another set.");
+      return;
+    }
+
+    onConfirm(mins, selectedSet);
+    onClose();
   };
 
   return (
@@ -74,12 +86,20 @@ export default function TimeInputModal({ isOpen, onClose, onConfirm, test }: Tim
         <input
           type="number"
           value={minutes}
-          onChange={(e) => setMinutes(e.target.value)}
-          className="w-full border border-gray-300 dark:border-slate-600 p-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-purple-500 bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+          onChange={(e) => {
+            setMinutes(e.target.value);
+            setError(null);
+          }}
+          className={`w-full border p-2 rounded-md mb-2 focus:outline-none focus:ring-2 bg-white dark:bg-slate-800 text-gray-900 dark:text-white ${
+            error 
+              ? 'border-red-500 focus:ring-red-500' 
+              : 'border-gray-300 dark:border-slate-600 focus:ring-blue-500 dark:focus:ring-purple-500'
+          }`}
           placeholder="e.g., 180"
           min="1"
           autoFocus
         />
+        {error && <p className="text-red-500 text-sm mb-4 text-left">{error}</p>}
 
         {loading ? (
           <div className="text-sm text-gray-500 dark:text-slate-400 mb-4">Loading sets...</div>

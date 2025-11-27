@@ -12,17 +12,21 @@ interface RenameModalProps {
 
 export default function RenameModal({ isOpen, onClose, onConfirm, currentName, isSubmitting = false }: RenameModalProps) {
   const [name, setName] = useState(currentName);
+  const [error, setError] = useState<string | null>(null);
 
   // Update local state when currentName changes
   React.useEffect(() => {
     setName(currentName);
-  }, [currentName]);
+    setError(null);
+  }, [currentName, isOpen]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      onConfirm(name.trim());
+    if (!name.trim()) {
+      setError("Name cannot be empty.");
+      return;
     }
+    onConfirm(name.trim());
   };
 
   return (
@@ -32,12 +36,20 @@ export default function RenameModal({ isOpen, onClose, onConfirm, currentName, i
         <input
           type="text"
           value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full border border-gray-300 dark:border-slate-600 p-2 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
+          onChange={(e) => {
+            setName(e.target.value);
+            setError(null);
+          }}
+          className={`w-full border p-2 rounded-md mb-2 focus:outline-none focus:ring-2 bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 ${
+            error 
+              ? 'border-red-500 focus:ring-red-500' 
+              : 'border-gray-300 dark:border-slate-600 focus:ring-blue-500'
+          }`}
           placeholder="Name"
           autoFocus
           disabled={isSubmitting}
         />
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <div className="flex justify-end space-x-2">
           <button
             type="button"
