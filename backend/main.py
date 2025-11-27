@@ -18,6 +18,7 @@ origins = [
     "http://127.0.0.1:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
+    "https://frontend-351771281344.us-central1.run.app",
 ]
 
 # Add production frontend URL if set

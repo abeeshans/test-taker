@@ -5,6 +5,8 @@ steps:
       '-t', 'gcr.io/$PROJECT_ID/frontend',
       '--build-arg', 'NEXT_PUBLIC_API_URL=$_NEXT_PUBLIC_API_URL',
       '--build-arg', 'NEXT_PUBLIC_SITE_URL=$_NEXT_PUBLIC_SITE_URL',
+      '--build-arg', 'NEXT_PUBLIC_SUPABASE_URL=$_NEXT_PUBLIC_SUPABASE_URL',
+      '--build-arg', 'NEXT_PUBLIC_SUPABASE_ANON_KEY=$_NEXT_PUBLIC_SUPABASE_ANON_KEY',
       '.'
     ]
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -24,3 +26,5 @@ images:
 substitutions:
   _NEXT_PUBLIC_API_URL: ''
   _NEXT_PUBLIC_SITE_URL: ''
+  _NEXT_PUBLIC_SUPABASE_URL: ''
+  _NEXT_PUBLIC_SUPABASE_ANON_KEY: ''

@@ -709,10 +709,20 @@ export default function Dashboard() {
     }
 
     try {
+      console.log(`Fetching data from: ${API_URL}`);
       const [testsRes, foldersRes] = await Promise.all([
         fetch(`${API_URL}/tests`, { headers: { Authorization: `Bearer ${session.access_token}` } }),
         fetch(`${API_URL}/folders`, { headers: { Authorization: `Bearer ${session.access_token}` } })
       ]);
+
+      if (!testsRes.ok) {
+        console.error(`Tests fetch failed: ${testsRes.status} ${testsRes.statusText}`);
+        try { console.error(await testsRes.text()); } catch (e) {}
+      }
+      if (!foldersRes.ok) {
+        console.error(`Folders fetch failed: ${foldersRes.status} ${foldersRes.statusText}`);
+        try { console.error(await foldersRes.text()); } catch (e) {}
+      }
 
       if (testsRes.ok && foldersRes.ok) {
         const testsData = await testsRes.json();
@@ -724,6 +734,7 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+      console.error("API_URL was:", API_URL);
     } finally {
         setLoading(false);
     }
