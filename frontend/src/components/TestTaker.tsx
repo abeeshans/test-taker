@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/utils/supabase/client'
 import { 
   Flag, 
   Clock, 
@@ -55,6 +55,7 @@ interface TestTakerProps {
 export default function TestTaker({ testId, initialData, timeLimit }: TestTakerProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const supabase = createClient()
   
   // State
   const [selectedSetIndex, setSelectedSetIndex] = useState<number | 'all' | null>(null)
@@ -440,25 +441,25 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
     <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-900 overflow-hidden">
       {/* Header */}
       <header className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 h-16 flex items-center justify-between px-6 flex-shrink-0 z-20">
-        <div className="flex items-center gap-4">
-          <button onClick={handleExitClick} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300">
+        <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+          <button onClick={handleExitClick} className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 flex-shrink-0">
             <ArrowLeft size={20} weight="bold" />
           </button>
           
           {/* Title with Set Name and Score (if review mode) */}
-          <h1 className="font-semibold text-gray-800 dark:text-white truncate max-w-2xl" title={initialData.title}>
+          <h1 className="font-semibold text-gray-800 dark:text-white truncate text-sm md:text-base" title={initialData.title}>
             {initialData.title}
             {getSetTitle && (
               <span className="text-purple-600 dark:text-purple-400"> [{getSetTitle}]</span>
             )}
             {isReviewMode && (
-              <span className="text-blue-600 dark:text-blue-400"> - {calculateScore}/{questions.length} ({Math.round((calculateScore / questions.length) * 100)}%)</span>
+              <span className="text-blue-600 dark:text-blue-400 hidden md:inline"> - {calculateScore}/{questions.length} ({Math.round((calculateScore / questions.length) * 100)}%)</span>
             )}
           </h1>
         </div>
 
-        {/* Center: Finish/Exit Button */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
+        {/* Center: Finish/Exit Button - Hidden on small mobile, moved to bottom or menu if needed, or just kept small */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3 hidden md:flex">
           {!isFinished ? (
             <button 
               onClick={handleFinishClick}
@@ -483,7 +484,7 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
           {!isFinished && !isReviewMode && (
             <button 
               onClick={() => setIsPaused(!isPaused)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg font-medium text-sm border-2 ${
+              className={`flex items-center gap-2 px-2 md:px-3 py-1.5 rounded-lg font-medium text-sm border-2 ${
                 isPaused 
                   ? 'bg-green-50 dark:bg-green-900/20 border-green-500 dark:border-green-600 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30' 
                   : 'bg-gray-100 dark:bg-slate-700 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600'
@@ -493,12 +494,12 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
               {isPaused ? (
                 <>
                   <Play size={18} weight="fill" />
-                  <span>Resume</span>
+                  <span className="hidden md:inline">Resume</span>
                 </>
               ) : (
                 <>
                   <Pause size={18} weight="fill" />
-                  <span>Pause</span>
+                  <span className="hidden md:inline">Pause</span>
                 </>
               )}
             </button>
@@ -822,15 +823,16 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
         </div>
       ) : (
       /* Main Split View - Persistent Layout (Test View) */
-      <div className="flex-1 flex overflow-hidden relative">
+      /* Main Split View - Persistent Layout (Test View) */
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         
         {/* Left Pane: Passage (Always visible, empty if no passage) */}
-        <div className="w-1/2 border-r border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-y-auto p-8 custom-scrollbar">
+        <div className={`w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-y-auto p-4 md:p-8 custom-scrollbar ${hasPassage ? 'h-1/3 lg:h-auto min-h-[150px]' : 'hidden lg:block'}`}>
             {hasPassage ? (
                 <div className="max-w-2xl mx-auto">
                     <h3 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-4 sticky top-0 bg-white dark:bg-slate-800 py-2">Passage</h3>
                     <div 
-                        className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed font-serif dark:prose-invert"
+                        className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed font-serif dark:prose-invert text-sm md:text-base"
                         dangerouslySetInnerHTML={{ __html: currentQ.passage! }} 
                     />
                 </div>
@@ -842,7 +844,7 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
         </div>
 
         {/* Right Pane: Question */}
-        <div className="w-1/2 bg-gray-50 dark:bg-slate-900 overflow-y-auto p-8 custom-scrollbar pb-24">
+        <div className="w-full lg:w-1/2 bg-gray-50 dark:bg-slate-900 overflow-y-auto p-4 md:p-8 custom-scrollbar pb-24">
           <div className="max-w-2xl mx-auto">
             {/* Question Header & Nav */}
             <div className="flex justify-between items-start mb-6">
@@ -1082,14 +1084,22 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
       )}
 
       {/* Bottom Center Navigation Button */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3 w-full justify-center px-4">
          <button 
            onClick={() => setIsNavOpen(true)}
            className="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-slate-700 text-white rounded-full shadow-lg hover:bg-gray-800 dark:hover:bg-slate-600"
          >
             <List size={18} weight="bold" />
-            <span className="text-sm font-medium">Question {currentIndex + 1} / {questions.length}</span>
+            <span className="text-sm font-medium">Q {currentIndex + 1} / {questions.length}</span>
             {flagged[currentIndex] && <div className="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full ml-1" />}
+         </button>
+
+         {/* Mobile Finish Button (visible only on small screens where header button is hidden) */}
+         <button 
+            onClick={isFinished ? handleExitClick : handleFinishClick}
+            className="md:hidden flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-purple-600 text-white rounded-full shadow-lg hover:bg-blue-700 dark:hover:bg-purple-700"
+         >
+            <span className="text-sm font-bold">{isFinished ? 'Exit' : 'Finish'}</span>
          </button>
       </div>
 

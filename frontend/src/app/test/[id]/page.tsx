@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/utils/supabase/client'
 import TestTaker from '@/components/TestTaker'
 import { API_URL } from '@/lib/api'
 
@@ -13,6 +13,7 @@ export default function TestPage() {
   const [testData, setTestData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const supabase = createClient()
 
   const timeLimit = searchParams.get('time') ? parseInt(searchParams.get('time') as string) : null
 

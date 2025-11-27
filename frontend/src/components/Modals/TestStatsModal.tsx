@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BaseModal from './BaseModal';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/client';
 import { API_URL } from '@/lib/api';
 import { 
   CaretLeft, 
@@ -16,47 +16,13 @@ import {
   XCircle
 } from '@phosphor-icons/react';
 import ReviewTestModal from './ReviewTestModal';
+import { TestAttempt, Test, TestStats } from '@/types';
 
 interface TestStatsModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialTestId?: string | null;
   refreshTrigger?: number;
-}
-
-interface TestAttempt {
-  id: string;
-  test_id: string;
-  score: number;
-  total_questions: number;
-  time_taken: number;
-  completed_at: string;
-  test_title?: string;
-  set_name?: string;
-  details?: {
-    question: string;
-    user_answer: string | null;
-    correct_answer: string;
-    is_correct: boolean;
-  }[];
-  is_reset?: boolean;
-}
-
-interface Test {
-  id: string;
-  title: string;
-  created_at: string;
-  folder_id?: string | null;
-  is_starred?: boolean;
-  last_accessed?: string | null;
-  question_count?: number;
-  set_count: number;
-  attempt_count?: number;
-  avg_score?: number | null;
-  best_score?: number | null;
-  last_score?: number | null;
-  question_range?: string | null;
-  sets?: { title: string }[];
 }
 
 interface GroupedStats {
@@ -66,14 +32,6 @@ interface GroupedStats {
   stats: TestStats;
 }
 
-interface TestStats {
-  attempts: number;
-  avgScore: number | null;
-  bestScore: number | null;
-  avgTime: number | null;
-  lastDate: string | null;
-}
-
 interface TestNode {
   id: string;
   title: string;
@@ -81,6 +39,8 @@ interface TestNode {
   stats: TestStats;
   children?: TestNode[];
 }
+
+
 
 // Helper to get days in a month
 const getDaysInMonth = (year: number, month: number) => {
@@ -133,6 +93,7 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('list'); // Default to list based on screenshot
+  const supabase = createClient();
   
   // Review Modal State
   const [showReviewModal, setShowReviewModal] = useState(false);

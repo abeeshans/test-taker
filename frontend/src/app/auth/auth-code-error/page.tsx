@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { XCircle, CircleNotch } from '@phosphor-icons/react'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/utils/supabase/client'
 
 export default function AuthCodeError() {
   const router = useRouter()
   const [processing, setProcessing] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const supabase = createClient()
 
   useEffect(() => {
     const handleAuthResponse = async () => {
@@ -33,7 +34,6 @@ export default function AuthCodeError() {
           }
 
           // Session set successfully, redirect to dashboard
-          console.log('OAuth succeeded, redirecting to dashboard...')
           router.push('/dashboard')
           return
         }

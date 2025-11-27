@@ -2,23 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { DotsThreeVertical, Star, Trash, Pencil, ArrowCounterClockwise, DownloadSimple } from "@phosphor-icons/react";
+import { Test } from "@/types";
 
 interface TestCardProps {
-  test: {
-    id: string;
-    title: string;
-    created_at: string;
-    is_starred: boolean;
-    folder_id?: string | null;
-    last_accessed?: string;
-    question_count: number;
-    set_count: number;
-    attempt_count: number;
-    avg_score?: number;
-    best_score?: number;
-    last_score?: number;
-    question_range?: string;
-  };
+  test: Test;
   onStart: (id: string) => void;
   onDelete: (id: string) => void;
   onRename: (id: string) => void;

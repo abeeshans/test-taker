@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MagnifyingGlass, FolderPlus, PlusCircle, ChartBar, Question, SignOut, House, CaretRight } from "@phosphor-icons/react";
@@ -34,31 +34,9 @@ import ReviewTestModal from "@/components/Modals/ReviewTestModal";
 import UploadResultsModal from "@/components/Modals/UploadResultsModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { API_URL } from "@/lib/api";
+import { Test, Folder } from "@/types";
 
-interface Test {
-  id: string;
-  title: string;
-  created_at: string;
-  folder_id: string | null;
-  is_starred: boolean;
-  last_accessed?: string;
-  question_count: number;
-  set_count: number;
-  attempt_count: number;
-  avg_score?: number;
-  best_score?: number;
-  last_score?: number;
-}
 
-interface Folder {
-  id: string;
-  name: string;
-  parent_id: string | null;
-  created_at: string;
-  test_count?: number;
-  folder_count?: number;
-  avg_score?: number;
-}
 
 // Droppable Breadcrumb Item
 function BreadcrumbDroppable({ id, name, isCurrent, onClick }: { id: string | null; name: string | React.ReactNode; isCurrent: boolean; onClick: () => void }) {
@@ -89,6 +67,7 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const supabase = createClient();
 
   // Modals state
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -709,7 +688,6 @@ export default function Dashboard() {
     }
 
     try {
-      console.log(`Fetching data from: ${API_URL}`);
       const [testsRes, foldersRes] = await Promise.all([
         fetch(`${API_URL}/tests`, { headers: { Authorization: `Bearer ${session.access_token}` } }),
         fetch(`${API_URL}/folders`, { headers: { Authorization: `Bearer ${session.access_token}` } })
@@ -727,8 +705,6 @@ export default function Dashboard() {
       if (testsRes.ok && foldersRes.ok) {
         const testsData = await testsRes.json();
         const foldersData = await foldersRes.json();
-        console.log('DEBUG: Fetched Tests:', testsData);
-        console.log('DEBUG: Fetched Folders:', foldersData);
         setTests(testsData);
         setFolders(foldersData);
       }
@@ -805,11 +781,11 @@ export default function Dashboard() {
                 <Image src="/icon.ico" fill alt="Logo" className="object-contain dark:hidden" />
                 <Image src="/icon-dark.ico" fill alt="Logo" className="object-contain hidden dark:block" />
               </div>
-              <span className="text-2xl font-bold text-gray-800 dark:text-white">SelfTest</span>
+              <span className="text-2xl font-bold text-gray-800 dark:text-white hidden lg:block">SelfTest</span>
             </button>
           </div>
 
-          <div className="relative flex-grow max-w-2xl mx-6">
+          <div className="relative flex-grow max-w-2xl mx-2 md:mx-6 min-w-[120px]">
             <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" size={20} />
             <input
               type="search"
@@ -823,23 +799,24 @@ export default function Dashboard() {
           <div className="flex items-center space-x-4 flex-shrink-0">
             <button
               onClick={() => setActiveModal("create-folder")}
-              className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 font-medium py-2 px-4 rounded-xl flex items-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="text-sm bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 font-medium py-2 px-3 md:px-4 rounded-xl flex items-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              title="Create Folder"
             >
-              <FolderPlus size={18} className="mr-1" /> Create Folder
+              <FolderPlus size={18} className="md:mr-1" /> <span className="hidden md:inline">Create Folder</span>
             </button>
 
-            <label className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium py-2 px-4 rounded-xl flex items-center btn-primary transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow">
-              <PlusCircle size={18} className="mr-1" />
-              {uploading ? "Uploading..." : "Add More Files"}
+            <label className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium py-2 px-3 md:px-4 rounded-xl flex items-center btn-primary transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow" title="Add Files">
+              <PlusCircle size={18} className="md:mr-1" />
+              <span className="hidden md:inline">{uploading ? "Uploading..." : "Add More Files"}</span>
               <input type="file" accept=".json,.pdf" multiple onChange={handleUpload} className="hidden" disabled={uploading} />
             </label>
 
             <button
               onClick={() => setActiveModal("test-stats")}
-              className="text-sm font-medium flex items-center py-2 px-4 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow cursor-pointer"
+              className="text-sm font-medium flex items-center py-2 px-3 md:px-4 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow cursor-pointer"
               title="Test Statistics"
             >
-              <ChartBar size={18} className="mr-1" /> Statistics
+              <ChartBar size={18} className="md:mr-1" /> <span className="hidden md:inline">Statistics</span>
             </button>
 
             <button
@@ -958,16 +935,9 @@ export default function Dashboard() {
                       }}
                       onToggleStar={handleToggleStar}
                       onReview={(id) => {
-                        console.log('onReview called with id:', id);
-                        const test = tests.find(t => t.id === id);
-                        console.log('Found test:', test);
                         if (test && test.attempt_count > 0) {
-                          console.log('Setting reviewTestId to:', id);
                           setReviewTestId(id);
                           setReviewTestTitle(test.title);
-                          console.log('reviewTestId set, should open modal');
-                        } else {
-                          console.log('Test not found or no attempts:', test?.attempt_count);
                         }
                       }}
                       onDownload={handleDownload}

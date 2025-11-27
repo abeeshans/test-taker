@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/utils/supabase/client'
 import { API_URL } from '@/lib/api'
 import BaseModal from './BaseModal'
 import { 
@@ -17,51 +17,14 @@ import {
   Desktop
 } from '@phosphor-icons/react'
 import ReviewStatsNavigation, { QuestionStatus } from '../ReviewStatsNavigation'
+import { TestAttempt, TestData } from '@/types'
 
 interface ReviewTestModalProps {
   isOpen: boolean
   onClose: () => void
   testId: string
   testTitle: string
-  attemptId?: string // Optional: if provided, review this specific attempt
-}
-
-interface QuestionDetail {
-  question: string
-  user_answer: string | null
-  correct_answer: string
-  is_correct: boolean
-  was_flagged?: boolean
-  strikethroughs?: number[]
-}
-
-interface TestAttempt {
-  id: string
-  test_id: string
-  score: number
-  total_questions: number
-  completed_at: string
-  set_name: string
-  details: QuestionDetail[]
-  is_reset?: boolean
-  time_taken?: number
-  away_clicks?: number
-}
-
-interface TestData {
-  title: string
-  content: {
-    sets: {
-      title: string
-      questions: {
-        passage?: string
-        question: string
-        options: string[]
-        correctAnswer: string
-        explanation?: string
-      }[]
-    }[]
-  }
+  attemptId?: string
 }
 
 export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, attemptId }: ReviewTestModalProps) {
@@ -72,6 +35,7 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'test' | 'list'>('test')
   const [error, setError] = useState<string | null>(null)
+  const supabase = createClient()
 
   useEffect(() => {
     if (isOpen && testId) {
@@ -85,7 +49,7 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowRight') {
-        setCurrentIndex(prev => Math.min(attempt.details.length - 1, prev + 1))
+        setCurrentIndex(prev => Math.min((attempt.details?.length || 1) - 1, prev + 1))
       } else if (e.key === 'ArrowLeft') {
         setCurrentIndex(prev => Math.max(0, prev - 1))
       }
@@ -196,7 +160,7 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
       )
     }
 
-    if (!attempt || !testData) {
+    if (!attempt || !attempt.details || !testData) {
       return (
         <div className="flex items-center justify-center py-20">
           <p className="text-gray-500 dark:text-slate-400">No data available</p>
@@ -255,7 +219,7 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
             <div className="max-w-6xl mx-auto flex gap-6">
               {/* Questions List */}
               <div className="flex-1 space-y-8 pb-20 min-w-0">
-                {attempt.details.map((detail, idx) => {
+                {attempt.details?.map((detail, idx) => {
                   // Find the corresponding question from test data
                   let questionData: any = null
                   for (const set of testData.content.sets) {
@@ -353,7 +317,7 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
               <div className="hidden xl:block w-64 flex-shrink-0">
                 <div className="sticky top-6">
                   <ReviewStatsNavigation 
-                    questions={attempt.details.map((d, i) => ({
+                    questions={(attempt.details || []).map((d, i) => ({
                       index: i,
                       status: d.user_answer === null ? 'unanswered' : (d.is_correct ? 'correct' : 'incorrect'),
                       isFlagged: !!d.was_flagged
@@ -373,7 +337,9 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
       )
     }
 
-    const currentDetail = attempt.details[currentIndex]
+    const currentDetail = attempt.details?.[currentIndex]
+    if (!currentDetail) return null;
+
     let currentQuestion: any = null
     for (const set of testData.content.sets) {
       const matchedQ = set.questions.find(q => q.question === currentDetail.question)
@@ -390,29 +356,29 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
       <div className="h-full flex flex-col">
         {/* Header - matches test page layout */}
         <div className="flex-shrink-0 border-b border-gray-200 dark:border-slate-700 px-6 py-4 bg-white dark:bg-slate-800">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             {/* Left: Test title */}
-            <div className="flex-1">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{testTitle}</h3>
-              <p className="text-xs text-gray-500 dark:text-slate-400">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">{testTitle}</h3>
+              <p className="text-xs text-gray-500 dark:text-slate-400 truncate">
                 {attempt.set_name} • {new Date(attempt.completed_at).toLocaleDateString()}
               </p>
             </div>
 
             {/* Center: Results */}
-            <div className="flex-1 flex justify-center">
+            <div className="flex-shrink-0 flex justify-center px-2">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                   {attempt.score}/{attempt.total_questions}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-slate-400">
+                <div className="text-xs md:text-sm text-gray-500 dark:text-slate-400">
                   {Math.round((attempt.score / attempt.total_questions) * 100)}%
                 </div>
               </div>
             </div>
 
-            {/* Right: Time and away clicks */}
-            <div className="flex-1 flex items-center justify-end gap-3">
+            {/* Right: Time and away clicks - Hidden on small mobile */}
+            <div className="hidden md:flex flex-1 items-center justify-end gap-3">
               <div className="flex items-center gap-2 font-mono text-lg font-bold px-3 py-1.5 rounded-lg text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-900">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -433,14 +399,14 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
         </div>
 
         {/* Main content area */}
-        <div className="flex-1 flex overflow-hidden relative">
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
           {/* Left: Passage */}
-          <div className="w-1/2 border-r border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-y-auto p-6">
+          <div className={`w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-y-auto p-4 md:p-6 custom-scrollbar ${hasPassage ? 'h-1/3 lg:h-auto min-h-[150px]' : 'hidden lg:block'}`}>
             {hasPassage ? (
               <div>
-                <h4 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-4">Passage</h4>
+                <h4 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-4 sticky top-0 bg-white dark:bg-slate-800 py-2">Passage</h4>
                 <div 
-                  className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed dark:prose-invert"
+                  className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed dark:prose-invert text-sm md:text-base"
                   dangerouslySetInnerHTML={{ __html: currentQuestion.passage! }} 
                 />
               </div>
@@ -452,17 +418,17 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
           </div>
 
           {/* Floating Navigation - Center between panes (only the navigation button) */}
-          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 z-10">
+          <div className="absolute left-1/2 bottom-8 -translate-x-1/2 z-10 w-full flex justify-center pointer-events-none">
             <button 
               onClick={() => setIsNavOpen(true)}
-              className="px-6 py-3 bg-blue-600 dark:bg-purple-600 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-purple-700 font-semibold text-sm shadow-2xl hover:shadow-3xl transition-all border border-blue-500 dark:border-purple-500"
+              className="pointer-events-auto px-6 py-3 bg-blue-600 dark:bg-purple-600 text-white rounded-xl hover:bg-blue-700 dark:hover:bg-purple-700 font-semibold text-sm shadow-2xl hover:shadow-3xl transition-all border border-blue-500 dark:border-purple-500"
             >
               Question Navigation
             </button>
           </div>
 
           {/* Right: Question and answers */}
-          <div className="w-1/2 bg-gray-50 dark:bg-slate-900 overflow-y-auto p-6">
+          <div className="w-full lg:w-1/2 bg-gray-50 dark:bg-slate-900 overflow-y-auto p-4 md:p-6 custom-scrollbar pb-24">
             <div className="max-w-2xl mx-auto pb-32">
               {/* Question Header & Nav */}
               <div className="flex justify-between items-start mb-6">
@@ -476,7 +442,7 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
 
                 <div className="flex flex-col items-center gap-2">
                   <span className="text-sm font-medium text-gray-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-3 py-1 rounded-full border border-gray-200 dark:border-slate-700 shadow-sm">
-                    Question {currentIndex + 1} of {attempt.details.length}
+                    Question {currentIndex + 1} of {attempt.details?.length || 0}
                   </span>
                   {currentDetail.was_flagged ? (
                     <div className="inline-flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded-full font-medium">
@@ -491,8 +457,8 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
                 </div>
 
                 <button
-                  onClick={() => setCurrentIndex(prev => Math.min(attempt.details.length - 1, prev + 1))}
-                  disabled={currentIndex === attempt.details.length - 1}
+                  onClick={() => setCurrentIndex(prev => Math.min((attempt.details?.length || 1) - 1, prev + 1))}
+                  disabled={currentIndex === (attempt.details?.length || 1) - 1}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-900 dark:bg-slate-700 text-white hover:bg-gray-800 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm text-sm"
                 >
                   Next <ArrowRight size={14} weight="bold" />
@@ -591,7 +557,7 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
               
               <div className="flex-1 overflow-y-auto p-6">
                 <div className="grid grid-cols-8 sm:grid-cols-10 gap-2">
-                  {attempt?.details.map((detail, idx) => {
+                  {attempt?.details?.map((detail, idx) => {
                     const isCurrent = idx === currentIndex
                     const isCorrect = detail.is_correct
                     const wasFlagged = detail.was_flagged

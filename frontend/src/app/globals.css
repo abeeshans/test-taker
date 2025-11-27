@@ -83,7 +83,13 @@ body {
 button {
   border-radius: 10px;
   font-weight: 600;
+  cursor: pointer;
   transition: transform 120ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+a {
+  cursor: pointer;
+  transition: color 120ms ease;
 }
 
 button:hover {

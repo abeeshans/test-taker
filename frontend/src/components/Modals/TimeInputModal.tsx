@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BaseModal from './BaseModal';
 import { API_URL } from '@/lib/api';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/client';
 
 interface TimeInputModalProps {
   isOpen: boolean;
@@ -20,6 +20,7 @@ export default function TimeInputModal({ isOpen, onClose, onConfirm, test }: Tim
   const [sets, setSets] = useState<TestSet[]>([]);
   const [selectedSet, setSelectedSet] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
     if (isOpen && test) {
