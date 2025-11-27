@@ -17,10 +17,12 @@ steps:
       - '--region'
       - 'us-central1'
       - '--set-env-vars'
-      - 'FRONTEND_URL=$_FRONTEND_URL'
+      - 'FRONTEND_URL=$_FRONTEND_URL,SUPABASE_URL=$_SUPABASE_URL,SUPABASE_KEY=$_SUPABASE_KEY'
 options:
   logging: CLOUD_LOGGING_ONLY
 images:
   - 'gcr.io/$PROJECT_ID/backend'
 substitutions:
   _FRONTEND_URL: ''
+  _SUPABASE_URL: ''
+  _SUPABASE_KEY: ''
