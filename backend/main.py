@@ -68,7 +68,9 @@ class Test(BaseModel):
     avg_score: Optional[int] = None
     best_score: Optional[int] = None
     last_score: Optional[int] = None
+    last_score: Optional[int] = None
     question_range: Optional[str] = None
+    source_id: Optional[str] = None
 
 class TestDetail(Test):
     content: dict
@@ -431,35 +433,30 @@ async def upload_files(files: List[UploadFile] = File(...), folder_id: Optional[
                     "question_range": question_range
                 }
                 
-                # Check if test with this ID exists
+                # Check if test with this ID exists (either as primary ID or source_id)
                 existing_test = None
                 if test_id:
                     # Check if valid UUID
                     try:
                         uuid_obj = uuid.UUID(test_id)
-                        # Check DB
+                        # Check DB for match on id OR source_id
+                        # Supabase-py doesn't support OR easily in one query with the builder, 
+                        # so we might need two queries or a raw query.
+                        # Let's check by ID first (if they own the original)
                         resp = client.table("tests").select("id").eq("id", test_id).eq("user_id", user_id).execute()
                         if resp.data:
                             existing_test = resp.data[0]
+                        else:
+                            # Check by source_id (if they imported it)
+                            resp = client.table("tests").select("id").eq("source_id", test_id).eq("user_id", user_id).execute()
+                            if resp.data:
+                                existing_test = resp.data[0]
                     except ValueError:
-                        # Invalid UUID, ignore ID and treat as new (or maybe error? Let's treat as new but warn?)
-                        # For now, let's just ignore invalid ID and generate new one
+                        # Invalid UUID, ignore ID and treat as new
                         pass
 
                 if existing_test:
                     # Update existing test
-                    # Don't update folder_id on re-upload unless explicitly requested? 
-                    # Requirement says "reupload an editted version... without it being read as a new test card"
-                    # Usually we want to keep it in the same folder it was.
-                    # So let's NOT update folder_id if it's an update, unless we want to move it.
-                    # But the user might be uploading from the dashboard root or a specific folder.
-                    # If they are in a specific folder, maybe they want to move it there?
-                    # Let's assume we update content and title, but keep folder unless specified?
-                    # Actually, if I upload a file, I expect it to go where I am.
-                    # But if it's an update, maybe it should stay where it is?
-                    # Let's update the content and title.
-                    # Let's keep the folder_id as is, unless we want to force move.
-                    # For now, let's only update title, content, stats.
                     update_data = {
                         "title": title,
                         "content": json_content,
@@ -467,15 +464,33 @@ async def upload_files(files: List[UploadFile] = File(...), folder_id: Optional[
                         "set_count": set_count,
                         "question_range": question_range
                     }
-                    # If the user is in a specific folder, maybe we should move it there?
-                    # Let's stick to updating content for now.
                     
-                    client.table("tests").update(update_data).eq("id", test_id).execute()
-                    results.append({"filename": file.filename, "status": "updated", "id": test_id})
+                    client.table("tests").update(update_data).eq("id", existing_test['id']).execute()
+                    results.append({"filename": file.filename, "status": "updated", "id": existing_test['id']})
                 else:
                     # Insert new test
+                    # If test_id is present, use it as source_id, but let DB generate a new primary ID
+                    # UNLESS we want to try to keep the ID?
+                    # The issue is if User A uploads ID=X, they get ID=X.
+                    # User B uploads ID=X. If we try to insert ID=X, it fails.
+                    # So User B must get a NEW ID, but we record source_id=X.
+                    
+                    # But wait, if User A uploads it first, they claim ID=X.
+                    # If User A re-uploads, we find ID=X and update.
+                    
+                    # If User B uploads, we don't find ID=X (owned by B).
+                    # We don't find source_id=X (owned by B).
+                    # So we insert.
+                    # If we try to insert with ID=X, it will fail because ID is PK and unique across table.
+                    # So we MUST NOT set 'id' in the insert data if we want a new ID.
+                    # We should set 'source_id' = test_id.
+                    
                     if test_id:
-                         data['id'] = test_id # Use the ID from JSON
+                         data['source_id'] = test_id
+                    
+                    # Remove 'id' from data if it was there, to let DB generate unique one
+                    if 'id' in data:
+                        del data['id']
                     
                     response = client.table("tests").insert(data).execute()
                     results.append({"filename": file.filename, "status": "created", "id": response.data[0]['id']})

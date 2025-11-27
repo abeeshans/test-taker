@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -80,6 +80,7 @@ export default function Dashboard() {
   const [reviewTestTitle, setReviewTestTitle] = useState<string>("");
   const [uploadResults, setUploadResults] = useState<any[]>([]);
   const [alertMessage, setAlertMessage] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCardClick = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -647,9 +648,28 @@ export default function Dashboard() {
     }
 
     const formData = new FormData();
+    const validFiles: File[] = [];
+    const invalidFiles: string[] = [];
+
     Array.from(e.target.files).forEach((file) => {
-      formData.append("files", file);
+      if (file.name.toLowerCase().endsWith(".json") || file.name.toLowerCase().endsWith(".pdf")) {
+        validFiles.push(file);
+        formData.append("files", file);
+      } else {
+        invalidFiles.push(file.name);
+      }
     });
+
+    if (invalidFiles.length > 0) {
+      setAlertMessage(`The following files are not supported: ${invalidFiles.join(", ")}. Only .json and .pdf files are allowed.`);
+      setActiveModal("alert");
+    }
+
+    if (validFiles.length === 0) {
+      setUploading(false);
+      e.target.value = "";
+      return;
+    }
     if (currentFolderId) {
         formData.append("folder_id", currentFolderId);
     }
@@ -807,11 +827,24 @@ export default function Dashboard() {
               <FolderPlus size={18} className="md:mr-1" /> <span className="hidden md:inline">Create Folder</span>
             </button>
 
-            <label className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium py-2 px-3 md:px-4 rounded-xl flex items-center btn-primary transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow" title="Add Files">
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium py-2 px-3 md:px-4 rounded-xl flex items-center btn-primary transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow" 
+              title="Add Files"
+              disabled={uploading}
+            >
               <PlusCircle size={18} className="md:mr-1" />
               <span className="hidden md:inline">{uploading ? "Uploading..." : "Add More Files"}</span>
-              <input type="file" accept=".json,.pdf" multiple onChange={handleUpload} className="hidden" disabled={uploading} />
-            </label>
+            </button>
+            <input 
+              ref={fileInputRef}
+              type="file" 
+              accept=".json,.pdf"
+              multiple 
+              onChange={handleUpload} 
+              className="hidden" 
+              disabled={uploading} 
+            />
 
             <button
               onClick={() => setActiveModal("test-stats")}
