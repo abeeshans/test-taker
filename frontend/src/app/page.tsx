@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
-import { EnvelopeSimple, LockKey, ArrowRight, CircleNotch, ArrowLeft, Check, GoogleLogo } from '@phosphor-icons/react'
+import { EnvelopeSimple, LockKey, ArrowRight, CircleNotch, ArrowLeft, Check, GoogleLogo, Eye, EyeSlash } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 
@@ -18,6 +18,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [rememberMe, setRememberMe] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -29,6 +30,22 @@ export default function Home() {
       }
     }
     checkSession()
+
+    // Check for remembered email
+    const rememberedEmail = localStorage.getItem('rememberedEmail')
+    if (rememberedEmail) {
+      setEmail(rememberedEmail)
+      setRememberMe(true)
+    }
+
+    // Handle bfcache restoration (back button from Google)
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        setLoading(false)
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
   }, [router, supabase])
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -44,6 +61,14 @@ export default function Home() {
           password,
         })
         if (error) throw error
+        
+        // Handle Remember Me
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email)
+        } else {
+          localStorage.removeItem('rememberedEmail')
+        }
+
         router.push('/dashboard')
       } else if (authMode === 'signup') {
         if (password !== confirmPassword) {
@@ -218,7 +243,6 @@ export default function Home() {
                     />
                   </div>
                 </div>
-                
                 {authMode !== 'forgot-password' && (
                   <div>
                     <div className="flex justify-between items-center mb-1.5 ml-1">
@@ -227,13 +251,20 @@ export default function Home() {
                     <div className="relative group">
                       <LockKey size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                       <input
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="block w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-600 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="block w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-600 outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         placeholder="••••••••"
                         required
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors focus:outline-none"
+                      >
+                        {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+                      </button>
                     </div>
                   </div>
                 )}
