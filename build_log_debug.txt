@@ -1,0 +1,187 @@
+----------------- REMOTE BUILD OUTPUT -----------------
+starting build "f082ee00-02b4-4917-acae-1f7024ec4966"
+FETCHSOURCE
+Fetching storage object: gs://compact-market-405422_cloudbuild/source/1764618515.692861-bcc353bd947c47c8b20e7ebe29c7946d.tgz#1764618546200219
+Copying gs://compact-market-405422_cloudbuild/source/1764618515.692861-bcc353bd947c47c8b20e7ebe29c7946d.tgz#1764618546200219...
+/ [0 files][    0.0 B/ 49.2 MiB]                                                -- [1 files][ 49.2 MiB/ 49.2 MiB]
+Operation completed over 1 objects/49.2 MiB.
+BUILD
+Starting Step #0
+Step #0: Already have image (with digest): gcr.io/cloud-builders/docker
+Step #0: Sending build context to Docker daemon  1.771MB
+Step #0: Step 1/40 : FROM node:20-slim AS base
+Step #0: 20-slim: Pulling from library/node
+Step #0: 8e44f01296e3: Pulling fs layer
+Step #0: 667488fa5220: Pulling fs layer
+Step #0: e96ce70b461a: Pulling fs layer
+Step #0: 6c2b787b4c45: Pulling fs layer
+Step #0: aa42edbc26fe: Pulling fs layer
+Step #0: aa42edbc26fe: Verifying Checksum
+Step #0: aa42edbc26fe: Download complete
+Step #0: 667488fa5220: Verifying Checksum
+Step #0: 667488fa5220: Download complete
+Step #0: 6c2b787b4c45: Verifying Checksum
+Step #0: 6c2b787b4c45: Download complete
+Step #0: 8e44f01296e3: Verifying Checksum
+Step #0: 8e44f01296e3: Download complete
+Step #0: e96ce70b461a: Verifying Checksum
+Step #0: e96ce70b461a: Download complete
+Step #0: 8e44f01296e3: Pull complete
+Step #0: 667488fa5220: Pull complete
+Step #0: e96ce70b461a: Pull complete
+Step #0: 6c2b787b4c45: Pull complete
+Step #0: aa42edbc26fe: Pull complete
+Step #0: Digest: sha256:fbb357f69d05c97333855b0846e4ef65462409728312df3c9ff12c941741c0a5
+Step #0: Status: Downloaded newer image for node:20-slim
+Step #0:  ---> 2438320b4ccb
+Step #0: Step 2/40 : FROM base AS deps
+Step #0:  ---> 2438320b4ccb
+Step #0: Step 3/40 : WORKDIR /app
+Step #0:  ---> Running in 92b85092cebf
+Step #0: Removing intermediate container 92b85092cebf
+Step #0:  ---> 53b4214d468a
+Step #0: Step 4/40 : COPY package.json package-lock.json* ./
+Step #0:  ---> 59ccd617f423
+Step #0: Step 5/40 : RUN rm -f package-lock.json && npm install
+Step #0:  ---> Running in 19f69bc2e3fa
+Step #0:
+Step #0: added 380 packages, and audited 381 packages in 29s
+Step #0:
+Step #0: 143 packages are looking for funding
+Step #0:   run `npm fund` for details
+Step #0:
+Step #0: found 0 vulnerabilities
+Step #0: [91mnpm notice
+Step #0: npm notice New major version of npm available! 10.8.2 -> 11.6.4
+Step #0: npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.4
+Step #0: npm notice To update run: npm install -g npm@11.6.4
+Step #0: npm notice
+Step #0: [0mRemoving intermediate container 19f69bc2e3fa
+Step #0:  ---> f26f25ce9f0c
+Step #0: Step 6/40 : FROM base AS builder
+Step #0:  ---> 2438320b4ccb
+Step #0: Step 7/40 : WORKDIR /app
+Step #0:  ---> Using cache
+Step #0:  ---> 53b4214d468a
+Step #0: Step 8/40 : COPY --from=deps /app/node_modules ./node_modules
+Step #0:  ---> 4cbcbc4b1dfb
+Step #0: Step 9/40 : COPY . .
+Step #0:  ---> d112c2e7cda4
+Step #0: Step 10/40 : ARG NEXT_PUBLIC_API_URL
+Step #0:  ---> Running in 02e86dfc9b82
+Step #0: Removing intermediate container 02e86dfc9b82
+Step #0:  ---> f151fca57308
+Step #0: Step 11/40 : ARG NEXT_PUBLIC_SITE_URL
+Step #0:  ---> Running in f0b6e40bfbd9
+Step #0: Removing intermediate container f0b6e40bfbd9
+Step #0:  ---> f6d3d77b803a
+Step #0: Step 12/40 : ARG NEXT_PUBLIC_SUPABASE_URL
+Step #0:  ---> Running in c417b1a0e3df
+Step #0: Removing intermediate container c417b1a0e3df
+Step #0:  ---> 882b118cc20b
+Step #0: Step 13/40 : ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+Step #0:  ---> Running in e27af030ecdd
+Step #0: Removing intermediate container e27af030ecdd
+Step #0:  ---> 44158a1c3939
+Step #0: Step 14/40 : ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+Step #0:  ---> Running in 6f904c3e9e2d
+Step #0: Removing intermediate container 6f904c3e9e2d
+Step #0:  ---> 135d65a68f29
+Step #0: Step 15/40 : ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+Step #0:  ---> Running in 866ec2f89aaf
+Step #0: Removing intermediate container 866ec2f89aaf
+Step #0:  ---> 55543575c853
+Step #0: Step 16/40 : ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+Step #0:  ---> Running in 275d1362f070
+Step #0: Removing intermediate container 275d1362f070
+Step #0:  ---> f67670d7038d
+Step #0: Step 17/40 : ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+Step #0:  ---> Running in 2fd07684abc2
+Step #0: Removing intermediate container 2fd07684abc2
+Step #0:  ---> 218f0540deef
+Step #0: Step 18/40 : ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+Step #0:  ---> Running in 052d55174952
+Step #0: Removing intermediate container 052d55174952
+Step #0:  ---> b1435eead60e
+Step #0: Step 19/40 : RUN echo "DEBUG: API_URL=$NEXT_PUBLIC_API_URL"
+Step #0:  ---> Running in 8ce719610dc8
+Step #0: DEBUG: API_URL=https://backend-351771281344.us-central1.run.app _NEXT_PUBLIC_SITE_URL=https://selftest.study _NEXT_PUBLIC_SUPABASE_URL=https://kgyvwxkkhyuehdesthcv.supabase.co _NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtneXZ3eGtraHl1ZWhkZXN0aGN2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1OTY0NzksImV4cCI6MjA3OTE3MjQ3OX0.0HbXEqGQDpfhy6Dq0E0aXQAEJxJIxHJoBv_lGwjOQLQ
+Step #0: Removing intermediate container 8ce719610dc8
+Step #0:  ---> 0ec479d63fc8
+Step #0: Step 20/40 : RUN echo "DEBUG: SITE_URL=$NEXT_PUBLIC_SITE_URL"
+Step #0:  ---> Running in 929f63574985
+Step #0: DEBUG: SITE_URL=
+Step #0: Removing intermediate container 929f63574985
+Step #0:  ---> 464dd2ddae93
+Step #0: Step 21/40 : RUN echo "DEBUG: SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL"
+Step #0:  ---> Running in 1c42475fd1ba
+Step #0: DEBUG: SUPABASE_URL=
+Step #0: Removing intermediate container 1c42475fd1ba
+Step #0:  ---> 0dc20a660718
+Step #0: Step 22/40 : RUN echo "DEBUG: SUPABASE_ANON_KEY_LENGTH=${#NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+Step #0:  ---> Running in 79c653622a0e
+Step #0: DEBUG: SUPABASE_ANON_KEY_LENGTH=0
+Step #0: Removing intermediate container 79c653622a0e
+Step #0:  ---> e4a10186c51c
+Step #0: Step 23/40 : RUN npm run build
+Step #0:  ---> Running in bfd7c363edbe
+Step #0:
+Step #0: > frontend@0.1.0 build
+Step #0: > next build
+Step #0:
+Step #0: [91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m ? `eslint` configuration in next.config.ts is no longer supported. See more info here: https://nextjs.org/docs/app/api-reference/cli/next#next-lint-options
+Step #0: [0m[91m ? Invalid next.config.ts options detected:
+Step #0:  ?     Unrecognized key(s) in object: 'eslint'
+Step #0:  ? See more info here: https://nextjs.org/docs/messages/invalid-next-config
+Step #0: [0mAttention: Next.js now collects completely anonymous telemetry regarding usage.
+Step #0: This information is used to shape Next.js' roadmap and prioritize features.
+Step #0: You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+Step #0: https://nextjs.org/telemetry
+Step #0:
+Step #0:    ? Next.js 16.0.3 (Turbopack)
+Step #0:    - Environments: .env.production
+Step #0:
+Step #0: [91m ? The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+Step #0: [0m   Creating an optimized production build ...
+Step #0: [91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m ? Compiled successfully in 4.4s
+Step #0:    Skipping validation of types
+Step #0:    Collecting page data using 7 workers ...
+Step #0: [91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m   Generating static pages using 7 workers (0/10) ...
+Step #0: [91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0mDEBUG: Creating client with URL:
+Step #0: DEBUG: Creating client with URL:
+Step #0: DEBUG: Creating client with URL:
+Step #0: [91mError occurred prerendering page "/auth/auth-code-error". Read more: https://nextjs.org/docs/messages/prerender-error
+Step #0: [0m[91mError: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+Step #0:
+Step #0: Check your Supabase project's API settings to find these values
+Step #0:
+Step #0: https://supabase.com/dashboard/project/_/settings/api
+Step #0:     at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+Step #0:     at <unknown> (.next/server/chunks/ssr/_29cf2427._.js:20:40987)
+Step #0:     at bh (.next/server/chunks/ssr/_29cf2427._.js:24:57)
+Step #0:     at h (.next/server/chunks/ssr/[root-of-the-server]__e7d02ef2._.js:1:7955) {
+Step #0:   digest: '2694895448'
+Step #0: }
+Step #0: Export encountered an error on /auth/auth-code-error/page: /auth/auth-code-error, exiting the build.
+Step #0: [0m[91m ? Next.js build worker exited with code: 1 and signal: null
+Step #0: [0m[91mnpm notice
+Step #0: npm notice New major version of npm available! 10.8.2 -> 11.6.4
+Step #0: npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.4
+Step #0: npm notice To update run: npm install -g npm@11.6.4
+Step #0: npm notice
+Step #0: The command '/bin/sh -c npm run build' returned a non-zero code: 1
+Finished Step #0
+ERROR
+ERROR: build step 0 "gcr.io/cloud-builders/docker" failed: step exited with non-zero status: 1
+Step #0: [0m
+-------------------------------------------------------

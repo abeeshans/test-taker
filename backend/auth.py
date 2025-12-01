@@ -11,9 +11,11 @@ url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
 
 if not url or not key:
-    raise ValueError("Supabase credentials not found in environment variables")
-
-supabase: Client = create_client(url, key)
+    print("Warning: Supabase credentials not found in environment variables. Auth will fail.")
+    # Initialize with dummy values to prevent crash on import, but operations will fail
+    supabase: Client = create_client("https://placeholder.supabase.co", "placeholder")
+else:
+    supabase: Client = create_client(url, key)
 security = HTTPBearer()
 
 def get_authenticated_client(credentials: HTTPAuthorizationCredentials = Depends(security)):

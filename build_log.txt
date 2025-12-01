@@ -1,0 +1,158 @@
+----------------- REMOTE BUILD OUTPUT -----------------
+starting build "6c163cd9-2a27-4be1-a83f-b3684c6c54aa"
+FETCHSOURCE
+Fetching storage object: gs://compact-market-405422_cloudbuild/source/1764617573.220242-0250d5dff4364ff9af43cad96018547c.tgz#1764617603789226
+Copying gs://compact-market-405422_cloudbuild/source/1764617573.220242-0250d5dff4364ff9af43cad96018547c.tgz#1764617603789226...
+/ [0 files][    0.0 B/ 49.2 MiB]                                                / [1 files][ 49.2 MiB/ 49.2 MiB]
+Operation completed over 1 objects/49.2 MiB.
+BUILD
+Starting Step #0
+Step #0: Already have image (with digest): gcr.io/cloud-builders/docker
+Step #0: Sending build context to Docker daemon   1.77MB
+Step #0: Step 1/35 : FROM node:20-slim AS base
+Step #0: 20-slim: Pulling from library/node
+Step #0: 8e44f01296e3: Pulling fs layer
+Step #0: 667488fa5220: Pulling fs layer
+Step #0: e96ce70b461a: Pulling fs layer
+Step #0: 6c2b787b4c45: Pulling fs layer
+Step #0: aa42edbc26fe: Pulling fs layer
+Step #0: aa42edbc26fe: Verifying Checksum
+Step #0: aa42edbc26fe: Download complete
+Step #0: 667488fa5220: Download complete
+Step #0: 6c2b787b4c45: Verifying Checksum
+Step #0: 6c2b787b4c45: Download complete
+Step #0: e96ce70b461a: Verifying Checksum
+Step #0: e96ce70b461a: Download complete
+Step #0: 8e44f01296e3: Verifying Checksum
+Step #0: 8e44f01296e3: Download complete
+Step #0: 8e44f01296e3: Pull complete
+Step #0: 667488fa5220: Pull complete
+Step #0: e96ce70b461a: Pull complete
+Step #0: 6c2b787b4c45: Pull complete
+Step #0: aa42edbc26fe: Pull complete
+Step #0: Digest: sha256:fbb357f69d05c97333855b0846e4ef65462409728312df3c9ff12c941741c0a5
+Step #0: Status: Downloaded newer image for node:20-slim
+Step #0:  ---> 2438320b4ccb
+Step #0: Step 2/35 : FROM base AS deps
+Step #0:  ---> 2438320b4ccb
+Step #0: Step 3/35 : WORKDIR /app
+Step #0:  ---> Running in a7ab44cd8300
+Step #0: Removing intermediate container a7ab44cd8300
+Step #0:  ---> 27e937e6c401
+Step #0: Step 4/35 : COPY package.json package-lock.json* ./
+Step #0:  ---> ed357f116022
+Step #0: Step 5/35 : RUN rm -f package-lock.json && npm install
+Step #0:  ---> Running in 7af159c77abe
+Step #0:
+Step #0: added 380 packages, and audited 381 packages in 29s
+Step #0:
+Step #0: 143 packages are looking for funding
+Step #0:   run `npm fund` for details
+Step #0:
+Step #0: found 0 vulnerabilities
+Step #0: [91mnpm notice
+Step #0: npm notice New major version of npm available! 10.8.2 -> 11.6.4
+Step #0: npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.4
+Step #0: npm notice To update run: npm install -g npm@11.6.4
+Step #0: npm notice
+Step #0: [0mRemoving intermediate container 7af159c77abe
+Step #0:  ---> 8617affb48ce
+Step #0: Step 6/35 : FROM base AS builder
+Step #0:  ---> 2438320b4ccb
+Step #0: Step 7/35 : WORKDIR /app
+Step #0:  ---> Using cache
+Step #0:  ---> 27e937e6c401
+Step #0: Step 8/35 : COPY --from=deps /app/node_modules ./node_modules
+Step #0:  ---> cc352d7229c0
+Step #0: Step 9/35 : COPY . .
+Step #0:  ---> e458b896bc6a
+Step #0: Step 10/35 : ARG NEXT_PUBLIC_API_URL
+Step #0:  ---> Running in aefc33c8c86c
+Step #0: Removing intermediate container aefc33c8c86c
+Step #0:  ---> 04f66dca560a
+Step #0: Step 11/35 : ARG NEXT_PUBLIC_SITE_URL
+Step #0:  ---> Running in 5bea1544ed7d
+Step #0: Removing intermediate container 5bea1544ed7d
+Step #0:  ---> 414a42c4f04d
+Step #0: Step 12/35 : ARG NEXT_PUBLIC_SUPABASE_URL
+Step #0:  ---> Running in e8adf3bbff2b
+Step #0: Removing intermediate container e8adf3bbff2b
+Step #0:  ---> c64de24900a5
+Step #0: Step 13/35 : ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+Step #0:  ---> Running in 151cd62d19ba
+Step #0: Removing intermediate container 151cd62d19ba
+Step #0:  ---> affda6b2db55
+Step #0: Step 14/35 : ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+Step #0:  ---> Running in 959f2dc9bd86
+Step #0: Removing intermediate container 959f2dc9bd86
+Step #0:  ---> 1b9d85012245
+Step #0: Step 15/35 : ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+Step #0:  ---> Running in f2590390f2b1
+Step #0: Removing intermediate container f2590390f2b1
+Step #0:  ---> 9cf229c412cd
+Step #0: Step 16/35 : ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+Step #0:  ---> Running in 42991bf4b77d
+Step #0: Removing intermediate container 42991bf4b77d
+Step #0:  ---> 7e38ca4ca3d0
+Step #0: Step 17/35 : ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+Step #0:  ---> Running in e2c599281c84
+Step #0: Removing intermediate container e2c599281c84
+Step #0:  ---> ac201bd9afcb
+Step #0: Step 18/35 : RUN npm run build
+Step #0:  ---> Running in c3e25aa0f577
+Step #0:
+Step #0: > frontend@0.1.0 build
+Step #0: > next build
+Step #0:
+Step #0: [91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m ? `eslint` configuration in next.config.ts is no longer supported. See more info here: https://nextjs.org/docs/app/api-reference/cli/next#next-lint-options
+Step #0: [0m[91m ? Invalid next.config.ts options detected:
+Step #0:  ?     Unrecognized key(s) in object: 'eslint'
+Step #0:  ? See more info here: https://nextjs.org/docs/messages/invalid-next-config
+Step #0: [0mAttention: Next.js now collects completely anonymous telemetry regarding usage.
+Step #0: This information is used to shape Next.js' roadmap and prioritize features.
+Step #0: You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+Step #0: https://nextjs.org/telemetry
+Step #0:
+Step #0:    ? Next.js 16.0.3 (Turbopack)
+Step #0:    - Environments: .env.production
+Step #0:
+Step #0: [91m ? The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+Step #0: [0m   Creating an optimized production build ...
+Step #0: [91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m ? Compiled successfully in 4.6s
+Step #0:    Skipping validation of types
+Step #0:    Collecting page data using 7 workers ...
+Step #0: [91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m   Generating static pages using 7 workers (0/10) ...
+Step #0: [91m[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Step #0: [0m[91mError occurred prerendering page "/auth/auth-code-error". Read more: https://nextjs.org/docs/messages/prerender-error
+Step #0: [0m[91mError: @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+Step #0:
+Step #0: Check your Supabase project's API settings to find these values
+Step #0:
+Step #0: https://supabase.com/dashboard/project/_/settings/api
+Step #0:     at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+Step #0:     at bh (.next/server/chunks/ssr/_29cf2427._.js:20:40913)
+Step #0:     at h (.next/server/chunks/ssr/[root-of-the-server]__e7d02ef2._.js:1:7955) {
+Step #0:   digest: '2694895448'
+Step #0: }
+Step #0: Export encountered an error on /auth/auth-code-error/page: /auth/auth-code-error, exiting the build.
+Step #0: [0m[91m ? Next.js build worker exited with code: 1 and signal: null
+Step #0: [0m[91mnpm notice
+Step #0: npm notice New major version of npm available! 10.8.2 -> 11.6.4
+Step #0: npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.4
+Step #0: npm notice To update run: npm install -g npm@11.6.4
+Step #0: npm notice
+Step #0: The command '/bin/sh -c npm run build' returned a non-zero code: 1
+Finished Step #0
+ERROR
+ERROR: build step 0 "gcr.io/cloud-builders/docker" failed: step exited with non-zero status: 1
+Step #0: [0m
+-------------------------------------------------------

@@ -6,6 +6,9 @@ steps:
       '-t', 'gcr.io/$PROJECT_ID/backend',
       '.'
     ]
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: 'backend'
+    args: ['push', 'gcr.io/$PROJECT_ID/backend']
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
@@ -17,7 +20,7 @@ steps:
       - '--region'
       - 'us-central1'
       - '--set-env-vars'
-      - 'FRONTEND_URL=$_FRONTEND_URL,SUPABASE_URL=$_SUPABASE_URL,SUPABASE_KEY=$_SUPABASE_KEY'
+      - 'FRONTEND_URL=$_FRONTEND_URL,SUPABASE_URL=$_SUPABASE_URL,SUPABASE_KEY=$_SUPABASE_KEY,GEMINI_API_KEY=$_GEMINI_API_KEY'
 options:
   logging: CLOUD_LOGGING_ONLY
 images:
@@ -26,3 +29,4 @@ substitutions:
   _FRONTEND_URL: ''
   _SUPABASE_URL: ''
   _SUPABASE_KEY: ''
+  _GEMINI_API_KEY: ''
