@@ -155,11 +155,22 @@ class GeminiClient:
         supabase_url = os.getenv("SUPABASE_URL")
         supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
         
-        if not supabase_url or not supabase_key:
-            print("Supabase credentials missing, skipping image processing")
+        if not supabase_url:
+            print("CRITICAL: SUPABASE_URL is missing. Cannot upload images.")
             return questions
+            
+        if not supabase_key:
+            print("CRITICAL: SUPABASE_SERVICE_ROLE_KEY and SUPABASE_KEY are missing. Cannot upload images.")
+            return questions
+            
+        if not os.getenv("SUPABASE_SERVICE_ROLE_KEY"):
+            print("WARNING: SUPABASE_SERVICE_ROLE_KEY is missing. Using SUPABASE_KEY. Image upload might fail due to RLS policies.")
 
-        supabase = create_client(supabase_url, supabase_key)
+        try:
+            supabase = create_client(supabase_url, supabase_key)
+        except Exception as e:
+            print(f"CRITICAL: Failed to initialize Supabase client: {e}")
+            return questions
         
         # Regex to find coordinates: (x1, y1, x2, y2)
         # and potentially page number: Page X
