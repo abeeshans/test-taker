@@ -31,15 +31,13 @@ import TimeInputModal from "@/components/Modals/TimeInputModal";
 import HelpModal from "@/components/Modals/HelpModal";
 import TestStatsModal from "@/components/Modals/TestStatsModal";
 import ReviewTestModal from "@/components/Modals/ReviewTestModal";
+import MergeTestModal from "@/components/Modals/MergeTestModal";
 import UploadResultsModal from "@/components/Modals/UploadResultsModal";
 import AlertModal from "@/components/Modals/AlertModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { API_URL } from "@/lib/api";
+import { API_URL, mergeTests, batchUpdateTests } from "@/lib/api";
 import { Test, Folder } from "@/types";
 
-
-
-// Droppable Breadcrumb Item
 function BreadcrumbDroppable({ id, name, isCurrent, onClick }: { id: string | null; name: string | React.ReactNode; isCurrent: boolean; onClick: () => void }) {
   const { setNodeRef, isOver } = useDroppable({
     id: `breadcrumb-${id ?? "root"}`,
@@ -81,6 +79,7 @@ export default function Dashboard() {
   const [uploadResults, setUploadResults] = useState<any[]>([]);
   const [alertMessage, setAlertMessage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [mergeModalData, setMergeModalData] = useState<{ source: Test; target: Test } | null>(null);
 
   const handleCardClick = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -220,6 +219,22 @@ export default function Dashboard() {
     setActiveDragId(null);
 
     const activeId = active.id as string;
+
+    // Check for Test Merge Drop
+    if (over?.id && (over.id as string).startsWith("test-drop-")) {
+        const targetTestId = (over.id as string).replace("test-drop-", "");
+        const sourceTestId = activeId; 
+
+        if (targetTestId === sourceTestId) return;
+
+        const sourceTest = tests.find(t => t.id === sourceTestId);
+        const targetTest = tests.find(t => t.id === targetTestId);
+
+        if (sourceTest && targetTest) {
+            setMergeModalData({ source: sourceTest, target: targetTest });
+        }
+        return;
+    }
     const dragMeta = (active.data.current as { fromPreview?: boolean } | undefined) ?? undefined;
     const isDraggingFromFolderCard = Boolean(dragMeta?.fromPreview);
 
@@ -787,6 +802,23 @@ export default function Dashboard() {
     return [...crumbs, ...path];
   }, [currentFolderId, folders]);
 
+  const handleMergeConfirm = async (updates: any[], deletes: string[]) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    setIsSubmitting(true);
+    try {
+        await batchUpdateTests(updates, deletes, session.access_token);
+        // Refresh data
+        fetchData();
+        setMergeModalData(null);
+    } catch (error) {
+        console.error("Error merging tests:", error);
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={customCollisionDetection}>
       <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-900">
@@ -1063,7 +1095,7 @@ export default function Dashboard() {
           test={testToStart}
           onConfirm={(minutes, setIndex) => {
             if (testToStart) {
-              router.push(`/test/${testToStart.id}?minutes=${minutes}&set=${setIndex}`);
+              router.push(`/test/${testToStart.id}?time=${minutes}&set=${setIndex}`);
               setActiveModal(null);
             }
           }}
@@ -1080,6 +1112,16 @@ export default function Dashboard() {
         />
 
         {/* Global drop zone overlay removed */}
+
+        {mergeModalData && (
+            <MergeTestModal
+              isOpen={true}
+              onClose={() => setMergeModalData(null)}
+              sourceTest={mergeModalData.source}
+              targetTest={mergeModalData.target}
+              onMerge={handleMergeConfirm}
+            />
+        )}
 
         <DragOverlay dropAnimation={null} modifiers={[snapCenterToCursor]} style={{ cursor: "grabbing", pointerEvents: "none" }}>
           {activeDragId ? (

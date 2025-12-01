@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useDraggable } from "@dnd-kit/core";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { DotsThreeVertical, Star, Trash, Pencil, ArrowCounterClockwise, DownloadSimple } from "@phosphor-icons/react";
 import { Test } from "@/types";
@@ -24,6 +24,11 @@ function TestCard({ test, onStart, onDelete, onRename, onReset, onToggleStar, on
     data: { type: "test", id: test.id, folderId: test.folder_id ?? null, fromPreview: false },
   });
 
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+    id: `test-drop-${test.id}`,
+    data: { type: "test-target", id: test.id },
+  });
+
   const style = {
     // transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.5 : 1,
@@ -44,12 +49,16 @@ function TestCard({ test, onStart, onDelete, onRename, onReset, onToggleStar, on
 
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        setDroppableRef(node);
+      }}
       style={style}
       {...attributes}
       {...listeners}
       className={`test-card bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4 relative flex flex-col h-72 hover:shadow-md dark:hover:border-slate-600 cursor-pointer
         ${isSelected ? "!ring-2 !ring-blue-500 !shadow-md z-10" : ""}
+        ${isOver ? "!ring-2 !ring-purple-500 !bg-purple-50 dark:!bg-purple-900/20" : ""}
       `}
       onClick={onClick}
       onDoubleClick={(e) => {

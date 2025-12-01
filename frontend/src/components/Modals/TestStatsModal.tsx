@@ -394,6 +394,28 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
       }
     };
 
+    const handleChildReviewClick = (e: React.MouseEvent, child: GroupedStats) => {
+      e.stopPropagation();
+      let relevantAttempts: TestAttempt[] = [];
+
+      if (node.id.startsWith('group-')) {
+          // Child is a test
+          relevantAttempts = attempts.filter(a => a.test_id === child.id);
+      } else {
+          // Child is a set
+          relevantAttempts = attempts.filter(a => a.test_id === node.id && a.set_name === child.title);
+      }
+
+      if (relevantAttempts.length > 0) {
+        relevantAttempts.sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime());
+        const latestAttempt = relevantAttempts[0];
+        setReviewTestId(latestAttempt.test_id);
+        setReviewTestTitle(node.id.startsWith('group-') ? child.title : node.title);
+        setReviewAttemptId(latestAttempt.id);
+        setShowReviewModal(true);
+      }
+    };
+
     return (
       <React.Fragment>
         {/* Parent Row */}
@@ -442,7 +464,7 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
              {node.stats.attempts > 0 && !node.id.startsWith('group-') && (
                <button
                  onClick={handleReviewClick}
-                 className="text-xs font-medium px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-blue-200 dark:border-blue-800 cursor-pointer"
+                 className="text-[10px] font-medium px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-blue-200 dark:border-blue-800 cursor-pointer whitespace-nowrap"
                >
                  Review last test
                </button>
@@ -480,7 +502,14 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
                 {formatTime(child.stats.avgTime)}
               </td>
               <td className="px-6 py-3">
-                {/* No review button for child rows - only on parent */}
+                {child.stats.attempts > 0 && (
+                   <button
+                     onClick={(e) => handleChildReviewClick(e, child)}
+                     className="text-[10px] font-medium px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-blue-200 dark:border-blue-800 cursor-pointer whitespace-nowrap"
+                   >
+                     Review last test
+                   </button>
+                )}
               </td>
             </motion.tr>
           ))}

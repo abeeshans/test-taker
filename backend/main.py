@@ -567,3 +567,27 @@ def get_attempt(attempt_id: str, user=Depends(get_current_user), client=Depends(
         attempt['test_title'] = test_resp.data[0]['title']
     
     return attempt
+
+@app.post("/tests/batch_update")
+def batch_update_tests(updates: List[dict], deletes: List[str] = [], user=Depends(get_current_user), client=Depends(get_authenticated_client)):
+    """
+    Batch update tests and optionally delete some.
+    Used for merging tests.
+    """
+    # 1. Perform updates
+    for update_item in updates:
+        test_id = update_item.get('id')
+        if not test_id:
+            continue
+            
+        # Prepare update data
+        data = {k: v for k, v in update_item.items() if k != 'id'}
+        
+        # Update test
+        client.table("tests").update(data).eq("id", test_id).eq("user_id", user.id).execute()
+
+    # 2. Perform deletes
+    if deletes:
+        client.table("tests").delete().in_("id", deletes).eq("user_id", user.id).execute()
+
+    return {"message": "Batch update successful"}
