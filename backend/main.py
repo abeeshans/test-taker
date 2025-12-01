@@ -21,9 +21,15 @@ load_dotenv()
 # Allow localhost, selftest.study (and subdomains), and run.app domains
 origin_regex = r"^(http://(localhost|127\.0\.0\.1)(:\d+)?|https://(.*\.)?selftest\.study|https://(.*\.)?run\.app)$"
 
+origins = [
+    "https://selftest.study",
+    "https://www.selftest.study",
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origin_regex=origin_regex,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

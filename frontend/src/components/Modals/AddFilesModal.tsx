@@ -25,6 +25,69 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const dragCounter = useRef(0);
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (e.type === "dragenter") {
+      dragCounter.current += 1;
+      if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+        setDragActive(true);
+      }
+    } else if (e.type === "dragleave") {
+      dragCounter.current -= 1;
+      if (dragCounter.current === 0) {
+        setDragActive(false);
+      }
+    } else if (e.type === "dragover") {
+      // Essential to allow dropping
+      e.preventDefault();
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    dragCounter.current = 0;
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      
+      // Check for JSON file first
+      const jsonFile = files.find(f => f.name.endsWith('.json'));
+      if (jsonFile) {
+        onUploadJson(jsonFile);
+        onClose();
+        return;
+      }
+
+      // Filter for allowed lecture files
+      const allowedExtensions = ['.pdf', '.ppt', '.pptx', '.png', '.jpg', '.jpeg'];
+      const validFiles = files.filter(file => 
+        allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext))
+      );
+
+      if (validFiles.length > 0) {
+        const newSets: FileSet[] = validFiles.map(file => ({
+          id: Math.random().toString(36).substring(7),
+          file,
+          name: file.name.replace(/\.[^/.]+$/, ""),
+          numQuestions: 5,
+          difficulty: 'Average'
+        }));
+        setSets(prev => [...prev, ...newSets]);
+      } else {
+        // If files were dropped but none were valid
+        if (files.length > 0) {
+          setError("Please upload valid files (PDF, PPT, Images, or JSON).");
+        }
+      }
+    }
+  };
 
   // Simulate progress
   useEffect(() => {
@@ -160,7 +223,26 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
       title="Add New Test"
       maxWidth="max-w-2xl"
     >
-      <div className="space-y-6">
+      <div 
+        className="relative"
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+      >
+        {dragActive && (
+          <div className="absolute inset-0 z-50 bg-blue-50/90 dark:bg-blue-900/90 border-2 border-dashed border-blue-500 rounded-xl flex flex-col items-center justify-center animate-in fade-in duration-200">
+            <div className="p-4 bg-white dark:bg-slate-800 rounded-full mb-4 shadow-lg">
+              <UploadSimple size={48} className="text-blue-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Drop files here</h3>
+            <p className="text-gray-500 dark:text-slate-300 mt-2">
+              JSON for existing test files, or PDF/PPT/Images for lectures/notes
+            </p>
+          </div>
+        )}
+
+        <div className="space-y-6">
         {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-4">
           <button
@@ -322,6 +404,7 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
             </button>
           </div>
         )}
+      </div>
       </div>
     </BaseModal>
   );
