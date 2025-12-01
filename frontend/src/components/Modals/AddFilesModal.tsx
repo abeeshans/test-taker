@@ -164,6 +164,19 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
       return;
     }
 
+    // Validate file names
+    if (sets.some(s => !s.name.trim())) {
+      setError("All files must have a name.");
+      return;
+    }
+
+    // Validate question counts
+    const invalidSet = sets.find(s => s.numQuestions < 5 || s.numQuestions > 100);
+    if (invalidSet) {
+      setError(`"${invalidSet.name}" must have between 5 and 100 questions.`);
+      return;
+    }
+
     setIsGenerating(true);
     setError(null);
 
@@ -343,8 +356,8 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
                         <label className="block text-xs text-gray-500 dark:text-slate-400 mb-1">Questions</label>
                         <input
                           type="number"
-                          min="1"
-                          max="50"
+                          min="5"
+                          max="100"
                           value={set.numQuestions}
                           onChange={(e) => updateSet(set.id, { numQuestions: parseInt(e.target.value) || 5 })}
                           className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-gray-900 dark:text-white"

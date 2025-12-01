@@ -18,4 +18,4 @@ EXPOSE 8000
 ENV PORT=8000
 
 # Run app.py when the container launches
-CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}
+CMD exec gunicorn --bind :${PORT:-8080} --workers 1 --worker-class uvicorn.workers.UvicornWorker --threads 8 --timeout 300 main:app
