@@ -97,58 +97,59 @@ class GeminiClient:
         """
         
         max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                response = self.model.generate_content([uploaded_file, prompt])
-                
-                # Clean up the response text (remove markdown code blocks if present)
-                text = response.text
-                # Handle various markdown code block formats
-                if text.startswith("```json"):
-                    text = text[7:]
-                elif text.startswith("```"):
-                    text = text[3:]
-                
-                if text.endswith("```"):
-                    text = text[:-3]
-                text = text.strip()
-                
-                data = json.loads(text)
-                
-                # Extract questions from the response structure
-                if isinstance(data, list):
-                    # If it's a list, assume it's the list of questions or sets
-                    if len(data) > 0 and "questions" in data[0]:
-                         # List of sets?
-                         questions = data[0]["questions"]
+        try:
+            for attempt in range(max_retries):
+                try:
+                    response = self.model.generate_content([uploaded_file, prompt])
+                    
+                    # Clean up the response text (remove markdown code blocks if present)
+                    text = response.text
+                    # Handle various markdown code block formats
+                    if text.startswith("```json"):
+                        text = text[7:]
+                    elif text.startswith("```"):
+                        text = text[3:]
+                    
+                    if text.endswith("```"):
+                        text = text[:-3]
+                    text = text.strip()
+                    
+                    data = json.loads(text)
+                    
+                    # Extract questions from the response structure
+                    if isinstance(data, list):
+                        # If it's a list, assume it's the list of questions or sets
+                        if len(data) > 0 and "questions" in data[0]:
+                             # List of sets?
+                             questions = data[0]["questions"]
+                        else:
+                            questions = data
+                    elif "sets" in data and len(data["sets"]) > 0:
+                        questions = data["sets"][0].get("questions", [])
+                    elif "questions" in data:
+                         questions = data["questions"]
                     else:
-                        questions = data
-                elif "sets" in data and len(data["sets"]) > 0:
-                    questions = data["sets"][0].get("questions", [])
-                elif "questions" in data:
-                     questions = data["questions"]
-                else:
-                    print(f"Unexpected JSON structure (Attempt {attempt + 1}):", data.keys())
+                        print(f"Unexpected JSON structure (Attempt {attempt + 1}):", data.keys())
+                        if attempt == max_retries - 1:
+                             questions = []
+                        else:
+                            continue # Retry on unexpected structure
+                    
+                    # Process images in questions
+                    if questions and file_path.lower().endswith('.pdf'):
+                        questions = self.process_images_in_questions(questions, file_path)
+                        
+                    return questions
+                        
+                except json.JSONDecodeError as e:
+                    print(f"JSON Parse Error (Attempt {attempt + 1}/{max_retries}): {e}")
+                    print(f"Raw Text: {text[:500]}...") # Log first 500 chars
                     if attempt == max_retries - 1:
-                         questions = []
-                    else:
-                        continue # Retry on unexpected structure
-                
-                # Process images in questions
-                if questions and file_path.lower().endswith('.pdf'):
-                    questions = self.process_images_in_questions(questions, file_path)
-                    
-                return questions
-                    
-            except json.JSONDecodeError as e:
-                print(f"JSON Parse Error (Attempt {attempt + 1}/{max_retries}): {e}")
-                print(f"Raw Text: {text[:500]}...") # Log first 500 chars
-                if attempt == max_retries - 1:
-                    raise ValueError(f"Failed to generate valid JSON after {max_retries} attempts. Raw text: {text[:100]}") from e
-            except Exception as e:
-                print(f"Error generating questions (Attempt {attempt + 1}/{max_retries}): {e}")
-                if attempt == max_retries - 1:
-                    raise e
+                        raise ValueError(f"Failed to generate valid JSON after {max_retries} attempts. Raw text: {text[:100]}") from e
+                except Exception as e:
+                    print(f"Error generating questions (Attempt {attempt + 1}/{max_retries}): {e}")
+                    if attempt == max_retries - 1:
+                        raise e
         finally:
             # Cleanup: delete the file from Gemini to save space/privacy
             try:
