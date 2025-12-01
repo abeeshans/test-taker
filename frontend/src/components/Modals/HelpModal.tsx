@@ -7,6 +7,8 @@ import { useTheme } from '../ThemeProvider';
 interface HelpModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentUsername?: string;
+  onProfileUpdate?: (newUsername: string) => Promise<void>;
 }
 
 interface AccordionItemProps {
@@ -49,10 +51,18 @@ const AccordionItem = ({ title, children, defaultOpen = false }: AccordionItemPr
   );
 };
 
-export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
+export default function HelpModal({ isOpen, onClose, currentUsername, onProfileUpdate }: HelpModalProps) {
   const [copied, setCopied] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
+  const [username, setUsername] = useState(currentUsername || '');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+
+  // Update local state when prop changes
+  React.useEffect(() => {
+    if (currentUsername) setUsername(currentUsername);
+  }, [currentUsername]);
 
   const handleCopy = () => {
     const json = `{
@@ -84,6 +94,22 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
     navigator.clipboard.writeText(json);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!onProfileUpdate) return;
+    setIsSaving(true);
+    setSaveMessage('');
+    try {
+      await onProfileUpdate(username);
+      setSaveMessage('Saved!');
+      setTimeout(() => setSaveMessage(''), 2000);
+    } catch (error) {
+      console.error(error);
+      setSaveMessage('Error saving');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const darkModeToggle = (
@@ -126,15 +152,47 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
       headerAction={darkModeToggle}
     >
       <div className="space-y-3 text-sm">
-        <AccordionItem title="About SelfTest" defaultOpen>
+        {onProfileUpdate && (
+          <AccordionItem title="User Profile" defaultOpen>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-slate-400 mb-1">Display Name</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter your display name"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm"
+                  />
+                  <button
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px]"
+                  >
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </button>
+                </div>
+                {saveMessage && (
+                  <p className={`mt-1 text-xs ${saveMessage.includes('Error') ? 'text-red-500' : 'text-green-500'}`}>
+                    {saveMessage}
+                  </p>
+                )}
+              </div>
+            </div>
+          </AccordionItem>
+        )}
+
+        <AccordionItem title="About SelfTest">
           <p><strong>SelfTest</strong> is your personal study companion designed to transform lecture notes and slides into interactive practice tests. It helps you organize your study material, review efficiently, and track your performance over time.</p>
           <p className="mt-2"><strong>Core Philosophy:</strong> Active recall is the most effective way to learn. By creating and taking tests, you reinforce your memory and understanding of the subject matter.</p>
         </AccordionItem>
 
         <AccordionItem title="Quick Start Guide">
           <ol className="list-decimal pl-5 space-y-2">
-            <li><strong>Import Data:</strong> Click the <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium">Add More Files</span> button to upload your <code>.json</code> question files.</li>
+            <li><strong>Import Data:</strong> Click the <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium">Add More Files</span> button to upload your lecture notes (PDF, PPTX, TXT) or existing JSON question files.</li>
             <li><strong>Organize:</strong> Create folders to categorize your tests by subject or course. Drag and drop tests into folders to keep your dashboard clean.</li>
+            <li><strong>Merge Tests:</strong> Drag one test onto another to merge them into a single comprehensive exam.</li>
             <li><strong>Take a Test:</strong> Click on any test card to begin. Set a timer if you want to simulate exam conditions.</li>
             <li><strong>Review:</strong> After completing a test, review your answers. You can also use the <strong>Review Last Test</strong> option in the test card menu to revisit your most recent attempt.</li>
             <li><strong>Views:</strong> Toggle between <strong>Grid View</strong> and <strong>List View</strong> using the icons in the top right to find tests easier.</li>
@@ -149,13 +207,17 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
           </div>
         </AccordionItem>
 
-        <AccordionItem title="JSON Format & Examples">
-          <p>SelfTest uses a simple, flexible JSON format. You can create these manually or use AI to generate them for you.</p>
+        <AccordionItem title="File Uploading & Formats">
+          <p>SelfTest supports various file formats to help you create tests easily:</p>
+          <ul className="list-disc pl-5 mt-2 space-y-1">
+            <li><strong>PDF / PPTX / TXT:</strong> Upload your lecture slides or notes directly. Our AI will analyze the content and generate multiple-choice questions for you.</li>
+            <li><strong>JSON:</strong> For advanced users or manual creation, you can upload structured JSON files.</li>
+          </ul>
           
           <div className="mt-4 mb-4 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-100 dark:border-purple-800">
             <div className="font-medium text-purple-900 dark:text-purple-200 mb-1">✨ Generate Tests with AI</div>
             <p className="text-purple-800 dark:text-purple-300 text-xs leading-relaxed">
-              Upload your lecture notes or slides to an LLM like <strong>ChatGPT</strong> or <strong>Gemini</strong>, copy the example JSON below, and ask:
+              You can also use external LLMs like <strong>ChatGPT</strong> or <strong>Gemini</strong> to generate JSON files. Copy the example below and ask:
             </p>
             <div className="mt-2 p-2 bg-white dark:bg-slate-900 rounded border border-purple-200 dark:border-purple-700 text-xs font-mono text-gray-600 dark:text-slate-400 select-all">
               "Create a multiple choice test based on my uploaded lecture following this JSON file format with 20 questions."
@@ -164,7 +226,7 @@ export default function HelpModal({ isOpen, onClose }: HelpModalProps) {
 
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-gray-900 dark:text-white">Accepted JSON Structure</span>
+              <span className="font-medium text-gray-900 dark:text-white">JSON Structure (Advanced)</span>
               <button
                 onClick={handleCopy}
                 className="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-gray-600 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded transition-colors"

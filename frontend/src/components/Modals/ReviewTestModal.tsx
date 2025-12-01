@@ -17,6 +17,7 @@ import {
   Desktop
 } from '@phosphor-icons/react'
 import ReviewStatsNavigation, { QuestionStatus } from '../ReviewStatsNavigation'
+import ImagePreviewModal from './ImagePreviewModal'
 import { TestAttempt, TestData } from '@/types'
 
 interface ReviewTestModalProps {
@@ -35,7 +36,15 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [viewMode, setViewMode] = useState<'test' | 'list'>('test')
   const [error, setError] = useState<string | null>(null)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
   const supabase = createClient()
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement
+    if (target.tagName === 'IMG') {
+      setPreviewImage((target as HTMLImageElement).src)
+    }
+  }
 
   useEffect(() => {
     if (isOpen && testId) {
@@ -406,8 +415,9 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
               <div>
                 <h4 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-4 sticky top-0 bg-white dark:bg-slate-800 py-2">Passage</h4>
                 <div 
-                  className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed dark:prose-invert text-sm md:text-base"
+                  className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed dark:prose-invert text-sm md:text-base cursor-pointer [&_img]:cursor-zoom-in"
                   dangerouslySetInnerHTML={{ __html: currentQuestion.passage! }} 
+                  onClick={handleImageClick}
                 />
               </div>
             ) : (
@@ -647,6 +657,11 @@ export default function ReviewTestModal({ isOpen, onClose, testId, testTitle, at
       <div className="h-[85vh] flex flex-col">
         {renderContent()}
       </div>
+      <ImagePreviewModal 
+        isOpen={!!previewImage} 
+        onClose={() => setPreviewImage(null)} 
+        imageUrl={previewImage} 
+      />
     </BaseModal>
   )
 }

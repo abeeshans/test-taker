@@ -10,6 +10,12 @@ from auth import get_current_user, get_authenticated_client, supabase
 app = FastAPI()
 
 import os
+from dotenv import load_dotenv
+from gemini_utils import GeminiClient
+import tempfile
+import shutil
+
+load_dotenv()
 
 # CORS configuration
 # Explicitly allow localhost origins (required for credentials)
@@ -512,6 +518,97 @@ async def upload_files(files: List[UploadFile] = File(...), folder_id: Optional[
             results.append({"filename": file.filename, "status": "error", "detail": "Unsupported file type"})
             
     return {"results": results}
+
+@app.post("/generate-test")
+async def generate_test(
+    files: List[UploadFile] = File(...),
+    configurations: str = Form(...),
+    test_name: str = Form(...),
+    user=Depends(get_current_user),
+    client=Depends(get_authenticated_client)
+):
+    try:
+        configs = json.loads(configurations)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid configurations JSON")
+
+    gemini_client = GeminiClient()
+    all_sets = []
+    total_questions = 0
+    
+    # Create a temporary directory to store uploaded files
+    with tempfile.TemporaryDirectory() as temp_dir:
+        for file in files:
+            # Find config for this file
+            # We assume configurations is a list of objects with 'filename' key
+            # OR a dict keyed by filename. Let's assume list for now as it's safer with duplicate names?
+            # Actually, frontend usually sends a map or list. Let's assume the config has 'filename'
+            
+            # Let's look at the plan: "configurations (JSON string mapping file to config)"
+            # So configs = { "filename.pdf": { "numQuestions": 5, "difficulty": "Simple" } }
+            
+            config = configs.get(file.filename)
+            if not config:
+                continue
+                
+            file_path = os.path.join(temp_dir, file.filename)
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+                
+            try:
+                questions = gemini_client.generate_questions(
+                    file_path=file_path,
+                    mime_type=file.content_type or "application/pdf", # Fallback
+                    num_questions=config.get("numQuestions", 5),
+                    difficulty=config.get("difficulty", "Average")
+                )
+                
+                if questions:
+                    all_sets.append({
+                        "title": config.get("name", file.filename),
+                        "questions": questions
+                    })
+                    total_questions += len(questions)
+                    
+            except Exception as e:
+                print(f"Error processing {file.filename}: {e}")
+                # We continue with other files even if one fails? 
+                # Or fail the whole request? Let's fail for now to be safe/clear.
+                raise HTTPException(status_code=500, detail=f"Error processing {file.filename}: {str(e)}")
+
+    if not all_sets:
+         raise HTTPException(status_code=400, detail="No questions generated")
+
+    # Construct final test content
+    test_content = {
+        "id": str(uuid.uuid4()),
+        "title": test_name,
+        "sets": all_sets
+    }
+    
+    # Calculate question range
+    question_counts = [len(s["questions"]) for s in all_sets]
+    question_range = None
+    if len(all_sets) > 1:
+        min_q = min(question_counts) if question_counts else 0
+        max_q = max(question_counts) if question_counts else 0
+        if min_q != max_q:
+            question_range = f"{min_q}-{max_q}"
+        else:
+            question_range = f"{min_q}"
+
+    # Insert into DB
+    data = {
+        "user_id": user.id,
+        "title": test_name,
+        "content": test_content,
+        "question_count": total_questions,
+        "set_count": len(all_sets),
+        "question_range": question_range
+    }
+    
+    response = client.table("tests").insert(data).execute()
+    return {"id": response.data[0]['id'], "message": "Test generated successfully"}
 
 # --- Stats ---
 

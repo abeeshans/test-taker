@@ -25,6 +25,7 @@ import {
 import { API_URL } from '@/lib/api'
 import HelpModal from '@/components/Modals/HelpModal'
 import ReviewStatsNavigation, { QuestionStatus } from './ReviewStatsNavigation'
+import ImagePreviewModal from './Modals/ImagePreviewModal'
 
 interface Question {
   passage?: string
@@ -74,6 +75,15 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
   const [startTime, setStartTime] = useState<number>(0)
   
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  
+  const handleImageClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement
+    if (target.tagName === 'IMG') {
+      setPreviewImage((target as HTMLImageElement).src)
+    }
+  }
   const [isHelpOpen, setIsHelpOpen] = useState(false)
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
@@ -832,8 +842,9 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
                 <div className="max-w-2xl mx-auto">
                     <h3 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-4 sticky top-0 bg-white dark:bg-slate-800 py-2">Passage</h3>
                     <div 
-                        className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed font-serif dark:prose-invert text-sm md:text-base"
+                        className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed font-serif dark:prose-invert text-sm md:text-base cursor-pointer [&_img]:cursor-zoom-in"
                         dangerouslySetInnerHTML={{ __html: currentQ.passage! }} 
+                        onClick={handleImageClick}
                     />
                 </div>
             ) : (
@@ -1121,6 +1132,12 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
           </div>
         </div>
       )}
+      {/* Image Preview Modal */}
+      <ImagePreviewModal 
+        isOpen={!!previewImage} 
+        onClose={() => setPreviewImage(null)} 
+        imageUrl={previewImage} 
+      />
     </div>
   )
 }

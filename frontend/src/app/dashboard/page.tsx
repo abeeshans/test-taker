@@ -33,6 +33,7 @@ import TestStatsModal from "@/components/Modals/TestStatsModal";
 import ReviewTestModal from "@/components/Modals/ReviewTestModal";
 import MergeTestModal from "@/components/Modals/MergeTestModal";
 import UploadResultsModal from "@/components/Modals/UploadResultsModal";
+import AddFilesModal from "@/components/Modals/AddFilesModal";
 import AlertModal from "@/components/Modals/AlertModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { API_URL, mergeTests, batchUpdateTests } from "@/lib/api";
@@ -80,6 +81,7 @@ export default function Dashboard() {
   const [alertMessage, setAlertMessage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [mergeModalData, setMergeModalData] = useState<{ source: Test; target: Test } | null>(null);
+  const [username, setUsername] = useState<string>("");
 
   const handleCardClick = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -724,6 +726,12 @@ export default function Dashboard() {
         return;
     }
 
+    // Get user details for profile
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+        setUsername(user.user_metadata.display_name || user.email?.split('@')[0] || 'User');
+    }
+
     try {
       const [testsRes, foldersRes] = await Promise.all([
         fetch(`${API_URL}/tests`, { headers: { Authorization: `Bearer ${session.access_token}` } }),
@@ -819,6 +827,15 @@ export default function Dashboard() {
     }
   };
 
+  const handleProfileUpdate = async (newUsername: string) => {
+    const { error } = await supabase.auth.updateUser({
+      data: { display_name: newUsername }
+    });
+
+    if (error) throw error;
+    setUsername(newUsername);
+  };
+
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={customCollisionDetection}>
       <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-900">
@@ -860,7 +877,7 @@ export default function Dashboard() {
             </button>
 
             <button 
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => setActiveModal("add-files")}
               className="cursor-pointer text-sm bg-blue-600 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium py-2 px-3 md:px-4 rounded-xl flex items-center btn-primary transition-all hover:scale-105 active:scale-95 shadow-sm hover:shadow" 
               title="Add Files"
               disabled={uploading}
@@ -893,6 +910,10 @@ export default function Dashboard() {
             >
               <Question size={20} />
             </button>
+
+            <div className="hidden md:flex flex-col items-end mr-2">
+                <span className="text-xs font-medium text-gray-700 dark:text-slate-300">{username}</span>
+            </div>
 
             <button
               onClick={async () => {
@@ -1042,6 +1063,8 @@ export default function Dashboard() {
         <HelpModal
           isOpen={activeModal === "help"}
           onClose={() => setActiveModal(null)}
+          currentUsername={username}
+          onProfileUpdate={handleProfileUpdate}
         />
 
         <UploadResultsModal 
@@ -1052,6 +1075,28 @@ export default function Dashboard() {
           }} 
           results={uploadResults} 
         />
+        
+        <AddFilesModal
+          isOpen={activeModal === "add-files"}
+          onClose={() => setActiveModal(null)}
+          onUploadJson={(file) => {
+            // Create a synthetic event to reuse handleUpload
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            const event = {
+              target: {
+                files: dataTransfer.files,
+                value: 'dummy' // needed to reset
+              }
+            } as unknown as React.ChangeEvent<HTMLInputElement>;
+            handleUpload(event);
+          }}
+          onGenerateComplete={(newTestId) => {
+            fetchData();
+            setStatsRefreshTrigger(prev => prev + 1);
+          }}
+        />
+
         <CreateFolderModal 
           isOpen={activeModal === "create-folder"} 
           onClose={() => setActiveModal(null)} 
