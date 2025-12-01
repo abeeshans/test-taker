@@ -1,13 +1,35 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, CheckCircle, Student, Brain, FilePdf, Sun, Moon } from '@phosphor-icons/react'
-import { motion } from 'framer-motion'
+import { ArrowRight, CheckCircle, Student, Brain, FilePdf, Sun, Moon, Heart } from '@phosphor-icons/react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useTheme } from '@/components/ThemeProvider'
 
 export default function LandingPage() {
   const { theme, toggleTheme } = useTheme()
+  const [inputBuffer, setInputBuffer] = useState('')
+  const [heartBursts, setHeartBursts] = useState<number[]>([])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      setInputBuffer(prev => {
+        const newBuffer = (prev + e.key).slice(-4).toLowerCase()
+        if (newBuffer === 'gaya') {
+          const id = Date.now() + Math.random()
+          setHeartBursts(prev => [...prev, id])
+          setTimeout(() => {
+            setHeartBursts(prev => prev.filter(burstId => burstId !== id))
+          }, 5000)
+        }
+        return newBuffer
+      })
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 selection:bg-blue-500/30 transition-colors duration-300">
@@ -69,11 +91,11 @@ export default function LandingPage() {
             >
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 dark:text-white mb-6">
                 Turn your lecture notes into <br />
-                <span className="text-blue-600 dark:text-blue-500">interactive tests</span> instantly.
+                <span className="text-blue-600 dark:text-blue-500">interactive tests</span>&nbsp;instantly.
               </h1>
               <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
                 Upload your PDFs, PPTs, or notes and let our AI generate comprehensive practice exams. 
-                Master your subjects with active recall and spaced repetition.
+                Master your subjects with active recall and spaced&nbsp;repetition.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
@@ -101,7 +123,10 @@ export default function LandingPage() {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Everything you need to ace your exams</h2>
             <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              SelfTest combines advanced AI with proven learning techniques to help you study smarter, not harder.
+              SelfTest combines advanced AI with proven learning techniques to help you study smarter, not&nbsp;harder.
+            </p>
+            <p className="text-slate-500 dark:text-slate-500 max-w-2xl mx-auto mt-4 text-sm italic">
+              This project was made for my fiancée. I love you! Write the secret code to find the easter egg&nbsp;❤️
             </p>
           </div>
 
@@ -109,7 +134,7 @@ export default function LandingPage() {
             <FeatureCard 
               icon={<FilePdf size={32} className="text-red-500 dark:text-red-400" />}
               title="Upload Any Material"
-              description="Support for PDF, PowerPoint, and images. Simply drag and drop your lecture slides or notes."
+              description="Support for PDF, PowerPoint, and images. Simply drag and drop your lecture slides or&nbsp;notes."
             />
             <FeatureCard 
               icon={<Brain size={32} className="text-purple-500 dark:text-purple-400" />}
@@ -124,6 +149,39 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Hearts Animation */}
+      <AnimatePresence>
+        {heartBursts.map((burstId) => (
+          <div key={burstId} className="fixed inset-0 pointer-events-none z-[100] overflow-hidden">
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ 
+                  y: '100vh', 
+                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                  opacity: 1,
+                  scale: 0.5 + Math.random() * 1
+                }}
+                animate={{ 
+                  y: '-10vh',
+                  x: (Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000)) + (Math.random() - 0.5) * 200,
+                  rotate: Math.random() * 360,
+                  opacity: 0
+                }}
+                transition={{ 
+                  duration: 2 + Math.random() * 2, 
+                  ease: "easeOut",
+                  delay: Math.random() * 0.5
+                }}
+                className="absolute text-red-500 dark:text-red-400 drop-shadow-lg"
+              >
+                <Heart weight="fill" size={32 + Math.random() * 32} />
+              </motion.div>
+            ))}
+          </div>
+        ))}
+      </AnimatePresence>
 
       {/* Footer */}
       <footer className="py-12 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-colors duration-300">

@@ -54,7 +54,7 @@ class GeminiClient:
         
         # Construct the prompt
         prompt = f"""
-        You are an expert teacher and test creator. The questions you create should only have clinical/anatomical/biological relevance (no historical figures or anything unrelated). If the question references an image/page in the file, you must include a note in the passage that tells the user to refer to the image on the file. Below that include the pixel coordinates of the image to be referenced on the page, so that it can be used to crop using PIL. 
+        You are an expert teacher and test creator. The questions you create should only have relevance to the content of the file (no questions about the structure of the curriculum/notes/lecture, or anything unrelated). If the question references an image/page in the file, you must include a note in the passage that tells the user to refer to the image on the file. Below that include the pixel coordinates of the image to be referenced on the page, so that it can be used to crop using PIL. 
         IMPORTANT: Provide coordinates on a normalized 0-1000 scale, where (0,0) is top-left and (1000,1000) is bottom-right.
         Format: [E.g. Refer to the diagram on Page X of '{os.path.basename(file_path)}'.<br> (100, 200, 300, 400)]
         Create a JSON test based on the attached file.
