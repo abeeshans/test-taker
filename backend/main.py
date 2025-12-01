@@ -18,25 +18,12 @@ import shutil
 load_dotenv()
 
 # CORS configuration
-# Explicitly allow localhost origins (required for credentials)
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
-    "https://frontend-351771281344.us-central1.run.app",
-    "https://selftest.study",
-    "https://www.selftest.study",
-]
-
-# Add production frontend URL if set
-frontend_url = os.getenv("FRONTEND_URL")
-if frontend_url:
-    origins.append(frontend_url)
+# Allow localhost, selftest.study (and subdomains), and run.app domains
+origin_regex = r"^(http://(localhost|127\.0\.0\.1)(:\d+)?|https://(.*\.)?selftest\.study|https://(.*\.)?run\.app)$"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origin_regex=origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
