@@ -165,7 +165,7 @@ function LoginContent() {
   const colors = getGradientColors()
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 relative overflow-hidden transition-colors duration-300">
+    <div className="login-page flex min-h-screen items-center justify-center p-4 bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 relative overflow-hidden transition-colors duration-300">
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-50">
         <button
@@ -192,7 +192,7 @@ function LoginContent() {
 
       <motion.div 
         layout
-        className="w-full max-w-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-gray-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-10"
+        className="login-modal w-full max-w-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-gray-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -228,11 +228,11 @@ function LoginContent() {
               {authMode !== 'forgot-password' && (
                 <>
                   <div className="space-y-4 mb-6">
-                    <motion.button
+                      <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleOAuth('google')}
-                      className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 border border-transparent rounded-lg font-medium text-sm shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
+                      className="google-btn w-full flex items-center justify-center gap-3 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 border border-transparent rounded-lg font-medium text-sm shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer"
                       disabled={loading}
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
@@ -241,17 +241,14 @@ function LoginContent() {
                         <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                         <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                       </svg>
-                      <span>Sign in with Google</span>
+                      Sign in with Google
                     </motion.button>
                   </div>
 
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-200 dark:border-slate-800"></div>
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="px-2 bg-white dark:bg-slate-900 text-gray-500 dark:text-slate-500">Or continue with</span>
-                    </div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="separator-line h-px flex-1 bg-gray-200 dark:bg-slate-800"></div>
+                    <span className="separator-text text-xs uppercase text-gray-500 dark:text-slate-500">Or continue with</span>
+                    <div className="separator-line h-px flex-1 bg-gray-200 dark:bg-slate-800"></div>
                   </div>
                 </>
               )}
@@ -260,7 +257,6 @@ function LoginContent() {
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Email Address</label>
                   <div className="relative group">
-                    <EnvelopeSimple size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors" />
                     <input
                       type="email"
                       value={email}
@@ -269,6 +265,7 @@ function LoginContent() {
                       placeholder="name@example.com"
                       required
                     />
+                    <EnvelopeSimple size={18} className="input-icon z-10 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors" />
                   </div>
                 </div>
                 {authMode !== 'forgot-password' && (
@@ -277,7 +274,6 @@ function LoginContent() {
                       <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">Password</label>
                     </div>
                     <div className="relative group">
-                      <LockKey size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors" />
                       <input
                         type={showPassword ? "text" : "password"}
                         value={password}
@@ -293,6 +289,7 @@ function LoginContent() {
                       >
                         {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
                       </button>
+                      <LockKey size={18} className="input-icon z-10 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors" />
                     </div>
                   </div>
                 )}
@@ -325,7 +322,6 @@ function LoginContent() {
                   <div>
                     <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5 ml-1">Confirm Password</label>
                     <div className="relative group">
-                      <LockKey size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors" />
                       <input
                         type="password"
                         value={confirmPassword}
@@ -334,6 +330,7 @@ function LoginContent() {
                         placeholder="••••••••"
                         required
                       />
+                      <LockKey size={18} className="input-icon z-10 absolute left-3.5 top-1/2 -translate-y-1/2 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors" />
                     </div>
                   </div>
                 )}
@@ -343,7 +340,7 @@ function LoginContent() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={loading}
-                  className={`w-full py-3 px-4 rounded-lg text-white font-medium text-sm shadow-lg shadow-blue-500/20 transition-all ${
+                  className={`submit-btn w-full py-3 px-4 rounded-lg text-white font-medium text-sm shadow-lg shadow-blue-500/20 transition-all ${
                     authMode === 'signup' 
                       ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500' 
                       : authMode === 'forgot-password'

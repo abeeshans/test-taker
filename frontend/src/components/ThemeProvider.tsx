@@ -2,11 +2,12 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "pink";
 
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
+  setTheme: React.Dispatch<React.SetStateAction<Theme>>;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -30,34 +31,34 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (!mounted) return;
 
     const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
+    root.classList.remove("light", "dark", "pink");
     
     if (theme === "dark") {
       root.classList.add("dark");
+      root.style.colorScheme = "dark";
+    } else if (theme === "pink") {
+      root.classList.add("pink");
+      // Pink mode uses light color scheme for browser UI elements
+      root.style.colorScheme = "light";
     } else {
       root.classList.add("light");
       root.style.colorScheme = "light";
-    }
-    
-    if (theme === "dark") {
-      root.style.colorScheme = "dark";
     }
     
     localStorage.setItem("theme", theme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    // If in pink mode, toggle reverts to dark/light cycle (starting with light usually, or dark)
+    // Let's make it toggle between light/dark, exiting pink mode.
+    setTheme((prev) => {
+        if (prev === "pink") return "dark";
+        return prev === "light" ? "dark" : "light";
+    });
   };
 
-  // Prevent hydration mismatch by rendering nothing until mounted
-  // Or render children but without specific theme classes if critical
-  // For this app, rendering children is fine, the effect will kick in fast.
-  // But to avoid flash, we might want to hide until mounted? 
-  // Let's just render children. The effect handles the class.
-  
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

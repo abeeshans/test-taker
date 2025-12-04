@@ -11,6 +11,280 @@
   --card-gradient: linear-gradient(180deg, rgba(0, 90, 158, 0.08) 0%, rgba(0, 90, 158, 0.03) 100%);
 }
 
+.dark {
+  --muted-bg: #020617; /* slate-950 */
+  --brand-blue-light: #1e293b; /* slate-800 */
+}
+
+.pink {
+  --brand-blue: #db2777; /* Pink-600 */
+  --brand-blue-light: #fce7f3; /* Pink-100 */
+  --muted-bg: #fdf2f8; /* Pink-50 (Subtle Background) */
+  --hero-gradient: linear-gradient(135deg, #fe8fbe 0%, #d63d7a 100%);
+  --card-gradient: none;
+}
+
+.pink body {
+  background: var(--muted-bg);
+  color: #831843; /* Pink-900 */
+}
+
+/* --- Global Light & Airy Pink Theme Overrides --- */
+
+/* 1. Hero Section */
+.pink body {
+  background: var(--hero-gradient);
+  background-attachment: fixed;
+  color: #ffffff;
+}
+
+/* 2. Features & Main Content (Opaque Subtle Pink) */
+.pink .bg-gray-50,
+.pink .dark\:bg-slate-900 {
+  background-color: #fdf2f8 !important; /* Pink-50 */
+  position: relative;
+  z-index: 10;
+}
+
+/* 3. Footer (White) */
+.pink footer.bg-white {
+  background-color: #ffffff !important;
+  position: relative;
+  z-index: 10;
+}
+
+/* 4. Cards (Clean White, No Pink Glow) */
+.pink .bg-white, 
+.pink .bg-white\/80,
+.pink .dark\:bg-slate-950,
+.pink .dark\:bg-slate-900,
+.pink .dark\:bg-slate-800\/50,
+.pink .test-card {
+  background-color: #ffffff !important;
+  backdrop-filter: none !important;
+  border: 1px solid #fbcfe8 !important; /* Pink-200 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important; /* Standard Shadow */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pink .feature-card:hover,
+.pink .test-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important; /* Stronger Standard Shadow */
+}
+
+/* 5. Text Colors (Context Aware - High Contrast) */
+
+/* Hero Text */
+.pink .text-slate-900,
+.pink .text-gray-900,
+.pink .dark\:text-white {
+  color: #ffffff !important;
+}
+
+/* Text inside White/Pink Sections (Features, Footer, Cards, Nav, Modals) */
+.pink .bg-gray-50 .text-slate-900,
+.pink .bg-gray-50 .text-gray-900,
+.pink .bg-gray-50 .dark\:text-white,
+.pink footer .text-slate-900,
+.pink footer .text-gray-900,
+.pink .bg-white .text-slate-900,
+.pink .bg-white .text-gray-900,
+.pink .bg-white .dark\:text-white,
+.pink nav .text-slate-900,
+.pink nav .dark\:text-white,
+.pink .test-card h3,
+.pink .login-modal h1,
+.pink .login-modal p,
+.pink .login-modal label,
+.pink .login-modal span,
+.pink button span {
+  color: #831843 !important; /* Pink-900 */
+}
+
+/* Secondary Text (Hero) */
+.pink .text-slate-600,
+.pink .text-slate-500,
+.pink .dark\:text-slate-400 {
+  color: #fce7f3 !important; /* Pink-100 */
+}
+
+/* Secondary Text (White/Pink Sections) */
+.pink .bg-gray-50 .text-slate-600,
+.pink .bg-gray-50 .text-slate-500,
+.pink .bg-gray-50 .dark\:text-slate-400,
+.pink footer .text-slate-500,
+.pink .bg-white .text-slate-600,
+.pink .bg-white .text-slate-500,
+.pink nav .text-slate-600,
+.pink nav .text-slate-500,
+.pink .test-card .text-gray-500,
+.pink .test-card .dark\:text-slate-300 {
+  color: #be185d !important; /* Pink-700 */
+}
+
+/* 6. NO BLUE BUTTONS OR TEXT */
+
+/* Blue Text -> Pink */
+.pink .text-blue-600,
+.pink .text-blue-500,
+.pink .text-blue-400,
+.pink .dark\:text-blue-400,
+.pink .dark\:text-blue-500,
+.pink .group-hover\:text-blue-700,
+.pink .group-hover\:text-blue-500 {
+  color: #db2777 !important; /* Pink-600 */
+}
+
+/* Blue Backgrounds -> Pink */
+.pink .bg-blue-600,
+.pink .bg-blue-500,
+.pink .bg-blue-800, /* TestCard Start Button */
+.pink .dark\:bg-purple-600, /* Dark mode buttons */
+.pink .dark\:bg-blue-900\/20 {
+  background-color: #db2777 !important; /* Pink-600 */
+  color: white !important;
+  border: none !important;
+}
+
+.pink .bg-blue-600:hover,
+.pink .bg-blue-500:hover,
+.pink .bg-blue-800:hover,
+.pink .dark\:bg-purple-600:hover {
+  background-color: #be185d !important; /* Pink-700 */
+}
+
+/* Light Blue Backgrounds (Score boxes, etc) -> Light Pink */
+.pink .bg-blue-50,
+.pink .bg-blue-100,
+.pink .dark\:bg-slate-800 {
+  background-color: #fff1f2 !important; /* Rose-50 */
+  border-color: #fbcfe8 !important;
+}
+
+/* Blue Borders -> Pink */
+.pink .border-blue-600,
+.pink .border-blue-500,
+.pink .border-blue-100,
+.pink .focus\:border-blue-500,
+.pink .focus\:ring-blue-500 {
+  border-color: #db2777 !important;
+  --tw-ring-color: #db2777 !important;
+}
+
+/* 7. Inputs (Clean White) */
+.pink input,
+.pink textarea,
+.pink select {
+  background-color: #ffffff !important;
+  border-color: #fbcfe8 !important; /* Pink-200 */
+  color: #831843 !important; /* Pink-900 */
+}
+.pink input::placeholder {
+  color: #db2777 !important; /* Pink-600 */
+  opacity: 0.4;
+}
+
+/* 8. Buttons (General) */
+/* Primary (Hero CTA - Sign In) - White with Pink Text */
+.pink .btn-primary,
+.pink a.bg-blue-600 {
+  background: #ffffff !important;
+  color: #db2777 !important; /* Pink-600 */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: none !important;
+}
+.pink .btn-primary:hover,
+.pink a.bg-blue-600:hover {
+  background: #fdf2f8 !important; /* Pink-50 */
+  transform: translateY(-2px);
+}
+
+/* Header Sign In Button Override - Pink with White Text */
+.pink nav a.bg-blue-600 {
+  background-color: #db2777 !important; /* Pink-600 */
+  color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba(219, 39, 119, 0.2);
+}
+.pink nav a.bg-blue-600:hover {
+  background-color: #be185d !important; /* Pink-700 */
+  background: #be185d !important;
+  transform: translateY(0);
+}
+
+/* Secondary Buttons (Get Started) - Transparent/Glassy on Hero */
+.pink a.bg-gray-100,
+.pink button.bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(8px);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+.pink a.bg-gray-100:hover,
+.pink button.bg-gray-100:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Exception: Buttons inside White/Pink Sections (Features, Dashboard) should be Pink */
+.pink .bg-gray-50 .btn-primary,
+.pink .bg-gray-50 button.bg-blue-600,
+.pink .bg-gray-50 button.bg-blue-800 {
+  background: #db2777 !important;
+  color: white !important;
+}
+
+/* 9. Border & Divider Fixes */
+.pink hr,
+.pink .border-gray-200,
+.pink .border-slate-200,
+.pink .dark\:border-slate-800,
+.pink .dark\:border-slate-700,
+.pink .border-t,
+.pink .border-b,
+.pink .lg\:border-r {
+  border-color: #fce7f3 !important; /* Match card border (Very Light Pink) */
+}
+
+/* Fix "OR CONTINUE WITH" text background to match card */
+.pink span.bg-white,
+.pink span.dark\:bg-slate-900 {
+  background-color: #ffffff !important;
+  color: #db2777 !important; /* Pink text for "Or continue with" */
+}
+
+/* Fix "PASSAGE" header background */
+.pink h3.bg-white,
+.pink h4.bg-white,
+.pink h3.dark\:bg-slate-800,
+.pink h4.dark\:bg-slate-800 {
+  background-color: #ffffff !important;
+  color: #db2777 !important; /* Pink text for "PASSAGE" */
+}
+
+/* 10. Icons */
+.pink svg {
+  /* Let text color cascade handle most icons */
+}
+
+/* 11. Clean up Hero Blobs in Pink Mode */
+.pink .bg-blue-600\/10,
+.pink .bg-blue-600\/20,
+.pink .bg-indigo-600\/5,
+.pink .bg-indigo-600\/10 {
+  background-color: rgba(255, 255, 255, 0.1) !important; /* Subtle white glow instead of muddy blue */
+}
+
+/* 12. Logo */
+.pink .bg-clip-text.text-transparent {
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  color: #ffffff !important;
+}
+.pink nav .bg-clip-text.text-transparent {
+  color: #db2777 !important; /* Pink-600 */
+}
+
+
 body {
   background: var(--muted-bg);
   color: #0f172a; /* gray-900 */
@@ -37,7 +311,92 @@ body {
   background: #c0c0c0;
   border-radius: 4px;
 }
+/* Login Page Pink Mode Overrides */
+.pink .login-page {
+  background-color: #fce7f3 !important; /* Pink-100 - Subtle Saturated */
+}
 
+.pink .login-modal {
+  background-color: rgba(255, 241, 242, 0.9) !important; /* Rose-50 with opacity */
+  border-color: #fbcfe8 !important; /* Pink-200 */
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 25px 50px -12px rgba(219, 39, 119, 0.25); /* Pink shadow */
+}
+
+.pink .separator-line {
+  background-color: #fbcfe8 !important; /* Pink-200 */
+  border: none !important;
+}
+
+.pink .separator-text {
+  background-color: transparent !important;
+  color: #831843 !important; /* Pink-900 */
+}
+
+/* Google Button Text - Ensure White */
+/* Google Button Text - Ensure White */
+.pink .google-btn {
+  background-color: #831843 !important; /* Pink-900 */
+  border-color: transparent !important;
+  color: #ffffff !important; /* Apply directly to button */
+}
+
+/* Input Icons - Darker Pink (Pink-900) */
+.pink .input-icon,
+.pink .input-icon path,
+.pink .input-icon line,
+.pink .input-icon polyline,
+.pink .input-icon rect,
+.pink .input-icon circle {
+  color: #831843 !important; /* Pink-900 */
+  fill: #831843 !important;
+  stroke: #831843 !important; /* Add stroke for Phosphor icons */
+  z-index: 10 !important; /* Ensure on top of input */
+}
+
+.pink .group:focus-within .input-icon {
+  color: #be185d !important; /* Pink-700 */
+}
+
+/* Submit Button - Pink Gradient */
+.pink .submit-btn {
+  background: linear-gradient(to right, #ec4899, #db2777) !important; /* Pink-500 to Pink-600 */
+  color: white !important;
+  box-shadow: 0 10px 15px -3px rgba(219, 39, 119, 0.3) !important;
+}
+.pink .submit-btn:hover {
+  background: linear-gradient(to right, #db2777, #be185d) !important; /* Pink-600 to Pink-700 */
+}
+
+/* Helper Links (Forgot Password, Sign Up) - Legible Pink */
+.pink .login-modal .text-blue-400 {
+  color: #831843 !important; /* Pink-900 */
+}
+.pink .login-modal .text-blue-400:hover {
+  color: #be185d !important; /* Pink-700 */
+}
+.pink .login-modal .text-blue-400:hover {
+  color: #be185d !important; /* Pink-700 */
+}
+
+/* Ensure text contrast in pink modal */
+.pink .login-modal h1,
+.pink .login-modal p,
+.pink .login-modal label,
+.pink .login-modal span {
+  color: #831843 !important; /* Pink-900 */
+}
+
+.pink .login-modal input {
+  background-color: #fff0f5 !important; /* Lavender Blush */
+  color: #831843 !important;
+  border-color: #fbcfe8 !important;
+}
+
+.pink .login-modal input::placeholder {
+  color: #be185d !important; /* Pink-700 */
+  opacity: 0.6;
+}
 ::-webkit-scrollbar-thumb:hover {
   background: #a0a0a0;
 }

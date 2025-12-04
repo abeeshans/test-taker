@@ -1,38 +1,62 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, CheckCircle, Student, Brain, FilePdf, Sun, Moon, Heart } from '@phosphor-icons/react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowRight, CheckCircle, Brain, FilePdf, Sun, Moon } from '@phosphor-icons/react'
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useTheme } from '@/components/ThemeProvider'
+import HeartScene from '@/components/HeartScene'
 
 export default function LandingPage() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme, setTheme } = useTheme()
   const [inputBuffer, setInputBuffer] = useState('')
-  const [heartBursts, setHeartBursts] = useState<number[]>([])
+  const [showSecret, setShowSecret] = useState(false)
+  const [isExiting, setIsExiting] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      setInputBuffer(prev => {
-        const newBuffer = (prev + e.key).slice(-4).toLowerCase()
-        if (newBuffer === 'gaya') {
-          const id = Date.now() + Math.random()
-          setHeartBursts(prev => [...prev, id])
-          setTimeout(() => {
-            setHeartBursts(prev => prev.filter(burstId => burstId !== id))
-          }, 5000)
-        }
-        return newBuffer
-      })
+      setInputBuffer(prev => (prev + e.key).slice(-4).toLowerCase())
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
+  useEffect(() => {
+    if (inputBuffer === 'gaya') {
+      if (showSecret) {
+        // Already showing, so trigger exit
+        setShowSecret(false)
+        setIsExiting(true)
+        setTimeout(() => setIsExiting(false), 2000) // Allow time for explosion
+        setTheme('dark')
+      } else {
+        // Enable secret
+        setShowSecret(true)
+        setTheme('pink')
+      }
+      setInputBuffer('') // Clear buffer to prevent loop
+    }
+  }, [inputBuffer, setTheme, showSecret])
+
+  useEffect(() => {
+    if (theme !== 'pink' && showSecret) {
+      setShowSecret(false)
+      setIsExiting(true)
+      setTimeout(() => setIsExiting(false), 2000)
+    }
+  }, [theme, showSecret])
+
+  // Persist hearts if theme is pink (e.g. on refresh)
+  useEffect(() => {
+    if (theme === 'pink' && !showSecret) {
+      setShowSecret(true)
+    }
+  }, [theme, showSecret])
+
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200 selection:bg-blue-500/30 transition-colors duration-300">
+    <div className="min-h-screen text-slate-900 dark:text-slate-200 selection:bg-blue-500/30 transition-colors duration-300">
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,6 +139,9 @@ export default function LandingPage() {
             </motion.div>
           </div>
         </div>
+
+        {/* Hearts Animation - Contained in Hero */}
+        <HeartScene active={showSecret} exiting={isExiting} />
       </section>
 
       {/* Features Section */}
@@ -125,9 +152,15 @@ export default function LandingPage() {
             <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
               SelfTest combines advanced AI with proven learning techniques to help you study smarter, not&nbsp;harder.
             </p>
-            <p className="text-slate-500 dark:text-slate-500 max-w-2xl mx-auto mt-4 text-sm italic">
-              This project was made for my fiancée. I love you! Write the secret code to find the easter egg&nbsp;❤️
-            </p>
+            {showSecret && (
+              <motion.p 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-pink-600 dark:text-pink-400 font-medium max-w-2xl mx-auto mt-4 text-sm"
+              >
+                You found the secret code! This project was made for my fiancée. If you're reading this, I love you! ❤️
+              </motion.p>
+            )}
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -150,38 +183,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Hearts Animation */}
-      <AnimatePresence>
-        {heartBursts.map((burstId) => (
-          <div key={burstId} className="fixed inset-0 pointer-events-none z-[100] overflow-hidden">
-            {[...Array(20)].map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{ 
-                  y: '100vh', 
-                  x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-                  opacity: 1,
-                  scale: 0.5 + Math.random() * 1
-                }}
-                animate={{ 
-                  y: '-10vh',
-                  x: (Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000)) + (Math.random() - 0.5) * 200,
-                  rotate: Math.random() * 360,
-                  opacity: 0
-                }}
-                transition={{ 
-                  duration: 2 + Math.random() * 2, 
-                  ease: "easeOut",
-                  delay: Math.random() * 0.5
-                }}
-                className="absolute text-red-500 dark:text-red-400 drop-shadow-lg"
-              >
-                <Heart weight="fill" size={32 + Math.random() * 32} />
-              </motion.div>
-            ))}
-          </div>
-        ))}
-      </AnimatePresence>
+
 
       {/* Footer */}
       <footer className="py-12 border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-colors duration-300">
@@ -212,7 +214,7 @@ export default function LandingPage() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <div className="p-6 bg-white dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-2xl hover:shadow-lg dark:hover:bg-slate-800 transition-all duration-300">
+    <div className="feature-card p-6 bg-white dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-2xl hover:shadow-lg dark:hover:bg-slate-800 transition-all duration-300">
       <div className="mb-4 p-3 bg-gray-100 dark:bg-slate-900 rounded-xl w-fit">
         {icon}
       </div>
