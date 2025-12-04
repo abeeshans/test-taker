@@ -91,6 +91,7 @@ class TestAttemptCreate(BaseModel):
     time_taken: int
     set_name: Optional[str] = None
     details: Optional[List[dict]] = None
+    away_clicks: Optional[int] = 0
 
 class TestAttempt(TestAttemptCreate):
     id: str
@@ -704,7 +705,8 @@ def record_attempt(attempt: TestAttemptCreate, user=Depends(get_current_user), c
         "total_questions": attempt.total_questions,
         "time_taken": attempt.time_taken,
         "set_name": attempt.set_name,
-        "details": attempt.details
+        "details": attempt.details,
+        "away_clicks": attempt.away_clicks
     }
     response = client.table("test_attempts").insert(data).execute()
     return response.data[0]

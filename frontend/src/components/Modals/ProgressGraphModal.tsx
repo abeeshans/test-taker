@@ -10,6 +10,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { TestAttempt } from '@/types';
+import { Eye } from '@phosphor-icons/react';
 
 interface ProgressGraphModalProps {
   isOpen: boolean;
@@ -32,7 +33,8 @@ export default function ProgressGraphModal({ isOpen, onClose, testTitle, attempt
       fullDate: new Date(a.completed_at).toLocaleString(),
       score: Math.round((a.score / a.total_questions) * 100),
       setName: a.set_name || 'Test',
-      attemptId: a.id
+      attemptId: a.id,
+      awayClicks: a.away_clicks || 0
     }));
   }, [attempts]);
 
@@ -57,9 +59,17 @@ export default function ProgressGraphModal({ isOpen, onClose, testTitle, attempt
             <div className="w-2 h-2 rounded-full bg-purple-500"></div>
             <p className="text-purple-600 dark:text-purple-400 font-bold text-lg">{dataPoint.score}%</p>
           </div>
-          <p className="text-gray-500 dark:text-slate-400 text-xs bg-gray-100 dark:bg-slate-700/50 px-2 py-0.5 rounded-full inline-block">
-            {dataPoint.setName}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-gray-500 dark:text-slate-400 text-xs bg-gray-100 dark:bg-slate-700/50 px-2 py-0.5 rounded-full inline-block">
+              {dataPoint.setName}
+            </p>
+            {dataPoint.awayClicks > 0 && (
+              <div className="flex items-center gap-1.5 text-xs font-bold text-yellow-400 bg-gray-900 border border-orange-500/50 px-2 py-0.5 rounded-full shadow-sm">
+                <Eye size={14} weight="bold" />
+                <span>{dataPoint.awayClicks}</span>
+              </div>
+            )}
+          </div>
         </div>
       );
     }
