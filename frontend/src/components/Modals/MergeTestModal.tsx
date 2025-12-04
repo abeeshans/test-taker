@@ -6,6 +6,7 @@ import { Test } from '@/types';
 import BaseModal from './BaseModal';
 import { CaretRight, PencilSimple, Warning } from '@phosphor-icons/react';
 import { createClient } from '@/utils/supabase/client';
+import { API_URL } from '@/lib/api';
 
 interface MergeTestModalProps {
   isOpen: boolean;
@@ -336,37 +337,76 @@ export default function MergeTestModal({ isOpen, onClose, sourceTest, targetTest
       }
   };
 
-  const executeMerge = (deletes: string[] = []) => {
-      const updates = [];
-      
-      // 1. Update Source Test
-      if (sourceSets.length > 0) {
-          const newContent = { ...sourceFullContent, sets: sourceSets.map(s => ({ title: s.title, questions: s.questions })) };
-          const totalQ = sourceSets.reduce((acc, s) => acc + s.questions.length, 0);
-          updates.push({
-              id: sourceTest.id,
-              title: sourceTitle,
-              content: newContent,
-              question_count: totalQ,
-              set_count: sourceSets.length,
-          });
-      }
+  const executeMerge = async (deletes: string[] = []) => {
+      setLoading(true);
+      try {
+          const supabase = createClient();
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
 
-      // 2. Update Target Test
-      if (targetSets.length > 0) {
-          const newContent = { ...targetFullContent, sets: targetSets.map(s => ({ title: s.title, questions: s.questions })) };
-          const totalQ = targetSets.reduce((acc, s) => acc + s.questions.length, 0);
-          updates.push({
-              id: targetTest.id,
-              title: targetTitle,
-              content: newContent,
-              question_count: totalQ,
-              set_count: targetSets.length,
+          // Calculate moves
+          const moves: any[] = [];
+          
+          // Source Sets Moves
+          sourceSets.forEach(s => {
+              if (s.originalTestId !== sourceTest.id) {
+                  // Moved from Target to Source
+                  moves.push({
+                      from_test_id: targetTest.id,
+                      from_set_name: s.title, 
+                      to_test_id: sourceTest.id,
+                      to_set_name: s.title
+                  });
+              }
           });
-      }
 
-      onMerge(updates, deletes);
-      onClose();
+          // Target Sets Moves
+          targetSets.forEach(s => {
+              if (s.originalTestId !== targetTest.id) {
+                  // Moved from Source to Target
+                  moves.push({
+                      from_test_id: sourceTest.id,
+                      from_set_name: s.title,
+                      to_test_id: targetTest.id,
+                      to_set_name: s.title
+                  });
+              }
+          });
+
+          // Construct final content
+          const sourceContent = { ...sourceFullContent, sets: sourceSets.map(s => ({ title: s.title, questions: s.questions })) };
+          const targetContent = { ...targetFullContent, sets: targetSets.map(s => ({ title: s.title, questions: s.questions })) };
+
+          // Call API
+          const res = await fetch(`${API_URL}/tests/merge`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${session.access_token}`
+              },
+              body: JSON.stringify({
+                  source_test_id: sourceTest.id,
+                  target_test_id: targetTest.id,
+                  source_content: sourceContent,
+                  target_content: targetContent,
+                  moves: moves,
+                  deletes: deletes
+              })
+          });
+
+          if (res.ok) {
+              onMerge([], deletes); // We don't need to pass updates as backend handled it, just trigger refresh
+              onClose();
+          } else {
+              const errorData = await res.json();
+              console.error("Merge failed", errorData);
+              alert(`Merge failed: ${errorData.detail || JSON.stringify(errorData)}`);
+          }
+      } catch (e) {
+          console.error("Error merging tests", e);
+      } finally {
+          setLoading(false);
+      }
   };
 
   const handleMergeClick = () => {

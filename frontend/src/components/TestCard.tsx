@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { DotsThreeVertical, Star, Trash, Pencil, ArrowCounterClockwise, DownloadSimple } from "@phosphor-icons/react";
+import { DotsThreeVertical, Star, Trash, Pencil, ArrowCounterClockwise, DownloadSimple, PencilSimple, PlusCircle } from "@phosphor-icons/react";
 import { Test } from "@/types";
 
 interface TestCardProps {
@@ -13,12 +13,14 @@ interface TestCardProps {
   onToggleStar: (id: string, isStarred: boolean) => void;
   onReview: (id: string) => void;
   onDownload: (id: string, title: string) => void;
+  onManageSets?: (id: string) => void;
+  onAddSet?: (id: string) => void;
   isSelected?: boolean;
   onClick?: (e: React.MouseEvent) => void;
   onDoubleClick?: () => void;
 }
 
-function TestCard({ test, onStart, onDelete, onRename, onReset, onToggleStar, onReview, onDownload, isSelected, onClick, onDoubleClick }: TestCardProps) {
+function TestCard({ test, onStart, onDelete, onRename, onReset, onToggleStar, onReview, onDownload, onManageSets, onAddSet, isSelected, onClick, onDoubleClick }: TestCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: test.id,
     data: { type: "test", id: test.id, folderId: test.folder_id ?? null, fromPreview: false },
@@ -56,7 +58,7 @@ function TestCard({ test, onStart, onDelete, onRename, onReset, onToggleStar, on
       style={style}
       {...attributes}
       {...listeners}
-      className={`test-card bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4 relative flex flex-col h-72 hover:shadow-md dark:hover:border-slate-600 cursor-pointer
+      className={`test-card group bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 p-4 relative flex flex-col h-72 hover:shadow-md dark:hover:border-slate-600 cursor-pointer
         ${isSelected ? "!ring-2 !ring-blue-500 !shadow-md z-10" : ""}
         ${isOver ? "!ring-2 !ring-purple-500 !bg-purple-50 dark:!bg-purple-900/20" : ""}
       `}
@@ -77,7 +79,31 @@ function TestCard({ test, onStart, onDelete, onRename, onReset, onToggleStar, on
           </div>
 
           <div>
-            {test.question_range ? `${test.question_range}` : test.question_count} questions • {test.set_count} sets
+            <div className="flex items-center gap-2">
+              <span>{test.question_range ? `${test.question_range}` : test.question_count} questions • {test.set_count} sets</span>
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onManageSets?.(test.id);
+                  }}
+                  className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  title="Manage Sets"
+                >
+                  <PencilSimple size={14} />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddSet?.(test.id);
+                  }}
+                  className="p-1 text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors"
+                  title="Add Set"
+                >
+                  <PlusCircle size={14} />
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 mt-3">

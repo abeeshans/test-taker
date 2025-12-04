@@ -7,8 +7,9 @@ import { createClient } from '@/utils/supabase/client';
 interface AddFilesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUploadJson: (file: File) => void;
+  onUploadJson: (files: File[]) => void;
   onGenerateComplete: (newTestId: string) => void;
+  targetTestId?: string | null;
 }
 
 interface FileSet {
@@ -19,7 +20,7 @@ interface FileSet {
   difficulty: 'Simple' | 'Average' | 'Challenging';
 }
 
-export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerateComplete }: AddFilesModalProps) {
+export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerateComplete, targetTestId }: AddFilesModalProps) {
   const [testName, setTestName] = useState('');
   const [sets, setSets] = useState<FileSet[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -57,10 +58,10 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const files = Array.from(e.dataTransfer.files);
       
-      // Check for JSON file first
-      const jsonFile = files.find(f => f.name.endsWith('.json'));
-      if (jsonFile) {
-        onUploadJson(jsonFile);
+      // Check for JSON files first
+      const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+      if (jsonFiles.length > 0) {
+        onUploadJson(jsonFiles);
         onClose();
         return;
       }
@@ -136,12 +137,14 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
 
   const handleJsonSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      if (file.name.endsWith('.json')) {
-        onUploadJson(file);
+      const files = Array.from(e.target.files);
+      const validJsonFiles = files.filter(f => f.name.endsWith('.json'));
+      
+      if (validJsonFiles.length > 0) {
+        onUploadJson(validJsonFiles);
         onClose();
       } else {
-        setError("Please select a valid JSON file.");
+        setError("Please select valid JSON files.");
       }
     }
   };
@@ -159,7 +162,9 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
       setError("Please add at least one lecture file.");
       return;
     }
-    if (!testName.trim()) {
+    
+    // Only validate test name if creating a new test
+    if (!targetTestId && !testName.trim()) {
       setError("Please enter a test name.");
       return;
     }
@@ -185,7 +190,6 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
       if (!session) throw new Error("Not authenticated");
 
       const formData = new FormData();
-      formData.append('test_name', testName);
       
       const configs: Record<string, any> = {};
       
@@ -200,7 +204,14 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
       
       formData.append('configurations', JSON.stringify(configs));
 
-      const response = await fetch(`${API_URL}/generate-test`, {
+      let url = `${API_URL}/generate-test`;
+      if (targetTestId) {
+        url = `${API_URL}/tests/${targetTestId}/add_sets`;
+      } else {
+        formData.append('test_name', testName);
+      }
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -214,7 +225,8 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
       }
 
       const data = await response.json();
-      onGenerateComplete(data.id);
+      // If adding sets, we might not get an ID back in the same way, or we might just want to refresh
+      onGenerateComplete(targetTestId || data.id);
       onClose();
       
       // Reset state
@@ -233,7 +245,7 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Add New Test"
+      title={targetTestId ? "Add Sets to Test" : "Add New Test"}
       maxWidth="max-w-2xl"
     >
       <div 
@@ -295,23 +307,26 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
           onChange={handleJsonSelect}
           className="hidden"
           accept=".json"
+          multiple
         />
 
         {/* Configuration Area */}
         {sets.length > 0 && (
           <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="border-t dark:border-slate-700 pt-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                Test Name
-              </label>
-              <input
-                type="text"
-                value={testName}
-                onChange={(e) => setTestName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter test name..."
-              />
-            </div>
+            {!targetTestId && (
+              <div className="border-t dark:border-slate-700 pt-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                  Test Name
+                </label>
+                <input
+                  type="text"
+                  value={testName}
+                  onChange={(e) => setTestName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter test name..."
+                />
+              </div>
+            )}
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">

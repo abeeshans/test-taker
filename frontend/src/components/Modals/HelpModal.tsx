@@ -192,19 +192,49 @@ export default function HelpModal({ isOpen, onClose, currentUsername, onProfileU
           <ol className="list-decimal pl-5 space-y-2">
             <li><strong>Import Data:</strong> Click the <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs font-medium">Add More Files</span> button to upload your lecture notes (PDF, PPTX, TXT) or existing JSON question files.</li>
             <li><strong>Organize:</strong> Create folders to categorize your tests by subject or course. Drag and drop tests into folders to keep your dashboard clean.</li>
-            <li><strong>Merge Tests:</strong> Drag one test onto another to merge them into a single comprehensive exam.</li>
             <li><strong>Take a Test:</strong> Click on any test card to begin. Set a timer if you want to simulate exam conditions.</li>
             <li><strong>Review:</strong> After completing a test, review your answers. You can also use the <strong>Review Last Test</strong> option in the test card menu to revisit your most recent attempt.</li>
-            <li><strong>Views:</strong> Toggle between <strong>Grid View</strong> and <strong>List View</strong> using the icons in the top right to find tests easier.</li>
           </ol>
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-100 dark:border-blue-800">
             <div className="font-medium text-blue-900 dark:text-blue-200 mb-1">Pro Tips:</div>
             <ul className="list-disc pl-5 text-blue-800 dark:text-blue-300 space-y-1">
               <li>Use keyboard shortcuts (<strong>1-4</strong>) to select answers quickly.</li>
               <li>Use <strong>F</strong> to flag questions for review and <strong>P</strong> to pause the timer.</li>
-              <li>Use the kebab menu (<DotsThreeVertical size={16} weight="bold" className="inline-block align-middle" />) on test cards to <strong>Rename</strong>, <strong>Reset Stats</strong>, <strong>Download JSON</strong>, or <strong>Delete</strong> them.</li>
+              <li>Use the kebab menu (<DotsThreeVertical size={16} weight="bold" className="inline-block align-middle" />) on test cards to access advanced options like <strong>Manage Sets</strong> and <strong>Statistics</strong>.</li>
             </ul>
           </div>
+        </AccordionItem>
+
+        <AccordionItem title="Managing Tests & Sets">
+            <p className="mb-2">SelfTest allows you to build comprehensive exams by combining multiple sets of questions.</p>
+            <ul className="list-disc pl-5 space-y-2">
+                <li><strong>Merging Tests:</strong> Drag one test card onto another to merge them. This creates a new test containing all question sets from both.</li>
+                <li><strong>Adding Sets:</strong> Use the <span className="font-medium">Add More Files</span> button and select "Add to existing test" to append new questions to a test you've already created.</li>
+                <li><strong>Editing Sets:</strong> Click the menu icon on a test card and select <strong>Manage Sets</strong>. Here you can:
+                    <ul className="list-circle pl-5 mt-1 text-gray-600 dark:text-slate-400">
+                        <li>Rename individual sets for better organization.</li>
+                        <li>Delete specific sets you no longer need.</li>
+                        <li>Reorder sets via drag-and-drop to change the sequence in the test.</li>
+                    </ul>
+                </li>
+            </ul>
+        </AccordionItem>
+
+        <AccordionItem title="Test Interface Features">
+            <ul className="list-disc pl-5 space-y-2">
+                <li><strong>Passage Toggle:</strong> For questions with reading passages, use the arrow button on the left edge to slide the passage pane in or out. This gives you more screen space for the question when you need it.</li>
+                <li><strong>Review Mode:</strong> When reviewing a completed test, use the filters at the top to quickly jump to <strong>Incorrect</strong>, <strong>Flagged</strong>, or <strong>Unanswered</strong> questions.</li>
+                <li><strong>Image Zoom:</strong> Click on any image within a passage or question to view it in full screen.</li>
+            </ul>
+        </AccordionItem>
+
+        <AccordionItem title="Statistics & Progress">
+          <p>Tracking your progress is key to improvement. Access the <strong>Statistics</strong> modal from any test card menu:</p>
+          <ul className="list-disc pl-5 mt-2 space-y-1">
+            <li><strong>Progress Graph:</strong> Visualize your scores over time to see your improvement trend.</li>
+            <li><strong>Attempt History:</strong> A detailed log of every time you've taken the test, including date and score.</li>
+            <li><strong>Performance Metrics:</strong> View your <strong>Average Score</strong> and <strong>Best Score</strong> at a glance.</li>
+          </ul>
         </AccordionItem>
 
         <AccordionItem title="File Uploading & Formats">
@@ -271,15 +301,6 @@ export default function HelpModal({ isOpen, onClose, currentUsername, onProfileU
               Note: The <code>id</code> field is optional for new tests but required for updating existing ones. The <code>passage</code> field is optional.
             </p>
           </div>
-        </AccordionItem>
-
-        <AccordionItem title="Statistics & Progress">
-          <p>Tracking your progress is key to improvement. SelfTest provides detailed statistics for each test:</p>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li><strong>Attempt History:</strong> See every time you've taken a test, your score, and the date.</li>
-            <li><strong>Averages:</strong> View your average score to gauge your overall mastery.</li>
-            <li><strong>Best Score:</strong> Challenge yourself to beat your personal best!</li>
-          </ul>
         </AccordionItem>
 
         <AccordionItem title="Troubleshooting">

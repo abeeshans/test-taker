@@ -91,6 +91,7 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [wasPausedBeforeHelp, setWasPausedBeforeHelp] = useState(false)
   const [viewMode, setViewMode] = useState<'test' | 'list'>('test')
+  const [isPassageVisible, setIsPassageVisible] = useState(true)
 
   // Helper to get current set title for multi-set tests
   const getSetTitle = useMemo(() => {
@@ -833,29 +834,34 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
         </div>
       ) : (
       /* Main Split View - Persistent Layout (Test View) */
-      /* Main Split View - Persistent Layout (Test View) */
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
         
         {/* Left Pane: Passage (Always visible, empty if no passage) */}
-        <div className={`w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 overflow-y-auto p-4 md:p-8 custom-scrollbar ${hasPassage ? 'h-1/3 lg:h-auto min-h-[150px]' : 'hidden lg:block'}`}>
-            {hasPassage ? (
-                <div className="max-w-2xl mx-auto">
-                    <h3 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-4 sticky top-0 bg-white dark:bg-slate-800 py-2">Passage</h3>
-                    <div 
-                        className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed font-serif dark:prose-invert text-sm md:text-base cursor-pointer [&_img]:cursor-zoom-in"
-                        dangerouslySetInnerHTML={{ __html: currentQ.passage! }} 
-                        onClick={handleImageClick}
-                    />
-                </div>
-            ) : (
-                <div className="h-full flex items-center justify-center text-gray-300 dark:text-slate-600 italic">
-                    No passage for this question
-                </div>
-            )}
+        <div className={`bg-white dark:bg-slate-800 overflow-y-auto custom-scrollbar transition-[margin-left] duration-500 ease-in-out flex-none ${
+          isPassageVisible 
+            ? 'h-1/3 min-h-[150px] lg:h-auto w-full lg:w-1/2 lg:ml-0 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-slate-700' 
+            : 'h-0 min-h-0 lg:h-auto w-full lg:w-1/2 lg:-ml-[50%] p-0 border-none'
+        }`}>
+            <div className="p-4 md:p-8">
+                {hasPassage ? (
+                    <div className="max-w-2xl mx-auto">
+                        <h3 className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider mb-4 sticky top-0 bg-white dark:bg-slate-800 py-2">Passage</h3>
+                        <div 
+                            className="prose prose-blue max-w-none text-gray-800 dark:text-slate-300 leading-relaxed font-serif dark:prose-invert text-sm md:text-base cursor-pointer [&_img]:cursor-zoom-in"
+                            dangerouslySetInnerHTML={{ __html: currentQ.passage! }} 
+                            onClick={handleImageClick}
+                        />
+                    </div>
+                ) : (
+                    <div className="h-full flex items-center justify-center text-gray-300 dark:text-slate-600 italic">
+                        No passage for this question
+                    </div>
+                )}
+            </div>
         </div>
 
         {/* Right Pane: Question */}
-        <div className="w-full lg:w-1/2 bg-gray-50 dark:bg-slate-900 overflow-y-auto p-4 md:p-8 custom-scrollbar pb-24">
+        <div className="bg-gray-50 dark:bg-slate-900 overflow-y-auto p-4 md:p-8 custom-scrollbar pb-24 transition-all duration-500 ease-in-out flex-1 w-full">
           <div className="max-w-2xl mx-auto">
             {/* Question Header & Nav */}
             <div className="flex justify-between items-start mb-6">
@@ -917,7 +923,7 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
                     if (isUnanswered) {
                       // Unanswered questions: highlight correct answer in yellow
                       containerClass = 'border-yellow-500 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 ring-1 ring-yellow-500 dark:ring-yellow-600'
-                      indicatorClass = 'border-yellow-500 dark:border-yellow-600 bg-yellow-500 dark:bg-yellow-600 text-white'
+                      indicatorClass = 'border-yellow-500 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-600 text-white'
                     } else {
                       // Answered correctly: green
                       containerClass = 'border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-900/20 ring-1 ring-green-500 dark:ring-green-600'
@@ -984,10 +990,21 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
                 <p className="text-blue-900 dark:text-blue-300 leading-relaxed">{currentQ.explanation}</p>
               </div>
             )}
-
-            {/* Navigation Buttons (Removed from bottom) */}
           </div>
         </div>
+
+        {/* Toggle Button - Hidden when modals are open */}
+        {!isNavOpen && !isHelpOpen && !showFinishConfirm && !showExitConfirm && !showLeaveConfirm && !showLogoutConfirm && !isFinished && (
+          <button
+            onClick={() => setIsPassageVisible(!isPassageVisible)}
+            className={`absolute top-1/2 z-40 p-1 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-full shadow-md text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 transition-all duration-500 ease-in-out hidden lg:flex items-center justify-center ${
+              isPassageVisible ? 'left-1/2 -translate-x-1/2' : 'left-0 translate-x-1'
+            }`}
+            title={isPassageVisible ? "Hide Passage" : "Show Passage"}
+          >
+            {isPassageVisible ? <ArrowLeft size={16} weight="bold" /> : <ArrowRight size={16} weight="bold" />}
+          </button>
+        )}
 
         {/* Navigation Modal (Centered) */}
         {isNavOpen && (

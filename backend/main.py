@@ -79,6 +79,10 @@ class TestUpdate(BaseModel):
     folder_id: Optional[str] = None
     is_starred: Optional[bool] = None
     last_accessed: Optional[str] = None
+    content: Optional[dict] = None
+    question_count: Optional[int] = None
+    set_count: Optional[int] = None
+    question_range: Optional[str] = None
 
 class TestAttemptCreate(BaseModel):
     test_id: str
@@ -603,6 +607,92 @@ async def generate_test(
     response = client.table("tests").insert(data).execute()
     return {"id": response.data[0]['id'], "message": "Test generated successfully"}
 
+@app.post("/tests/{test_id}/add_sets")
+async def add_sets_to_test(
+    test_id: str,
+    files: List[UploadFile] = File(...),
+    configurations: str = Form(...),
+    user=Depends(get_current_user),
+    client=Depends(get_authenticated_client)
+):
+    # 1. Fetch existing test
+    test_resp = client.table("tests").select("*").eq("id", test_id).eq("user_id", user.id).execute()
+    if not test_resp.data:
+        raise HTTPException(status_code=404, detail="Test not found")
+    
+    existing_test = test_resp.data[0]
+    existing_content = existing_test.get("content", {})
+    existing_sets = existing_content.get("sets", [])
+    
+    # 2. Generate new sets
+    try:
+        configs = json.loads(configurations)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid configurations JSON")
+
+    gemini_client = GeminiClient()
+    new_sets = []
+    
+    with tempfile.TemporaryDirectory() as temp_dir:
+        for file in files:
+            config = configs.get(file.filename)
+            if not config:
+                continue
+                
+            file_path = os.path.join(temp_dir, file.filename)
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+                
+            try:
+                questions = gemini_client.generate_questions(
+                    file_path=file_path,
+                    mime_type=file.content_type or "application/pdf",
+                    num_questions=config.get("numQuestions", 5),
+                    difficulty=config.get("difficulty", "Average")
+                )
+                
+                if questions:
+                    new_sets.append({
+                        "title": config.get("name", file.filename),
+                        "questions": questions
+                    })
+                    
+            except Exception as e:
+                print(f"Error processing {file.filename}: {e}")
+                raise HTTPException(status_code=500, detail=f"Error processing {file.filename}: {str(e)}")
+
+    if not new_sets:
+        raise HTTPException(status_code=400, detail="No questions generated")
+
+    # 3. Merge and Update
+    updated_sets = existing_sets + new_sets
+    updated_content = {**existing_content, "sets": updated_sets}
+    
+    # Recalculate stats
+    question_counts = [len(s["questions"]) for s in updated_sets]
+    total_questions = sum(question_counts)
+    set_count = len(updated_sets)
+    
+    question_range = None
+    if set_count > 1:
+        min_q = min(question_counts) if question_counts else 0
+        max_q = max(question_counts) if question_counts else 0
+        if min_q != max_q:
+            question_range = f"{min_q}-{max_q}"
+        else:
+            question_range = f"{min_q}"
+    
+    update_data = {
+        "content": updated_content,
+        "question_count": total_questions,
+        "set_count": set_count,
+        "question_range": question_range
+    }
+    
+    client.table("tests").update(update_data).eq("id", test_id).execute()
+    
+    return {"message": "Sets added successfully", "new_set_count": len(new_sets)}
+
 # --- Stats ---
 
 @app.post("/attempts", response_model=TestAttempt)
@@ -681,3 +771,97 @@ def batch_update_tests(updates: List[dict], deletes: List[str] = [], user=Depend
         client.table("tests").delete().in_("id", deletes).eq("user_id", user.id).execute()
 
     return {"message": "Batch update successful"}
+
+class MergeMove(BaseModel):
+    from_test_id: str
+    from_set_name: str
+    to_test_id: str
+    to_set_name: str
+
+class MergeRequest(BaseModel):
+    source_test_id: str
+    target_test_id: str
+    source_content: dict
+    target_content: dict
+    moves: List[MergeMove]
+    deletes: List[str] = []
+
+from fastapi.responses import JSONResponse
+import traceback
+
+@app.post("/tests/merge")
+def merge_tests(req: MergeRequest, user=Depends(get_current_user), client=Depends(get_authenticated_client)):
+    """
+    Merge tests by updating content and reassigning attempts.
+    """
+    try:
+        print(f"Merge request received: source={req.source_test_id}, target={req.target_test_id}")
+        
+        # 1. Update Content for Source and Target
+        # Helper to calculate stats
+        def calculate_stats(content):
+            sets = content.get('sets', [])
+            question_counts = [len(s['questions']) for s in sets]
+            total_questions = sum(question_counts)
+            set_count = len(sets)
+            
+            question_range = None
+            if set_count > 1 and question_counts:
+                min_q = min(question_counts)
+                max_q = max(question_counts)
+                if min_q != max_q:
+                    question_range = f"{min_q}-{max_q}"
+                else:
+                    question_range = f"{min_q}"
+            elif set_count == 1:
+                question_range = f"{total_questions}"
+                
+            return total_questions, set_count, question_range
+
+        # Update Source
+        s_total, s_count, s_range = calculate_stats(req.source_content)
+        client.table("tests").update({
+            "content": req.source_content,
+            "question_count": s_total,
+            "set_count": s_count,
+            "question_range": s_range
+        }).eq("id", req.source_test_id).eq("user_id", user.id).execute()
+
+        # Update Target
+        t_total, t_count, t_range = calculate_stats(req.target_content)
+        client.table("tests").update({
+            "content": req.target_content,
+            "question_count": t_total,
+            "set_count": t_count,
+            "question_range": t_range
+        }).eq("id", req.target_test_id).eq("user_id", user.id).execute()
+
+        # 2. Move Attempts
+        for move in req.moves:
+            # Update attempts where test_id matches and set_name matches
+            client.table("test_attempts").update({
+                "test_id": move.to_test_id,
+                "set_name": move.to_set_name
+            }).eq("test_id", move.from_test_id).eq("set_name", move.from_set_name).eq("user_id", user.id).execute()
+
+        # 3. Recalculate Attempt Stats for both tests
+        # Note: We don't need to update attempt_count or avg_score on the test table itself
+        # because get_folders calculates these dynamically from the test_attempts table.
+        # We only need to ensure the attempts are moved (Step 2), which we did.
+        pass
+
+        # 4. Perform Deletes
+        if req.deletes:
+            # First delete any remaining attempts for these tests to avoid FK constraints
+            client.table("test_attempts").delete().in_("test_id", req.deletes).eq("user_id", user.id).execute()
+            
+            # Now delete the tests
+            client.table("tests").delete().in_("id", req.deletes).eq("user_id", user.id).execute()
+
+        print("Merge completed successfully")
+        return {"message": "Merge successful"}
+
+    except Exception as e:
+        error_msg = f"Error during merge: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)
+        return JSONResponse(status_code=500, content={"detail": str(e)})

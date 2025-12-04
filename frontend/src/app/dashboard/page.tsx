@@ -34,6 +34,7 @@ import ReviewTestModal from "@/components/Modals/ReviewTestModal";
 import MergeTestModal from "@/components/Modals/MergeTestModal";
 import UploadResultsModal from "@/components/Modals/UploadResultsModal";
 import AddFilesModal from "@/components/Modals/AddFilesModal";
+import ManageSetsModal from "@/components/Modals/ManageSetsModal";
 import AlertModal from "@/components/Modals/AlertModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { API_URL, mergeTests, batchUpdateTests } from "@/lib/api";
@@ -82,6 +83,17 @@ export default function Dashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [mergeModalData, setMergeModalData] = useState<{ source: Test; target: Test } | null>(null);
   const [username, setUsername] = useState<string>("");
+  const [manageSetsTestId, setManageSetsTestId] = useState<string | null>(null);
+  const [addSetsTestId, setAddSetsTestId] = useState<string | null>(null);
+
+  const handleManageSets = (id: string) => {
+    setManageSetsTestId(id);
+  };
+
+  const handleAddSet = (id: string) => {
+    setAddSetsTestId(id);
+    setActiveModal("add-files");
+  };
 
   const handleCardClick = useCallback((id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -1031,9 +1043,12 @@ export default function Dashboard() {
                         if (test && test.attempt_count > 0) {
                           setReviewTestId(id);
                           setReviewTestTitle(test.title);
+                          setActiveModal("review-test");
                         }
                       }}
                       onDownload={handleDownload}
+                      onManageSets={handleManageSets}
+                      onAddSet={handleAddSet}
                       isSelected={selectedCardId === test.id}
                       onClick={(e) => handleCardClick(test.id, e)}
                       onDoubleClick={() => {
@@ -1078,11 +1093,14 @@ export default function Dashboard() {
         
         <AddFilesModal
           isOpen={activeModal === "add-files"}
-          onClose={() => setActiveModal(null)}
-          onUploadJson={(file) => {
+          onClose={() => {
+            setActiveModal(null);
+            setAddSetsTestId(null);
+          }}
+          onUploadJson={(files) => {
             // Create a synthetic event to reuse handleUpload
             const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
+            files.forEach(file => dataTransfer.items.add(file));
             const event = {
               target: {
                 files: dataTransfer.files,
@@ -1094,7 +1112,9 @@ export default function Dashboard() {
           onGenerateComplete={(newTestId) => {
             fetchData();
             setStatsRefreshTrigger(prev => prev + 1);
+            setAddSetsTestId(null);
           }}
+          targetTestId={addSetsTestId}
         />
 
         <CreateFolderModal 
@@ -1147,8 +1167,9 @@ export default function Dashboard() {
         />
 
         <ReviewTestModal
-          isOpen={reviewTestId !== null}
+          isOpen={activeModal === "review-test"}
           onClose={() => {
+            setActiveModal(null);
             setReviewTestId(null);
             setReviewTestTitle("");
           }}
@@ -1156,7 +1177,18 @@ export default function Dashboard() {
           testTitle={reviewTestTitle}
         />
 
-        {/* Global drop zone overlay removed */}
+        {manageSetsTestId && (
+          <ManageSetsModal
+            isOpen={!!manageSetsTestId}
+            onClose={() => setManageSetsTestId(null)}
+            testId={manageSetsTestId}
+            testTitle={tests.find(t => t.id === manageSetsTestId)?.title || ""}
+            onUpdate={() => {
+              fetchData();
+              setStatsRefreshTrigger(prev => prev + 1);
+            }}
+          />
+        )}
 
         {mergeModalData && (
             <MergeTestModal

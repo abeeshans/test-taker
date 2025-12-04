@@ -13,9 +13,11 @@ import {
   Funnel,
   MagnifyingGlass,
   CheckCircle,
-  XCircle
+  XCircle,
+  ChartLineUp
 } from '@phosphor-icons/react';
 import ReviewTestModal from './ReviewTestModal';
+import ProgressGraphModal from './ProgressGraphModal';
 import { TestAttempt, Test, TestStats } from '@/types';
 
 interface TestStatsModalProps {
@@ -100,6 +102,11 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
   const [reviewTestId, setReviewTestId] = useState<string | null>(null);
   const [reviewTestTitle, setReviewTestTitle] = useState<string>("");
   const [reviewAttemptId, setReviewAttemptId] = useState<string | undefined>(undefined);
+  
+  // Progress Graph Modal State
+  const [showGraphModal, setShowGraphModal] = useState(false);
+  const [graphTestId, setGraphTestId] = useState<string | null>(null);
+  const [graphTestTitle, setGraphTestTitle] = useState<string>("");
   
   // Calendar State
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -344,6 +351,15 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
         const aValue = sortConfig.key === 'title' ? a.title : (a.stats as any)[sortConfig.key];
         const bValue = sortConfig.key === 'title' ? b.title : (b.stats as any)[sortConfig.key];
         
+        // Handle nulls for scores to ensure 0% is sorted above incomplete (null)
+        if (sortConfig.key === 'avgScore' || sortConfig.key === 'bestScore') {
+            const aNum = aValue === null ? -1 : aValue;
+            const bNum = bValue === null ? -1 : bValue;
+            if (aNum < bNum) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aNum > bNum) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        }
+
         if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
@@ -416,6 +432,13 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
       }
     };
 
+    const handleGraphClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setGraphTestId(node.id);
+      setGraphTestTitle(node.title);
+      setShowGraphModal(true);
+    };
+
     return (
       <React.Fragment>
         {/* Parent Row */}
@@ -461,14 +484,30 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
             {formatTime(node.stats.avgTime)}
           </td>
           <td className="px-6 py-4">
-             {node.stats.attempts > 0 && !node.id.startsWith('group-') && (
-               <button
-                 onClick={handleReviewClick}
-                 className="text-[10px] font-medium px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-blue-200 dark:border-blue-800 cursor-pointer whitespace-nowrap"
-               >
-                 Review last test
-               </button>
-             )}
+             <div className="flex items-center gap-2">
+               {node.stats.attempts > 0 && !node.id.startsWith('group-') && (
+                 <>
+                   <button
+                     onClick={handleReviewClick}
+                     className="text-[10px] font-medium px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-blue-200 dark:border-blue-800 cursor-pointer whitespace-nowrap"
+                   >
+                     Review last test
+                   </button>
+                   <button
+                      onClick={handleGraphClick}
+                      disabled={node.stats.attempts < 2}
+                      className={`p-1 rounded transition-colors ${
+                        node.stats.attempts < 2 
+                          ? 'text-gray-300 dark:text-slate-600 cursor-not-allowed' 
+                          : 'text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                      }`}
+                      title={node.stats.attempts < 2 ? "Need at least 2 attempts to view progress" : "View Progress Graph"}
+                    >
+                      <ChartLineUp size={18} weight="bold" />
+                    </button>
+                 </>
+               )}
+             </div>
           </td>
         </motion.tr>
 
@@ -752,25 +791,25 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
                   <table className="min-w-full text-sm text-left text-gray-500 dark:text-slate-400">
                     <thead className="text-xs text-gray-700 dark:text-slate-300 uppercase bg-gray-50 dark:bg-slate-900/50 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-10">
                       <tr>
-                        <th className="px-6 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700" onClick={() => handleSort('title')}>
+                        <th className="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 whitespace-nowrap" onClick={() => handleSort('title')}>
                           <div className="flex items-center gap-1">Test <SortIcon column="title" /></div>
                         </th>
-                        <th className="px-6 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700" onClick={() => handleSort('lastDate')}>
+                        <th className="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 whitespace-nowrap" onClick={() => handleSort('lastDate')}>
                           <div className="flex items-center gap-1">Last <SortIcon column="lastDate" /></div>
                         </th>
-                        <th className="px-6 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700" onClick={() => handleSort('attempts')}>
+                        <th className="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 whitespace-nowrap" onClick={() => handleSort('attempts')}>
                           <div className="flex items-center gap-1">Attempts <SortIcon column="attempts" /></div>
                         </th>
-                        <th className="px-6 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700" onClick={() => handleSort('avgScore')}>
+                        <th className="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 whitespace-nowrap" onClick={() => handleSort('avgScore')}>
                           <div className="flex items-center gap-1">Avg % <SortIcon column="avgScore" /></div>
                         </th>
-                        <th className="px-6 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700" onClick={() => handleSort('bestScore')}>
+                        <th className="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 whitespace-nowrap" onClick={() => handleSort('bestScore')}>
                           <div className="flex items-center gap-1">Best % <SortIcon column="bestScore" /></div>
                         </th>
-                        <th className="px-6 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700" onClick={() => handleSort('avgTime')}>
+                        <th className="px-4 py-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 whitespace-nowrap" onClick={() => handleSort('avgTime')}>
                           <div className="flex items-center gap-1">Avg Time <SortIcon column="avgTime" /></div>
                         </th>
-                        <th className="px-6 py-3">
+                        <th className="px-4 py-3 whitespace-nowrap">
                           Actions
                         </th>
                       </tr>
@@ -819,6 +858,14 @@ export default function TestStatsModal({ isOpen, onClose, initialTestId, refresh
           testId={reviewTestId}
           testTitle={reviewTestTitle}
           attemptId={reviewAttemptId}
+        />
+      )}
+      {showGraphModal && graphTestId && (
+        <ProgressGraphModal
+          isOpen={showGraphModal}
+          onClose={() => setShowGraphModal(false)}
+          testTitle={graphTestTitle}
+          attempts={attempts.filter(a => a.test_id === graphTestId)}
         />
       )}
     </BaseModal>
