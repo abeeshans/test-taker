@@ -288,6 +288,7 @@
 body {
   background: var(--muted-bg);
   color: #0f172a; /* gray-900 */
+  overflow-x: hidden;
 }
 
 /* Universal transition for theme switching */

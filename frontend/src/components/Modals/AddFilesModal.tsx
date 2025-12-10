@@ -194,8 +194,13 @@ export default function AddFilesModal({ isOpen, onClose, onUploadJson, onGenerat
       const configs: Record<string, any> = {};
       
       sets.forEach(set => {
-        formData.append('files', set.file);
-        configs[set.file.name] = {
+        // Use a unique filename (prepend id) to ensure that if multiple files have the same name
+        // (e.g. uploading 'notes.pdf' twice), they map to the correct config and don't overwrite each other.
+        // We pass this unique name to formData, which the backend will receive as file.filename.
+        const uniqueFilename = `${set.id}_${set.file.name}`;
+        
+        formData.append('files', set.file, uniqueFilename);
+        configs[uniqueFilename] = {
           name: set.name,
           numQuestions: set.numQuestions,
           difficulty: set.difficulty

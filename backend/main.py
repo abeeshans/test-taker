@@ -391,6 +391,72 @@ def update_test(test_id: str, test: TestUpdate, user=Depends(get_current_user), 
         raise HTTPException(status_code=404, detail="Test not found")
     return response.data[0]
 
+class SetRename(BaseModel):
+    old_name: str
+    new_name: str
+
+class ContentUpdate(BaseModel):
+    content: dict
+    question_count: int
+    set_count: int
+    question_range: Optional[str] = None
+    renames: List[SetRename] = []
+
+@app.post("/tests/{test_id}/update_content")
+def update_test_content(test_id: str, update: ContentUpdate, user=Depends(get_current_user), client=Depends(get_authenticated_client)):
+    # 1. Update Test Content
+    data = {
+        "content": update.content,
+        "question_count": update.question_count,
+        "set_count": update.set_count,
+        "question_range": update.question_range
+    }
+    
+    response = client.table("tests").update(data).eq("id", test_id).execute()
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Test not found")
+        
+    # 2. Process Renames Safely
+    # To handle swaps (A->B, B->A) or chains (A->B, B->C), we use a 2-phase approach.
+    # Phase 1: Rename all "old" names to temporary unique names.
+    # Phase 2: Rename all temporary names to "new" names.
+    
+    renames_map = {} # temp_name -> new_name
+    results = []
+    
+    # Phase 1: Rename start -> temp
+    for rename in update.renames:
+        if rename.old_name == rename.new_name:
+            continue
+            
+        # Create a temp name that is highly unlikely to collide
+        temp_name = f"__TMP_RENAME_{uuid.uuid4()}__"
+        renames_map[temp_name] = rename.new_name
+        
+        print(f"Phase 1: Renaming set '{rename.old_name}' to temp '{temp_name}' for test {test_id}")
+        
+        client.table("test_attempts").update({
+            "set_name": temp_name
+        }).eq("test_id", test_id).eq("set_name", rename.old_name).eq("user_id", user.id).execute()
+        
+    # Phase 2: Rename temp -> end
+    for temp_name, final_name in renames_map.items():
+        print(f"Phase 2: Renaming temp '{temp_name}' to '{final_name}' for test {test_id}")
+        
+        r = client.table("test_attempts").update({
+            "set_name": final_name
+        }).eq("test_id", test_id).eq("set_name", temp_name).eq("user_id", user.id).execute()
+        
+        # We can't easily track exactly how many were updated in Phase 1 vs 2 effectively for the result list
+        # without more complex tracking, but the goal is achieved.
+        # We'll just list the operation in results.
+        
+    # Re-construct results for info
+    for rename in update.renames:
+       results.append({"old": rename.old_name, "new": rename.new_name, "status": "processed"})
+        
+    return {"message": "Content updated successfully", "renames": results}
+
 @app.delete("/tests/{test_id}")
 def delete_test(test_id: str, user=Depends(get_current_user), client=Depends(get_authenticated_client)):
     response = client.table("tests").delete().eq("id", test_id).execute()

@@ -33,6 +33,7 @@ interface ManageSetsModalProps {
 interface TestSet {
   id: string; // Temporary ID for dnd-kit
   title: string;
+  originalTitle: string;
   questions: any[];
 }
 
@@ -147,8 +148,12 @@ export default function ManageSetsModal({ isOpen, onClose, testId, testTitle, on
 
       const data = await response.json();
       if (data.content && data.content.sets) {
-        // Add unique IDs for dnd-kit
-        setSets(data.content.sets.map((s: any) => ({ ...s, id: crypto.randomUUID() })));
+        // Add unique IDs for dnd-kit and track original title
+        setSets(data.content.sets.map((s: any) => ({ 
+          ...s, 
+          id: crypto.randomUUID(),
+          originalTitle: s.title 
+        })));
       } else {
         setSets([]);
       }
@@ -203,12 +208,20 @@ export default function ManageSetsModal({ isOpen, onClose, testId, testTitle, on
         questionRange = minQ !== maxQ ? `${minQ}-${maxQ}` : `${minQ}`;
       }
 
-      // Prepare content for saving (remove temporary IDs)
-      const setsToSave = sets.map(({ id, ...rest }) => rest);
+      // Identify renames
+      const renames = sets
+        .filter(s => s.originalTitle && s.title !== s.originalTitle && s.title.trim() !== "")
+        .map(s => ({
+          old_name: s.originalTitle,
+          new_name: s.title
+        }));
+
+      // Prepare content for saving (remove temporary IDs and internal fields)
+      const setsToSave = sets.map(({ id, originalTitle, ...rest }) => rest);
       const newContent = { sets: setsToSave };
 
-      const response = await fetch(`${API_URL}/tests/${testId}`, {
-        method: 'PATCH',
+      const response = await fetch(`${API_URL}/tests/${testId}/update_content`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
@@ -217,7 +230,8 @@ export default function ManageSetsModal({ isOpen, onClose, testId, testTitle, on
           content: newContent,
           question_count: totalQuestions,
           set_count: setCount,
-          question_range: questionRange
+          question_range: questionRange,
+          renames: renames
         }),
       });
 

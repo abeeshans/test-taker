@@ -102,8 +102,8 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-blue-600/10 dark:bg-blue-600/20 rounded-full blur-[120px] opacity-50" />
-          <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-indigo-600/5 dark:bg-indigo-600/10 rounded-full blur-[100px] opacity-30" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150vw] sm:w-[1000px] h-[500px] bg-blue-600/10 dark:bg-blue-600/20 rounded-full blur-[120px] opacity-50" />
+          <div className="absolute bottom-0 right-0 w-[120vw] sm:w-[800px] h-[600px] bg-indigo-600/5 dark:bg-indigo-600/10 rounded-full blur-[100px] opacity-30" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

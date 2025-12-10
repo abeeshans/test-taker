@@ -428,7 +428,10 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
 
           <div className="space-y-3">
             <button 
-              onClick={() => setIsReviewMode(true)}
+              onClick={() => {
+                setIsReviewMode(true)
+                setIsPassageVisible(true)
+              }}
               className="w-full py-3 bg-blue-600 dark:bg-purple-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-purple-700 font-medium flex items-center justify-center gap-2"
             >
               <Eye size={20} /> Review Questions
@@ -449,7 +452,7 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
   const hasPassage = currentQ.passage && currentQ.passage !== "This question does not have a passage."
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-900 overflow-hidden">
+    <div className="h-[100dvh] flex flex-col bg-gray-50 dark:bg-slate-900 overflow-hidden">
       {/* Header */}
       <header className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 h-16 flex items-center justify-between px-6 flex-shrink-0 z-20">
         <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
@@ -546,9 +549,10 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
                     ? 'bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-blue-400' 
                     : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
                 }`}
+                title="Test View"
               >
                 <Desktop size={18} weight={viewMode === 'test' ? 'fill' : 'regular'} />
-                Test View
+                <span className="hidden md:inline">Test View</span>
               </button>
               <button
                 onClick={() => setViewMode('list')}
@@ -557,9 +561,10 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
                     ? 'bg-white dark:bg-slate-600 shadow-sm text-blue-600 dark:text-blue-400' 
                     : 'text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-300'
                 }`}
+                title="List View"
               >
                 <ListBullets size={18} weight={viewMode === 'list' ? 'fill' : 'regular'} />
-                List View
+                <span className="hidden md:inline">List View</span>
               </button>
             </div>
           )}
@@ -838,7 +843,7 @@ export default function TestTaker({ testId, initialData, timeLimit }: TestTakerP
         
         {/* Left Pane: Passage (Always visible, empty if no passage) */}
         <div className={`bg-white dark:bg-slate-800 overflow-y-auto custom-scrollbar transition-[margin-left] duration-500 ease-in-out flex-none ${
-          isPassageVisible 
+          isPassageVisible || isReviewMode
             ? 'h-1/3 min-h-[150px] lg:h-auto w-full lg:w-1/2 lg:ml-0 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-slate-700' 
             : 'h-0 min-h-0 lg:h-auto w-full lg:w-1/2 lg:-ml-[50%] p-0 border-none'
         }`}>
