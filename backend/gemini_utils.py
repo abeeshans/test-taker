@@ -52,9 +52,134 @@ class GeminiClient:
         # Wait for processing
         self.wait_for_files_active([uploaded_file])
         
+        
+        example_questions_json = """
+        {
+            "questions": [
+                {
+                "passage": "A 65 year old woman is admitted to her local hospital with a broken wrist after a fall. Her bone mineral density (BMD) is tested as her consultant suspects post-menopausal osteoporosis.",
+                "question": "What role does oestrogen play in protecting bone from excessive bone loss?",
+                "options": [
+                    "A. Inhibits osteoblast apoptosis",
+                    "B. Inhibits production of osteoprotegerin",
+                    "C. Promotes adipogenesis in bone marrow",
+                    "D. Promotes production of RANK ligand",
+                    "E. Upregulates M-CSF expression"
+                ],
+                "correctAnswer": "A. Inhibits osteoblast apoptosis",
+                "explanation": "Oestrogen is pro-osteoblastic and anti-osteoclastic. It protects bone by inhibiting the programmed cell death (apoptosis) of osteoblasts (bone-forming cells) and encouraging the apoptosis of osteoclasts (bone-resorbing cells). "
+                },
+                {
+                "passage": "A 65 year old man seeks advice from his genitourinary clinic after he develops lesions on his penis. He is diagnosed with genital warts and commenced on oral acyclovir.",
+                "question": "Inhibition of which enzyme would best explain the antiviral action of acyclovir in the treatment of herpes simplex (HSV) infections?",
+                "options": [
+                    "A. DNA polymerase",
+                    "B. Human cellular kinases",
+                    "C. Reverse transcriptase",
+                    "D. Thymidine kinase",
+                    "E. Viral integrase"
+                ],
+                "correctAnswer": "A. DNA polymerase",
+                "explanation": "While acyclovir is specifically activated (phosphorylated) by viral thymidine kinase, its ultimate mechanism of action is the inhibition of viral DNA polymerase, leading to DNA chain termination. Note: The clinical scenario mentions genital warts (usually HPV), but the question specifically asks about the mechanism for HSV."
+                },
+                {
+                "passage": "You are asked to perform a peripheral vascular examination on a patient with thigh pain. As part of your examination you palpate the femoral arteries.",
+                "question": "Which structure lies immediately medial to the femoral artery within the femoral triangle?",
+                "options": [
+                    "A. Adductor longus",
+                    "B. Fascia lata",
+                    "C. Femoral vein",
+                    "D. Ilioinguinal nerve",
+                    "E. Lymphatics"
+                ],
+                "correctAnswer": "C. Femoral vein",
+                "explanation": "The mnemonic VAN (Vein, Artery, Nerve) describes the structures in the femoral triangle from medial to lateral. Therefore, the femoral vein is immediately medial to the femoral artery. "
+                },
+                {
+                "passage": "A 35 year old woman has her routine cervical smear test. Abnormal cells are seen and following subsequent tests the presence of the human papillomavirus (HPV) is detected.",
+                "question": "Which HPV strain would be classified as a high-risk strain?",
+                "options": [
+                    "A. HPV6",
+                    "B. HPV10",
+                    "C. HPV11",
+                    "D. HPV16",
+                    "E. HPV74"
+                ],
+                "correctAnswer": "D. HPV16",
+                "explanation": "HPV 16 and 18 are the primary high-risk strains associated with the development of cervical cancer. Strains 6 and 11 are generally low-risk and associated with genital warts."
+                },
+                {
+                "passage": "This question does not have a passage.",
+                "question": "What virulence factor commonly present in one of the most common agents of skin, soft tissue and throat infections is a toxin targeting the plasma membrane?",
+                "options": [
+                    "A. Fibronectin Binding Protein A (FnBPA)",
+                    "B. Shiga toxin",
+                    "C. Streptolysin O",
+                    "D. Tuberculosis Necrotizing Toxin",
+                    "E. Yop proteins"
+                ],
+                "correctAnswer": "C. Streptolysin O",
+                "explanation": "Streptolysin O is a potent membrane-damaging exotoxin produced by Group A Streptococcus (Streptococcus pyogenes), which is a leading cause of throat and skin infections."
+                },
+                {
+                "passage": "A female infant is delivered at full term. Within 24 hours, she is visibly jaundiced and her test results reveal increased bilirubin levels which continue to rise through the day. Her haemoglobin levels are low at 16.5 g/dL (normal range 19-22 g/dL) and her blood film showed bite and blister cells. Haemoglobin electrophoresis and Coombes test are both normal. Supravital staining of her blood reveals the presence of Heinz bodies.",
+                "question": "What is the most likely cause of this neonatal jaundice?",
+                "options": [
+                    "A. Autoimmune haemolytic anaemia",
+                    "B. Glucose-6-phosphate dehydrogenase deficiency",
+                    "C. Hereditary spherocytosis",
+                    "D. Hereditary elliptocytosis",
+                    "E. α (alpha)-thalassaemia minor"
+                ],
+                "correctAnswer": "B. Glucose-6-phosphate dehydrogenase deficiency",
+                "explanation": "The presence of 'bite cells,' 'blister cells,' and 'Heinz bodies' (denatured haemoglobin) is pathognomonic for G6PD deficiency, especially in the context of neonatal jaundice and haemolysis. "
+                },
+                {
+                "passage": "In the oncology ward you are reviewing patient notes and come across a patient whose tumour is described as T3 N1 M0.",
+                "question": "What does this tell you?",
+                "options": [
+                    "A. The patient has a large tumour, that has lymph node involvement, and has metastasised",
+                    "B. The patient has a large tumour, that has lymph node involvement, and has not metastasised",
+                    "C. The patient has a large tumour, that has no lymph node involvement, and has metastasised",
+                    "D. The patient has a small tumour, that has no lymph node involvement, and has not metastasised",
+                    "E. That there is a mistake on the patient notes"
+                ],
+                "correctAnswer": "B. The patient has a large tumour, that has lymph node involvement, and has not metastasised",
+                "explanation": "In TNM staging: T3 indicates a large primary tumour size/extent; N1 indicates involvement of regional lymph nodes; M0 indicates that no distant metastasis has been found."
+                },
+                {
+                "passage": "A 60-year-old postmenopausal woman has been admitted to the Emergency Department with a fractured neck of the femur. She is normally in good health with a balanced diet, although she drinks around 5 units of alcohol per week and smokes the occasional cigarette socially. She walks about 2 miles every day and participates in an aerobics class once a week. She is not taking any medication regularly.",
+                "question": "What is the biggest risk factor for osteoporosis in this patient?",
+                "options": [
+                    "A. Alcohol consumption",
+                    "B. Lack of exercise",
+                    "C. Lack of oestrogen",
+                    "D. Smoking",
+                    "E. Vitamin D deficiency"
+                ],
+                "correctAnswer": "C. Lack of oestrogen",
+                "explanation": "While smoking and alcohol are risk factors, the most significant contributor to bone loss in a 60-year-old woman is the postmenopausal decline in oestrogen, which leads to increased bone resorption."
+                },
+                {
+                "passage": "It has been recently reported that hypercholesterolemia is a risk factor for male infertility and it has been shown that the manchette is disorganised.",
+                "question": "What are the direct consequences of this for the development of the sperm?",
+                "options": [
+                    "A. Golgi derived hydrolytic enzymes fail to be assembled in the tail of the developing sperm",
+                    "B. Somatic histones will be replaced by protamines",
+                    "C. The distal centriole will not develop the acrosome",
+                    "D. The structure that initiates the acrosome reaction is disorganised",
+                    "E. The transient and predominant microtubule-containing structure fails to support the developing acrosome."
+                ],
+                "correctAnswer": "E. The transient and predominant microtubule-containing structure fails to support the developing acrosome.",
+                "explanation": "The manchette is a transient microtubule-based structure in spermatids that is essential for the shaping of the sperm head and the transport of materials to the developing acrosome and tail."
+                }
+            ]
+        }
+        """
+
         # Construct the prompt
         prompt = f"""
-        You are an expert teacher and test creator. The questions you create should only have relevance to the content of the file (no questions about the table of contents, lecture outline,structure of the curriculum/notes, and anything else that is not directly related to the content of the file). If the question references an image/page in the file, you must include a note in the passage that tells the user to refer to the image on the file. Below that include the pixel coordinates of the image to be referenced on the page, so that it can be used to crop using PIL. 
+        You are an expert teacher and test creator. The questions you create should only have relevance to the content of the file (no questions about the table of contents, lecture outline,structure of the curriculum/notes, and anything else that is not directly related to the content of the file). If the question references an image/page in the file, you must include a note in the passage that tells the user to refer to the image on the file. Below that include the pixel coordinates of the image to be referenced on the page, so that it can be used to crop using PIL. Ensure that the cropped image does not provide the answer to the question. 
         IMPORTANT: Provide coordinates on a normalized 0-1000 scale, where (0,0) is top-left and (1000,1000) is bottom-right.
         Format: [E.g. Refer to the diagram on Page X of '{os.path.basename(file_path)}'.<br> (100, 200, 300, 400)]
         Create a JSON test based on the attached file.
@@ -94,6 +219,9 @@ class GeminiClient:
         }}
         
         Output ONLY the raw JSON string, no markdown formatting.
+
+        Here are some sample questions - I want you to follow the general structure of these questions: 
+        {example_questions_json}
         """
         
         max_retries = 3
@@ -281,4 +409,3 @@ class GeminiClient:
             doc.close()
         
         return questions
-
