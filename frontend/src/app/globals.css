@@ -17,16 +17,20 @@
 }
 
 .pink {
-  --brand-blue: #db2777; /* Pink-600 */
-  --brand-blue-light: #fce7f3; /* Pink-100 */
-  --muted-bg: #fdf2f8; /* Pink-50 (Subtle Background) */
-  --hero-gradient: linear-gradient(135deg, #fe8fbe 0%, #d63d7a 100%);
+  --brand-blue: #ec4899; /* Pink-500 (Vibrant, Clean Pink) */
+  --brand-blue-light: #fff1f2; /* Rose-50 (Warm white-pink) */
+  --brand-green: #4ade80; /* Green-400 */
+  --brand-yellow: #fcd34d; /* Amber-300 */
+  --brand-red: #fb7185; /* Rose-400 */
+  --muted-bg: #fff0f5; /* Lavender Blush (Clean light pink) */
+  --hero-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); /* Vibrant Peach/Pink Gradient */
   --card-gradient: none;
 }
 
 .pink body {
   background: var(--muted-bg);
-  color: #831843; /* Pink-900 */
+  color: #9d174d; /* Pink-800 - Crisp contrast */
+  font-family: var(--font-quicksand), sans-serif !important;
 }
 
 /* --- Global Light & Airy Pink Theme Overrides --- */
@@ -38,10 +42,10 @@
   color: #ffffff;
 }
 
-/* 2. Features & Main Content (Opaque Subtle Pink) */
+/* 2. Features & Main Content */
 .pink .bg-gray-50,
 .pink .dark\:bg-slate-900 {
-  background-color: #fdf2f8 !important; /* Pink-50 */
+  background-color: #fff5f7 !important; /* Very Light Pink, Clean */
   position: relative;
   z-index: 10;
 }
@@ -53,36 +57,49 @@
   z-index: 10;
 }
 
-/* 4. Cards (Clean White, No Pink Glow) */
+/* 4. Cards */
+/* Generic White Surfaces (Header, etc) - Keep White */
 .pink .bg-white, 
 .pink .bg-white\/80,
 .pink .dark\:bg-slate-950,
 .pink .dark\:bg-slate-900,
-.pink .dark\:bg-slate-800\/50,
-.pink .test-card {
+.pink .dark\:bg-slate-800\/50 {
   background-color: #ffffff !important;
   backdrop-filter: none !important;
-  border: 1px solid #fbcfe8 !important; /* Pink-200 */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important; /* Standard Shadow */
+  border-color: #fbcfe8 !important; /* Pink-200 */
+}
+
+/* Test Cards specifically - Ultra Light Pink (Close to white) */
+.pink .test-card {
+  background-color: #fff5f9 !important; /* Extremely pale pink */
+  border: 2px solid #fbcfe8 !important; /* Pink-200 */
+  box-shadow: 0 4px 6px rgba(251, 113, 133, 0.05) !important;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Stats Boxes inside Test Cards - Slightly more saturated pink */
+.pink .test-card .bg-gray-50 {
+  background-color: #ffe4ec !important; /* Slightly more saturated pink */
+  border-color: #fbcfe8 !important;
 }
 
 .pink .feature-card:hover,
 .pink .test-card:hover {
   transform: translateY(-4px) !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important; /* Stronger Standard Shadow */
+  box-shadow: 0 8px 12px rgba(251, 113, 133, 0.1) !important; /* Reduced hover glow */
+  border-color: #f687b3 !important; /* Pink-400 */
 }
 
-/* 5. Text Colors (Context Aware - High Contrast) */
+/* 5. Text Colors */
 
-/* Hero Text */
+/* Hero Text - Make Dark Pink for Pastel Background */
 .pink .text-slate-900,
 .pink .text-gray-900,
 .pink .dark\:text-white {
-  color: #ffffff !important;
+  color: #831843 !important; /* Pink-900 */
 }
 
-/* Text inside White/Pink Sections (Features, Footer, Cards, Nav, Modals) */
+/* Text inside White/Pink Sections */
 .pink .bg-gray-50 .text-slate-900,
 .pink .bg-gray-50 .text-gray-900,
 .pink .bg-gray-50 .dark\:text-white,
@@ -99,17 +116,16 @@
 .pink .login-modal label,
 .pink .login-modal span,
 .pink button span {
-  color: #831843 !important; /* Pink-900 */
+  color: #9d174d !important; /* Pink-800 */
 }
 
-/* Secondary Text (Hero) */
+/* Secondary Text */
 .pink .text-slate-600,
 .pink .text-slate-500,
 .pink .dark\:text-slate-400 {
-  color: #fce7f3 !important; /* Pink-100 */
+  color: #fff1f2 !important; /* Rose-50 (Light text on dark backgrounds if any) */
 }
 
-/* Secondary Text (White/Pink Sections) */
 .pink .bg-gray-50 .text-slate-600,
 .pink .bg-gray-50 .text-slate-500,
 .pink .bg-gray-50 .dark\:text-slate-400,
@@ -123,43 +139,134 @@
   color: #be185d !important; /* Pink-700 */
 }
 
-/* 6. NO BLUE BUTTONS OR TEXT */
+/* 6. BUTTONS & ACCENTS */
 
-/* Blue Text -> Pink */
-.pink .text-blue-600,
-.pink .text-blue-500,
-.pink .text-blue-400,
-.pink .dark\:text-blue-400,
-.pink .dark\:text-blue-500,
-.pink .group-hover\:text-blue-700,
-.pink .group-hover\:text-blue-500 {
-  color: #db2777 !important; /* Pink-600 */
-}
-
-/* Blue Backgrounds -> Pink */
-.pink .bg-blue-600,
-.pink .bg-blue-500,
-.pink .bg-blue-800, /* TestCard Start Button */
-.pink .dark\:bg-purple-600, /* Dark mode buttons */
-.pink .dark\:bg-blue-900\/20 {
-  background-color: #db2777 !important; /* Pink-600 */
-  color: white !important;
+/* Generic Buttons/Links (Primary) - VIBRANT PINK BACKGROUND, WHITE TEXT */
+.pink .btn-primary,
+.pink a.bg-blue-600,
+.pink button.bg-blue-600,
+.pink nav a.bg-blue-600 {
+  background: #ec4899 !important; /* Pink-500 */
+  background-color: #ec4899 !important;
+  color: #ffffff !important; /* WHITE TEXT */
   border: none !important;
+  box-shadow: 0 4px 6px -1px rgba(236, 72, 153, 0.4);
 }
 
-.pink .bg-blue-600:hover,
-.pink .bg-blue-500:hover,
-.pink .bg-blue-800:hover,
-.pink .dark\:bg-purple-600:hover {
-  background-color: #be185d !important; /* Pink-700 */
+.pink .btn-primary:hover,
+.pink a.bg-blue-600:hover,
+.pink button.bg-blue-600:hover,
+.pink nav a.bg-blue-600:hover {
+  background: #db2777 !important; /* Pink-600 */
+  background-color: #db2777 !important;
+  transform: translateY(-2px);
 }
 
-/* Light Blue Backgrounds (Score boxes, etc) -> Light Pink */
-.pink .bg-blue-50,
-.pink .bg-blue-100,
-.pink .dark\:bg-slate-800 {
-  background-color: #fff1f2 !important; /* Rose-50 */
-  border-color: #fbcfe8 !important;
+/* 7. FOLDER CARD OVERRIDES - VERY PALE GREEN ACCENTS */
+/* Target specific folder card elements to turn Blue -> Green */
+
+/* Top Line (bg-blue-500) */
+.pink .folder-card .bg-blue-500 {
+  background-color: #bbf7d0 !important; /* Green-200 (Very Pale Green) */
+}
+
+/* Folder Icon & Text (text-blue-600/400) */
+.pink .folder-card .text-blue-600,
+.pink .folder-card .text-blue-500,
+.pink .folder-card .text-blue-400,
+.pink .folder-card .group-hover\:text-blue-600 {
+  color: #86efac !important; /* Green-300 */
+}
+
+/* Folder Background */
+.pink .folder-card.bg-blue-50\/50,
+.pink .folder-card .hover\:bg-blue-100 {
+  background-color: #f0fdf4 !important; /* Green-50 */
+  border-color: #dcfce7 !important; /* Green-100 */
+}
+
+/* Folder Hover Ring */
+.pink .folder-card.ring-blue-400 {
+  --tw-ring-color: #bbf7d0 !important;
+}
+
+/* 7b. FOLDER INTERNAL ELEMENTS FIXES */
+/* Gradient Overlay - Match the new Green Background */
+.pink .folder-card .bg-gradient-to-t {
+  background-image: linear-gradient(to bottom, transparent, #f0fdf4) !important; /* Top (0%) -> Bottom (100% Green-50) */
+}
+
+/* "Show More" Text - Darker Green for Readability */
+.pink .folder-card button.text-blue-600 {
+  color: #15803d !important; /* Green-700 */
+}
+.pink .folder-card button.text-blue-600:hover {
+  color: #14532d !important; /* Green-900 */
+  background-color: #dcfce7 !important; /* Green-100 */
+}
+/* Border separator above Show More */
+.pink .folder-card .border-blue-200\/30 {
+  border-color: #bbf7d0 !important; /* Green-200 */
+}
+
+/* REDUCE SHADOW GLOWS */
+.pink .bg-white, 
+.pink .bg-white\/80,
+.pink .dark\:bg-slate-950,
+.pink .dark\:bg-slate-900,
+.pink .dark\:bg-slate-800\/50,
+.pink .test-card {
+  box-shadow: 0 4px 6px rgba(251, 113, 133, 0.05) !important; /* Much softer shadow */
+}
+
+.pink .feature-card:hover,
+.pink .test-card:hover {
+  box-shadow: 0 8px 12px rgba(251, 113, 133, 0.1) !important; /* Reduced hover glow */
+}
+
+/* BUTTON TEXT FIXES */
+
+/* Primary Button Text - FORCE WHITE EVERYWHERE */
+.pink .btn-primary,
+.pink .btn-primary span,
+.pink .btn-primary svg,
+.pink a.bg-blue-600,
+.pink a.bg-blue-600 span,
+.pink a.bg-blue-600 svg,
+.pink button.bg-blue-600,
+.pink button.bg-blue-600 span,
+.pink button.bg-blue-600 svg,
+.pink nav a.bg-blue-600,
+.pink nav a.bg-blue-600 span {
+  color: #ffffff !important;
+  fill: currentColor !important;
+}
+
+/* Secondary Button (Create Folder) Text & Icons -> Pink */
+.pink .bg-gray-50 button.bg-gray-100,
+.pink .bg-white button.bg-gray-100 {
+  color: #be185d !important; /* Pink-700 */
+}
+
+.pink .bg-gray-50 button.bg-gray-100 svg,
+.pink .bg-white button.bg-gray-100 svg {
+  color: #be185d !important;
+  fill: currentColor !important;
+}
+
+/* 8. OTHER ELEMENTS MAPPED TO PINK */
+
+/* Blue Text -> Soft Pink (Default fallback) */
+.pink .text-blue-600,
+.pink .text-blue-500 {
+  color: #be185d !important;
+}
+
+/* Blue Backgrounds -> Pink (Default fallback) */
+.pink .bg-blue-600,
+.pink .bg-blue-500 {
+  background-color: #ec4899 !important;
+  color: white !important;
 }
 
 /* Blue Borders -> Pink */
@@ -171,6 +278,37 @@
   border-color: #db2777 !important;
   --tw-ring-color: #db2777 !important;
 }
+
+/* 9. PURPLE ACCENTS -> TEAL (Greenish-Blue) for Gaya Mode */
+.pink .text-purple-50, .pink .text-purple-100, .pink .text-purple-200, .pink .text-purple-300, 
+.pink .text-purple-400, .pink .text-purple-500, .pink .text-purple-600, .pink .text-purple-700, 
+.pink .text-purple-800, .pink .text-purple-900, .pink .dark\:text-purple-400 {
+  color: #0d9488 !important; /* Teal-600 */
+}
+
+.pink .bg-purple-100,
+.pink .bg-purple-50,
+.pink .bg-purple-200,
+.pink .dark\:bg-purple-900\/30,
+.pink .dark\:bg-purple-900 {
+  background-color: #ccfbf1 !important; /* Teal-100 */
+  color: #0f766e !important; /* Teal-700 */
+  border-color: #99f6e4 !important; /* Teal-200 */
+}
+
+.pink .bg-purple-500, .pink .bg-purple-600 {
+    background-color: #0d9488 !important; /* Teal-600 */
+    color: white !important;
+}
+
+.pink .border-purple-100, .pink .border-purple-200, .pink .border-purple-300,
+.pink .border-purple-400, .pink .border-purple-500, .pink .border-purple-600 {
+  border-color: #14b8a6 !important; /* Teal-500 */
+}
+
+/* Also ensure hover states map correctly if used */
+.pink .hover\:text-purple-600:hover { color: #0f766e !important; }
+.pink .hover\:bg-purple-50:hover { background-color: #ccfbf1 !important; }
 
 /* 7. Inputs (Clean White) */
 .pink input,

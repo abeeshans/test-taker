@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDroppable, useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { Folder, Pencil, Trash, Info, CaretDown, CaretUp, Star } from "@phosphor-icons/react";
+import { Folder, Pencil, Trash, Info, CaretDown, CaretUp, Star, Heart } from "@phosphor-icons/react";
 
 interface FolderCardProps {
   folder: {
@@ -177,14 +177,26 @@ function FolderCard({ folder, folders, tests, onToggle, onRename, onDelete, isSe
       <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500 rounded-t-lg" />
       {/* Header - Draggable Handle */}
       <div className="flex items-start justify-between mb-3">
-        <Folder size={24} weight="regular" className="text-gray-700 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+        {folder.id === 'valentine-2026' ? (
+             <div className="relative">
+                 <div className="absolute inset-0 bg-pink-500 blur-lg opacity-20 rounded-full animate-pulse"></div>
+                 <Heart size={32} weight="fill" className="text-pink-500 dark:text-pink-400 relative z-10 animate-bounce-slow" />
+             </div>
+        ) : (
+            <Folder size={24} weight="regular" className="text-gray-700 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+        )}
+        
         <div className="flex items-center gap-1" onPointerDown={(e) => e.stopPropagation()}>
-          <button onClick={() => onRename(folder.id)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded-full transition-all hover:scale-110 active:scale-95 cursor-pointer">
-            <Pencil size={16} />
-          </button>
-          <button onClick={() => onDelete(folder.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-full transition-all hover:scale-110 active:scale-95 cursor-pointer">
-            <Trash size={16} />
-          </button>
+          {folder.id !== 'valentine-2026' && (
+            <>
+              <button onClick={() => onRename(folder.id)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded-full transition-all hover:scale-110 active:scale-95 cursor-pointer">
+                <Pencil size={16} />
+              </button>
+              <button onClick={() => onDelete(folder.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-full transition-all hover:scale-110 active:scale-95 cursor-pointer">
+                <Trash size={16} />
+              </button>
+            </>
+          )}
           <div className="relative group/info">
             <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-all hover:scale-110 active:scale-95 cursor-help">
               <Info size={16} />
@@ -198,21 +210,25 @@ function FolderCard({ folder, folders, tests, onToggle, onRename, onDelete, isSe
 
       {/* Title & Stats */}
       <div className="mb-4">
-        <h3 className="font-semibold text-gray-900 dark:text-white text-base mb-1 truncate" title={folder.name}>
-          {folder.name}
-        </h3>
-        <div className="text-sm text-gray-500 dark:text-slate-300 flex justify-between items-end">
-          <div>
-            <div className="text-xs mt-0.5 text-gray-400 dark:text-slate-400">
-              {displayFolderCount} folder(s) • {displayTestCount} test(s)
+        {folder.id !== 'valentine-2026' && (
+          <>
+            <h3 className="font-semibold text-base mb-1 truncate text-gray-900 dark:text-white" title={folder.name}>
+              {folder.name}
+            </h3>
+            <div className="text-sm text-gray-500 dark:text-slate-300 flex justify-between items-end">
+              <div>
+                <div className="text-xs mt-0.5 text-gray-400 dark:text-slate-400">
+                  {`${displayFolderCount} folder(s) • ${displayTestCount} test(s)`}
+                </div>
+              </div>
+              {displayAvg !== undefined && displayAvg !== null && (
+                <div className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                  Avg: {displayAvg}%
+                </div>
+              )}
             </div>
-          </div>
-          {displayAvg !== undefined && displayAvg !== null && (
-            <div className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
-              Avg: {displayAvg}%
-            </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       {/* Content Preview */}
@@ -231,7 +247,18 @@ function FolderCard({ folder, folders, tests, onToggle, onRename, onDelete, isSe
           <DraggableTestItem key={test.id} test={test} />
         ))}
 
-        {tests.length === 0 && folders.length === 0 && <div className="text-xs text-gray-400 italic">Empty folder</div>}
+        {tests.length === 0 && folders.length === 0 && (
+          folder.id === 'valentine-2026' ? (
+            <div className="flex flex-col items-center justify-center h-full min-h-[140px] text-center px-2">
+                <span className="text-3xl leading-tight text-pink-600 dark:text-pink-400 font-quicksand font-bold drop-shadow-sm">
+                  {folder.name}
+                </span>
+                <span className="text-sm text-pink-400 mt-2 font-medium">14 letters</span>
+            </div>
+          ) : (
+            <div className="text-xs text-gray-400 italic">Empty folder</div>
+          )
+        )}
         
         {/* Gradient Overlay when collapsed and has more items */}
         {!isExpanded && shouldShowMore && !isSelected && (

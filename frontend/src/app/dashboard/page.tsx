@@ -36,6 +36,9 @@ import UploadResultsModal from "@/components/Modals/UploadResultsModal";
 import AddFilesModal from "@/components/Modals/AddFilesModal";
 import ManageSetsModal from "@/components/Modals/ManageSetsModal";
 import AlertModal from "@/components/Modals/AlertModal";
+import ValentineModal from "@/components/Modals/ValentineModal";
+import { useTheme } from "@/components/ThemeProvider";
+import { getValentineCards, ValentineCard, checkUnlockStatus } from "@/utils/valentine";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { API_URL, mergeTests, batchUpdateTests } from "@/lib/api";
 import { Test, Folder } from "@/types";
@@ -69,6 +72,7 @@ export default function Dashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const supabase = createClient();
+  const { theme } = useTheme();
 
   // Modals state
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -85,6 +89,9 @@ export default function Dashboard() {
   const [username, setUsername] = useState<string>("");
   const [manageSetsTestId, setManageSetsTestId] = useState<string | null>(null);
   const [addSetsTestId, setAddSetsTestId] = useState<string | null>(null);
+  
+  // Valentine State
+  const [valentineCard, setValentineCard] = useState<ValentineCard | null>(null);
 
   const handleManageSets = (id: string) => {
     setManageSetsTestId(id);
@@ -802,15 +809,41 @@ export default function Dashboard() {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 
+    // Inject Valentine Folder
+    if (theme === 'pink' && !currentFolderId && !searchQuery) {
+        // We create a virtual folder
+        const vFolder: any = {
+            id: 'valentine-2026',
+            name: "2026 Valentine's Day Countdown",
+            parent_id: null,
+            created_at: new Date().toISOString(),
+            test_count: 14,
+            folder_count: 0
+        };
+        // Insert at beginning
+        filteredFolders = [vFolder, ...filteredFolders];
+    }
+
     // Sort Folders: Name (A-Z)
-    filteredFolders.sort((a, b) => a.name.localeCompare(b.name));
+    // We want Valentine folder first if it exists, but the sort might mess it up unless we handle it
+    filteredFolders.sort((a, b) => {
+        if (a.id === 'valentine-2026') return -1;
+        if (b.id === 'valentine-2026') return 1;
+        return a.name.localeCompare(b.name);
+    });
 
     return { tests: filteredTests, folders: filteredFolders };
-  }, [tests, folders, currentFolderId, searchQuery]);
+  }, [tests, folders, currentFolderId, searchQuery, theme]);
 
   // Breadcrumbs
   const breadcrumbs = useMemo(() => {
-    const crumbs = [{ id: null, name: "Home" }];
+    const crumbs: { id: string | null; name: string | React.ReactNode }[] = [{ id: null, name: "Home" }];
+    
+    if (currentFolderId === 'valentine-2026') {
+        crumbs.push({ id: 'valentine-2026', name: "Valentine's Day Countdown" });
+        return crumbs;
+    }
+
     let curr = currentFolderId;
     const path = [];
     while (curr) {
@@ -976,7 +1009,61 @@ export default function Dashboard() {
               layout 
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 min-h-96 items-start content-start"
             >
-              <AnimatePresence mode="popLayout">
+              {currentFolderId === 'valentine-2026' ? (
+                  // Valentine Cards Render
+                  <AnimatePresence mode="popLayout">
+                      {getValentineCards().map((card) => {
+                          const status = checkUnlockStatus(card.date);
+                          const isLocked = status === 'locked';
+                          
+                          return (
+                              <motion.div
+                                layout
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.8 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 25, mass: 0.5 }}
+                                key={card.id}
+                              >
+                                  <div 
+                                    onClick={() => {
+                                        setValentineCard(card);
+                                        setActiveModal("valentine");
+                                    }}
+                                    className={`
+                                        bg-white dark:bg-slate-800 rounded-xl shadow-sm border-2 p-6 cursor-pointer transition-all hover:scale-105 active:scale-95 relative overflow-hidden group h-40 flex flex-col items-center justify-center text-center
+                                        ${isLocked 
+                                            ? 'border-gray-200 dark:border-slate-700 opacity-70 grayscale-[0.5] hover:opacity-100 hover:grayscale-0' 
+                                            : 'border-pink-200 dark:border-pink-900/50 hover:shadow-lg hover:border-pink-300 dark:hover:border-pink-500'
+                                        }
+                                    `}
+                                  >
+                                      {/* Decorative Background */}
+                                      <div className={`absolute inset-0 bg-gradient-to-br ${isLocked ? 'from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900' : 'from-pink-50 to-white dark:from-pink-900/10 dark:to-slate-800'} -z-10`} />
+                                      
+                                      <h3 className={`font-bold text-lg mb-2 ${isLocked ? 'text-gray-500 dark:text-slate-500' : 'text-pink-600 dark:text-pink-400'}`}>
+                                          {card.title}
+                                      </h3>
+                                      
+                                      {isLocked ? (
+                                           <div className="flex items-center gap-2 text-gray-400 dark:text-slate-500 text-sm font-medium mt-1">
+                                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80Zm-80,84a12,12,0,1,1,12-12A12,12,0,0,1,128,164Zm40-84H88V56a40,40,0,0,1,80,0Z"></path></svg>
+                                               Locked
+                                           </div>
+                                      ) : (
+                                           <div className="flex items-center gap-2 text-pink-500 dark:text-pink-400 text-sm font-medium mt-1">
+                                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M224,48H32a8,8,0,0,0-8,8V192a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A8,8,0,0,0,224,48ZM203.43,64,128,133.15,52.57,64ZM216,192H40V74.19l82.59,75.71a8,8,0,0,0,10.82,0L216,74.19V192Z"></path></svg>
+                                               Read Letter
+                                           </div>
+                                      )}
+                                  </div>
+                              </motion.div>
+                          );
+                      })}
+                  </AnimatePresence>
+              ) : (
+                <>
+                <AnimatePresence mode="popLayout">
                 {/* Folders */}
                 {filteredItems.folders.map((folder) => (
                     <motion.div
@@ -1064,6 +1151,8 @@ export default function Dashboard() {
                   </motion.div>
                 ))}
               </AnimatePresence>
+              </>
+              )}
             </motion.div>
           )}
         </main>
@@ -1189,6 +1278,12 @@ export default function Dashboard() {
             }}
           />
         )}
+
+        <ValentineModal
+          isOpen={activeModal === "valentine"}
+          onClose={() => setActiveModal(null)}
+          card={valentineCard}
+        />
 
         {mergeModalData && (
             <MergeTestModal

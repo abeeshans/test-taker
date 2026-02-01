@@ -5,7 +5,12 @@ module.exports = {
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'great-vibes': ['var(--font-great-vibes)'],
+        'quicksand': ['var(--font-quicksand)'],
+      },
+    },
   },
   plugins: [],
 }

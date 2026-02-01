@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Great_Vibes, Quicksand } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
@@ -11,6 +11,17 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const greatVibes = Great_Vibes({
+  weight: "400",
+  variable: "--font-great-vibes",
+  subsets: ["latin"],
+});
+
+const quicksand = Quicksand({
+    variable: "--font-quicksand",
+    subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -30,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} ${quicksand.variable} antialiased`} suppressHydrationWarning>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
