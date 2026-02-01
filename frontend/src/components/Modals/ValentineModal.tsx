@@ -28,8 +28,9 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const isLocked = status === 'locked';
   const timeUntil = getTimeUntilUnlock(card.date);
   
-  // Check if it's the Feb 1st card (Day 1)
+  // Check if it's the Feb 1st card (Day 1) or Feb 2nd (Day 2)
   const isDay1 = card.date === '2026-02-01';
+  const isDay2 = card.date === '2026-02-02';
 
   const handleYesClick = () => {
     setAccepted(true);
@@ -119,6 +120,16 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                           />
                       </div>
                   )}
+
+                  {isDay2 && (
+                      <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-6 shadow-md border-4 border-white -rotate-1 transform hover:rotate-0 transition-transform duration-500">
+                          <img 
+                            src="/valentine/us_elevator.png?v=2" 
+                            alt="Us in elevator" 
+                            className="w-full h-full object-cover"
+                          />
+                      </div>
+                  )}
                   
                   <div className="prose dark:prose-invert prose-pink max-w-none text-left whitespace-pre-wrap">
                     <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
@@ -176,7 +187,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                   {!isDay1 && (
                       <div className="mt-8 pt-6 border-t border-gray-100 dark:border-slate-700 w-full flex justify-center">
                         <span className="text-sm font-medium text-pink-400 dark:text-pink-500 uppercase tracking-widest">
-                        With Love
+                        I LOVE YOU ❤️
                         </span>
                       </div>
                   )}
