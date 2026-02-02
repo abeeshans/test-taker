@@ -31,6 +31,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   // Check if it's the Feb 1st card (Day 1) or Feb 2nd (Day 2)
   const isDay1 = card.date === '2026-02-01';
   const isDay2 = card.date === '2026-02-02';
+  const isDay3 = card.date === '2026-02-03';
 
   const handleYesClick = () => {
     setAccepted(true);
@@ -126,6 +127,16 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                           <img 
                             src="/valentine/us_elevator.png?v=2" 
                             alt="Us in elevator" 
+                            className="w-full h-full object-cover"
+                          />
+                      </div>
+                  )}
+
+                  {isDay3 && (
+                      <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-6 shadow-md border-4 border-white rotate-1 transform hover:rotate-0 transition-transform duration-500">
+                          <img 
+                            src="/valentine/feb3.png" 
+                            alt="You sleeping" 
                             className="w-full h-full object-cover"
                           />
                       </div>
