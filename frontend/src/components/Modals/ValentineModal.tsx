@@ -3,6 +3,7 @@ import { X, Heart, Lock } from '@phosphor-icons/react';
 import { ValentineCard, checkUnlockStatus, getTimeUntilUnlock } from '@/utils/valentine';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import Crossword from '../Crossword';
 
 interface ValentineModalProps {
   isOpen: boolean;
@@ -13,12 +14,14 @@ interface ValentineModalProps {
 export default function ValentineModal({ isOpen, onClose, card }: ValentineModalProps) {
   const [swapped, setSwapped] = useState(false);
   const [accepted, setAccepted] = useState(false);
+  const [crosswordSolved, setCrosswordSolved] = useState(false);
 
   // Reset state when modal opens/closes or card changes
   React.useEffect(() => {
     if (isOpen) {
       setSwapped(false);
       setAccepted(false);
+      setCrosswordSolved(false);
     }
   }, [isOpen, card]);
 
@@ -35,6 +38,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const isDay4 = card.date === '2026-02-04';
   const isDay5 = card.date === '2026-02-05';
   const isDay6 = card.date === '2026-02-06';
+  const isDay7 = card.date === '2026-02-07';
 
 
   const handleYesClick = () => {
@@ -68,7 +72,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border-2 border-pink-200 dark:border-pink-900/50"
+            className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden border-2 border-pink-200 dark:border-pink-900/50"
           >
             {/* Header with Close Button */}
             <div className="absolute top-4 right-4 z-10 w-full flex justify-end px-4 pointer-events-none">
@@ -175,10 +179,58 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                           />
                       </div>
                   )}
-                  
+
+                  {isDay7 && (
+                    <div className="w-full">
+                      <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans mb-6">
+                         Good morning my beautiful princess!! I wanted to change things up, so before today's love letter, I want you to answer a question for me: <br/>
+                         <span className="font-bold text-pink-600 dark:text-pink-400">"What's my favorite part of the day?"</span> <br/>
+                         Solve the crossword to get the answer :)
+                      </p>
+                      
+                      <Crossword onComplete={() => {
+                          setCrosswordSolved(true);
+                           confetti({
+                              particleCount: 200,
+                              spread: 100,
+                              origin: { y: 0.8 }, // Bottom heavy
+                              colors: ['#f472b6', '#fbbf24', '#ffffff'] // Pink, Gold, White
+                            });
+                      }} />
+                    </div>
+                  )}
+
+                  {isDay7 && crosswordSolved && (
+                       <motion.div 
+                         initial={{ opacity: 0, height: 0 }}
+                         animate={{ opacity: 1, height: 'auto' }}
+                         className="w-full mt-12 pt-12 border-t-2 border-pink-100 flex flex-col items-center"
+                        >
+                            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-serif">
+                                MORNINGS! 🌤️
+                            </h2>
+                          <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-8 shadow-xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
+                             <img 
+                                src="/valentine/feb7_reveal.jpg" 
+                                alt="Us together" 
+                                className="w-full h-full object-cover"
+                             />
+                          </div>
+                          
+                          <div className="prose dark:prose-invert prose-pink max-w-none text-left whitespace-pre-wrap bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-pink-100">
+                             <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
+                                {card.message}
+                             </p>
+                          </div>
+                      </motion.div>
+                  )}                    
+                  {/* Generic message fallback for other days OR if Day 7 is not solved yet and we want to hide message? 
+                      Actually, for Day 7 the message is in the reveal block.
+                      For Day 6 (isDay6), we show message normally.
+                   */}
                   <div className="prose dark:prose-invert prose-pink max-w-none text-left whitespace-pre-wrap">
                     <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
-                      {card.message}
+                      {isDay7 ? null : card.message}
                     </p>
                     
                     {accepted && isDay1 && (
