@@ -4,6 +4,7 @@ import { ValentineCard, checkUnlockStatus, getTimeUntilUnlock } from '@/utils/va
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Crossword from '../Crossword';
+import ValentinePuzzle from '../Puzzle/ValentinePuzzle';
 
 interface ValentineModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const [swapped, setSwapped] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [crosswordSolved, setCrosswordSolved] = useState(false);
+  const [puzzleSolved, setPuzzleSolved] = useState(false);
 
   // Reset state when modal opens/closes or card changes
   React.useEffect(() => {
@@ -22,6 +24,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
       setSwapped(false);
       setAccepted(false);
       setCrosswordSolved(false);
+      setPuzzleSolved(false);
     }
   }, [isOpen, card]);
 
@@ -40,6 +43,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const isDay6 = card.date === '2026-02-06';
   const isDay7 = card.date === '2026-02-07';
   const isDay8 = card.date === '2026-02-08';
+  const isDay9 = card.date === '2026-02-09';
 
 
   const handleYesClick = () => {
@@ -76,7 +80,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
             className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden border-2 border-pink-200 dark:border-pink-900/50"
           >
             {/* Header with Close Button */}
-            <div className="absolute top-4 right-4 z-10 w-full flex justify-end px-4 pointer-events-none">
+            <div className="absolute top-4 right-4 z-[200] w-full flex justify-end px-4 pointer-events-none">
               <button
                 onClick={onClose}
                 className="pointer-events-auto p-2 rounded-full bg-white/50 dark:bg-black/20 hover:bg-pink-100 dark:hover:bg-pink-900/30 text-pink-600 dark:text-pink-400 transition-colors"
@@ -191,6 +195,42 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                       </div>
                   )}
 
+                  {isDay9 && (
+                    <div className="w-full mb-8">
+                       <div className="prose dark:prose-invert prose-pink max-w-none text-center whitespace-pre-wrap mb-4">
+                            <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
+                                Good morningg my princess!! 👑❤️{"\n\n"}
+                                Before you read today’s message, I have a little challenge for you. Channel your inner Judy and solve this puzzle to unlock the message:
+                            </p>
+                       </div>
+                       
+                       {/* Reference Image */}
+                       <div className="relative w-48 mx-auto aspect-[4/3] rounded-lg overflow-hidden mb-4 shadow-sm border-2 border-white/50 opacity-80 hover:opacity-100 transition-opacity">
+                          <img 
+                            src="/valentine/feb9.jpg" 
+                            alt="Reference" 
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[10px] py-1 text-center font-mono uppercase tracking-widest">
+                              Reference
+                          </div>
+                       </div>
+
+                        <ValentinePuzzle 
+                            imageSrc="/valentine/feb9.jpg"
+                            onComplete={() => {
+                                setPuzzleSolved(true);
+                                confetti({
+                                    particleCount: 200,
+                                    spread: 100,
+                                    origin: { y: 0.6 },
+                                    colors: ['#ec4899', '#f472b6', '#fbbf24'] 
+                                });
+                            }}
+                        />
+                    </div>
+                  )}
+
                   {isDay7 && (
                     <div className="w-full">
                       <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans mb-6">
@@ -235,13 +275,43 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                           </div>
                       </motion.div>
                   )}                    
-                  {/* Generic message fallback for other days OR if Day 7 is not solved yet and we want to hide message? 
-                      Actually, for Day 7 the message is in the reveal block.
-                      For Day 6 (isDay6), we show message normally.
-                   */}
+                  {isDay9 && puzzleSolved && (
+                       <motion.div 
+                         initial={{ opacity: 0, height: 0 }}
+                         animate={{ opacity: 1, height: 'auto' }}
+                         className="w-full mt-12 pt-12 border-t-2 border-pink-100 flex flex-col items-center"
+                        >
+                            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-serif">
+                                Puzzle Solved! 🧩
+                            </h2>
+                            
+                          <div className="flex flex-col md:flex-row gap-6 mb-8 w-full max-w-2xl mx-auto">
+                              <div className="relative flex-1 aspect-[3/4] rounded-xl overflow-hidden shadow-xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
+                                 <img 
+                                   src="/valentine/feb9_couch.jpg" 
+                                   alt="Couch memory" 
+                                   className="w-full h-full object-cover"
+                                 />
+                              </div>
+                              <div className="relative flex-1 aspect-[3/4] rounded-xl overflow-hidden shadow-xl border-4 border-white -rotate-2 hover:rotate-0 transition-transform duration-500">
+                                 <img 
+                                   src="/valentine/feb9_bed.jpg" 
+                                   alt="Bed memory" 
+                                   className="w-full h-full object-cover"
+                                 />
+                              </div>
+                          </div>
+                          
+                          <div className="prose dark:prose-invert prose-pink max-w-none text-left whitespace-pre-wrap bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-pink-100">
+                             <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
+                                {card.message}
+                             </p>
+                          </div>
+                      </motion.div>
+                  )}
                   <div className="prose dark:prose-invert prose-pink max-w-none text-left whitespace-pre-wrap">
                     <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
-                      {isDay7 ? null : card.message}
+                      {isDay7 || isDay9 ? null : card.message}
                     </p>
                     
                     {accepted && isDay1 && (
