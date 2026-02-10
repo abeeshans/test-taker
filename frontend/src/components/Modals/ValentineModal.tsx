@@ -44,6 +44,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const isDay7 = card.date === '2026-02-07';
   const isDay8 = card.date === '2026-02-08';
   const isDay9 = card.date === '2026-02-09';
+  const isDay10 = card.date === '2026-02-10';
 
 
   const handleYesClick = () => {
@@ -190,6 +191,16 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                           <img 
                             src="/valentine/feb8.jpg" 
                             alt="Us together" 
+                            className="w-full h-full object-cover"
+                          />
+                      </div>
+                  )}
+
+                  {isDay10 && (
+                      <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-6 shadow-md border-4 border-white -rotate-1 transform hover:rotate-0 transition-transform duration-500">
+                          <img 
+                            src="/valentine/feb10.jpg" 
+                            alt="For you" 
                             className="w-full h-full object-cover"
                           />
                       </div>
