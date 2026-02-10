@@ -92,6 +92,7 @@ export default function Dashboard() {
   
   // Valentine State
   const [valentineCard, setValentineCard] = useState<ValentineCard | null>(null);
+  const [isValentineUnlocked, setIsValentineUnlocked] = useState(false);
 
   const handleManageSets = (id: string) => {
     setManageSetsTestId(id);
@@ -100,6 +101,27 @@ export default function Dashboard() {
   const handleAddSet = (id: string) => {
     setAddSetsTestId(id);
     setActiveModal("add-files");
+  };
+
+  const handleUnlockValentine = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        data: { valentine_unlocked: true }
+      });
+
+      if (error) throw error;
+      
+      setIsValentineUnlocked(true);
+      setAlertMessage("Valentine's Folder Unlocked! ❤️");
+      setActiveModal("alert");
+    } catch (error) {
+      console.error("Error unlocking valentine:", error);
+      setAlertMessage("Failed to unlock. Please try again.");
+      setActiveModal("alert");
+    }
   };
 
   const handleCardClick = useCallback((id: string, e: React.MouseEvent) => {
@@ -749,6 +771,9 @@ export default function Dashboard() {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
         setUsername(user.user_metadata.display_name || user.email?.split('@')[0] || 'User');
+        if (user.user_metadata.valentine_unlocked) {
+            setIsValentineUnlocked(true);
+        }
     }
 
     try {
@@ -810,7 +835,7 @@ export default function Dashboard() {
     });
 
     // Inject Valentine Folder
-    if (theme === 'pink' && !currentFolderId && !searchQuery) {
+    if (isValentineUnlocked && !currentFolderId && !searchQuery) {
         // We create a virtual folder
         const vFolder: any = {
             id: 'valentine-2026',
@@ -833,7 +858,7 @@ export default function Dashboard() {
     });
 
     return { tests: filteredTests, folders: filteredFolders };
-  }, [tests, folders, currentFolderId, searchQuery, theme]);
+  }, [tests, folders, currentFolderId, searchQuery, theme, isValentineUnlocked]);
 
   // Breadcrumbs
   const breadcrumbs = useMemo(() => {
@@ -1169,6 +1194,8 @@ export default function Dashboard() {
           onClose={() => setActiveModal(null)}
           currentUsername={username}
           onProfileUpdate={handleProfileUpdate}
+          onUnlockValentine={handleUnlockValentine}
+          isValentineUnlocked={isValentineUnlocked}
         />
 
         <UploadResultsModal 

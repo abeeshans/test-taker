@@ -9,6 +9,8 @@ interface HelpModalProps {
   onClose: () => void;
   currentUsername?: string;
   onProfileUpdate?: (newUsername: string) => Promise<void>;
+  onUnlockValentine?: () => Promise<void>;
+  isValentineUnlocked?: boolean;
 }
 
 interface AccordionItemProps {
@@ -51,13 +53,15 @@ const AccordionItem = ({ title, children, defaultOpen = false }: AccordionItemPr
   );
 };
 
-export default function HelpModal({ isOpen, onClose, currentUsername, onProfileUpdate }: HelpModalProps) {
+export default function HelpModal({ isOpen, onClose, currentUsername, onProfileUpdate, onUnlockValentine, isValentineUnlocked }: HelpModalProps) {
   const [copied, setCopied] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
   const [username, setUsername] = useState(currentUsername || '');
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [valentineCode, setValentineCode] = useState('');
+  const [codeError, setCodeError] = useState('');
 
   // Update local state when prop changes
   React.useEffect(() => {
@@ -109,6 +113,18 @@ export default function HelpModal({ isOpen, onClose, currentUsername, onProfileU
       setSaveMessage('Error saving');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleUnlockSubmit = async () => {
+    if (!onUnlockValentine) return;
+    if (valentineCode === "valentines2026") {
+        await onUnlockValentine();
+        setCodeError("");
+        setValentineCode("");
+        onClose();
+    } else {
+        setCodeError("Incorrect code");
     }
   };
 
@@ -320,6 +336,30 @@ export default function HelpModal({ isOpen, onClose, currentUsername, onProfileU
             <span>Last updated: {new Date().toLocaleDateString()}</span>
             <span>Designed & Built by <span className="font-medium text-gray-600 dark:text-slate-400">Abeeshan Selvabaskaran</span></span>
         </div>
+
+        {!isValentineUnlocked && onUnlockValentine && (
+           <AccordionItem title="Special Access">
+               <div className="space-y-2">
+                   <p className="text-gray-600 dark:text-slate-400 text-sm">Enter access code to unlock special features:</p>
+                   <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={valentineCode}
+                            onChange={(e) => setValentineCode(e.target.value)}
+                            placeholder="Enter code"
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 bg-white dark:bg-slate-900 text-gray-900 dark:text-white text-sm"
+                        />
+                        <button
+                            onClick={handleUnlockSubmit}
+                            className="px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-md text-sm font-medium transition-colors"
+                        >
+                            Unlock
+                        </button>
+                   </div>
+                   {codeError && <p className="text-red-500 text-xs">{codeError}</p>}
+               </div>
+           </AccordionItem>
+        )}
       </div>
     </BaseModal>
   );
