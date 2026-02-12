@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Crossword from '../Crossword';
 import ValentinePuzzle from '../Puzzle/ValentinePuzzle';
+import ValentineWordle from '../ValentineWordle';
 
 interface ValentineModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const [accepted, setAccepted] = useState(false);
   const [crosswordSolved, setCrosswordSolved] = useState(false);
   const [puzzleSolved, setPuzzleSolved] = useState(false);
+  const [wordleSolved, setWordleSolved] = useState(false);
 
   // Reset state when modal opens/closes or card changes
   React.useEffect(() => {
@@ -25,6 +27,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
       setAccepted(false);
       setCrosswordSolved(false);
       setPuzzleSolved(false);
+      setWordleSolved(false);
     }
   }, [isOpen, card]);
 
@@ -46,6 +49,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const isDay9 = card.date === '2026-02-09';
   const isDay10 = card.date === '2026-02-10';
   const isDay11 = card.date === '2026-02-11';
+  const isDay12 = card.date === '2026-02-12';
 
 
   const handleYesClick = () => {
@@ -217,6 +221,55 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                       </div>
                   )}
 
+                  {isDay12 && (
+                    <div className="w-full">
+                       <div className="prose dark:prose-invert prose-pink max-w-none text-center whitespace-pre-wrap mb-4">
+                            <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
+                                Hi my love ❤️ To unlock today's message, you'll need to answer this question: <br/>
+                                <span className="font-bold text-pink-600 dark:text-pink-400">What is a little part of Preston that I miss?</span> <br/>
+                                To get the answer, you can solve the wordle!
+                            </p>
+                       </div>
+                       
+                       <ValentineWordle 
+                           onComplete={() => {
+                               setWordleSolved(true);
+                               confetti({
+                                   particleCount: 200,
+                                   spread: 100,
+                                   origin: { y: 0.6 },
+                                   colors: ['#ef4444', '#f472b6', '#22c55e'] 
+                               });
+                           }}
+                       />
+                    </div>
+                  )}
+
+                  {isDay12 && wordleSolved && (
+                       <motion.div 
+                         initial={{ opacity: 0, height: 0 }}
+                         animate={{ opacity: 1, height: 'auto' }}
+                         className="w-full mt-12 pt-12 border-t-2 border-pink-100 flex flex-col items-center"
+                        >
+                            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-serif">
+                                Correct! 🚂
+                            </h2>
+                          <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-8 shadow-xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
+                             <img 
+                                src="/valentine/feb12.jpg" 
+                                alt="Us on the train" 
+                                className="w-full h-full object-cover"
+                             />
+                          </div>
+                          
+                          <div className="prose dark:prose-invert prose-pink max-w-none text-left whitespace-pre-wrap bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-pink-100">
+                             <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
+                                {card.message}
+                             </p>
+                          </div>
+                      </motion.div>
+                  )}
+
                   {isDay9 && (
                     <div className="w-full mb-8">
                        <div className="prose dark:prose-invert prose-pink max-w-none text-center whitespace-pre-wrap mb-4">
@@ -333,7 +386,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                   )}
                   <div className="prose dark:prose-invert prose-pink max-w-none text-left whitespace-pre-wrap">
                     <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
-                      {isDay7 || isDay9 ? null : card.message}
+                      {isDay7 || isDay9 || isDay12 ? null : card.message}
                     </p>
                     
                     {accepted && isDay1 && (
