@@ -44,9 +44,15 @@ export const getValentineCards = (): ValentineCard[] => {
 export const checkUnlockStatus = (dateStr: string): 'locked' | 'unlocked' => {
   const now = new Date();
   
-  // Create target date at 12 AM GMT (UTC+0)
-  // This corresponds to 7 PM EST on the previous day
-  const targetDate = new Date(`${dateStr}T00:00:00Z`);
+  // Default: 12 AM GMT (UTC+0) -> 7 PM EST previous day
+  let targetIso = `${dateStr}T00:00:00Z`;
+
+  // Special case for Feb 14: 7 AM EST = 12 PM UTC
+  if (dateStr === '2026-02-14') {
+    targetIso = `${dateStr}T12:00:00Z`;
+  }
+  
+  const targetDate = new Date(targetIso);
   
   // If the target time has passed, it's unlocked
   if (now >= targetDate) {
@@ -58,7 +64,14 @@ export const checkUnlockStatus = (dateStr: string): 'locked' | 'unlocked' => {
 
 export const getTimeUntilUnlock = (dateStr: string): string => {
   const now = new Date();
-  const targetDate = new Date(`${dateStr}T00:00:00Z`);
+  
+  let targetIso = `${dateStr}T00:00:00Z`;
+  // Special case for Feb 14: 7 AM EST = 12 PM UTC
+  if (dateStr === '2026-02-14') {
+    targetIso = `${dateStr}T12:00:00Z`;
+  }
+
+  const targetDate = new Date(targetIso);
   
   if (now >= targetDate) return "";
   
