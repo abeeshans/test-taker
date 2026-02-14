@@ -7,6 +7,11 @@ import Crossword from '../Crossword';
 import ValentinePuzzle from '../Puzzle/ValentinePuzzle';
 import ValentineWordle from '../ValentineWordle';
 
+import ParallaxIntro from '../Valentine/Feb14/ParallaxIntro';
+import LoveTimeline from '../Valentine/Feb14/LoveTimeline';
+import RelationshipStats from '../Valentine/Feb14/RelationshipStats';
+import FlappyHeartGame from '../Valentine/Feb14/FlappyHeartGame';
+
 interface ValentineModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +24,9 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const [crosswordSolved, setCrosswordSolved] = useState(false);
   const [puzzleSolved, setPuzzleSolved] = useState(false);
   const [wordleSolved, setWordleSolved] = useState(false);
+  const [gameFinished, setGameFinished] = useState(false);
+  
+  const scrollRef = React.useRef<HTMLDivElement>(null);
 
   // Reset state when modal opens/closes or card changes
   React.useEffect(() => {
@@ -28,6 +36,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
       setCrosswordSolved(false);
       setPuzzleSolved(false);
       setWordleSolved(false);
+      setGameFinished(false);
     }
   }, [isOpen, card]);
 
@@ -51,6 +60,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   const isDay11 = card.date === '2026-02-11';
   const isDay12 = card.date === '2026-02-12';
   const isDay13 = card.date === '2026-02-13';
+  const isDay14 = card.date === '2026-02-14';
 
 
   const handleYesClick = () => {
@@ -67,7 +77,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
   // Parse date for display
   const dateObj = new Date(card.date + 'T12:00:00'); // Safe mid-day parsing
   const dateDisplay = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
-
+  
   return (
     <AnimatePresence>
       {isOpen && (
@@ -97,12 +107,15 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
             </div>
 
             {/* Content */}
-            <div className="p-8 md:p-12 text-center relative overflow-hidden max-h-[85vh] overflow-y-auto">
+            <div 
+                ref={scrollRef}
+                className="p-8 md:p-12 text-center relative overflow-hidden max-h-[85vh] overflow-y-auto scroll-smooth"
+            >
                {/* Background Decorative Hearts */}
-               <div className="absolute top-[-20px] left-[-20px] text-pink-100 dark:text-pink-900/20 rotate-[-15deg]">
+               <div className="absolute top-[-20px] left-[-20px] text-pink-100 dark:text-pink-900/20 rotate-[-15deg] pointer-events-none">
                  <Heart size={100} weight="fill" />
                </div>
-               <div className="absolute bottom-[-10px] right-[-10px] text-pink-100 dark:text-pink-900/20 rotate-[15deg]">
+               <div className="absolute bottom-[-10px] right-[-10px] text-pink-100 dark:text-pink-900/20 rotate-[15deg] pointer-events-none">
                  <Heart size={80} weight="fill" />
                </div>
 
@@ -116,7 +129,9 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                   </h3>
                   <p className="text-gray-500 dark:text-slate-400 mb-6 max-w-xs mx-auto">
                     This love letter is sealed until <br/>
-                    <span className="font-semibold text-pink-600 dark:text-pink-400">12:00 AM GMT (7:00 PM EST) on {dateDisplay}</span>.
+                    <span className="font-semibold text-pink-600 dark:text-pink-400">
+                      {isDay14 ? `7:00 AM GMT (2:00 AM EST) on ${dateDisplay}` : `12:00 AM GMT (7:00 PM EST) on ${dateDisplay}`}
+                    </span>.
                   </p>
                   <div className="px-4 py-2 bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-300 rounded-lg text-sm font-medium">
                     Opens in {timeUntil}
@@ -232,6 +247,59 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                       </div>
                   )}
 
+                   {isDay14 && (
+                      <div className="w-full text-left">
+                           <ParallaxIntro containerRef={scrollRef} />
+                           
+                           <LoveTimeline />
+                           
+                           <RelationshipStats />
+                           
+                           <div className="py-20 px-6 min-h-[600px] flex flex-col items-center justify-center relative rounded-3xl mt-12 overflow-hidden">
+                               <div className="w-full max-w-4xl mx-auto text-center mb-12">
+                                   <h2 className="text-4xl md:text-6xl font-bold mb-8 font-great-vibes text-pink-500">
+                                       One Last Game...
+                                   </h2>
+                                   <p className="text-xl mb-8 max-w-2xl mx-auto text-gray-700 dark:text-gray-300 font-quicksand leading-relaxed">
+                                       You've solved crosswords, puzzles, and even a wordle, but did you think that you could read the final message without one last game? Capture as many hearts as you can to open the final message!
+                                   </p>
+                                   <FlappyHeartGame onGameOver={() => setGameFinished(true)} />
+                               </div>
+                               
+                               {gameFinished && (
+                                   <motion.div 
+                                       initial={{ opacity: 0, y: 50 }}
+                                       animate={{ opacity: 1, y: 0 }}
+                                       className="w-full max-w-3xl mx-auto text-center mt-12 pb-20"
+                                   >
+                                       <h2 className="text-5xl md:text-7xl font-bold mb-8 text-pink-500 font-great-vibes text-shadow-sm">
+                                           I love you!
+                                       </h2>
+                                       
+                                       <div className="bg-white/40 dark:bg-black/20 p-4 rounded-3xl backdrop-blur-sm border border-pink-100 dark:border-pink-900/30 shadow-xl mb-8 transform -rotate-1 hover:rotate-0 transition-transform duration-500">
+                                            <div className="rounded-2xl overflow-hidden aspect-[4/3] shadow-inner">
+                                                <img 
+                                                  src="/valentine/feb14/feb14.jpeg" 
+                                                  alt="Us together on Valentine's Day" 
+                                                  className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                       </div>
+
+                                       <div className="prose dark:prose-invert prose-pink max-w-none text-center whitespace-pre-wrap bg-pink-50 dark:bg-pink-950/30 p-8 rounded-2xl shadow-sm border border-pink-200 dark:border-pink-800">
+                                            <p className="text-lg md:text-xl leading-relaxed text-gray-800 dark:text-gray-200 font-quicksand">
+                                                {card.message}
+                                            </p>
+                                       </div>
+                                       <div className="mt-8 animate-bounce">
+                                           <Heart size={48} weight="fill" className="text-red-500 mx-auto" />
+                                       </div>
+                                   </motion.div>
+                               )}
+                           </div>
+                      </div>
+                  )}
+
                   {isDay12 && (
                     <div className="w-full">
                        <div className="prose dark:prose-invert prose-pink max-w-none text-center whitespace-pre-wrap mb-4">
@@ -262,7 +330,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                          animate={{ opacity: 1, height: 'auto' }}
                          className="w-full mt-12 pt-12 border-t-2 border-pink-100 flex flex-col items-center"
                         >
-                            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-serif">
+                            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-great-vibes">
                                 Correct! 🚂
                             </h2>
                           <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-8 shadow-xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
@@ -343,7 +411,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                          animate={{ opacity: 1, height: 'auto' }}
                          className="w-full mt-12 pt-12 border-t-2 border-pink-100 flex flex-col items-center"
                         >
-                            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-serif">
+                            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-great-vibes">
                                 MORNINGS! 🌤️
                             </h2>
                           <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-xl overflow-hidden mb-8 shadow-xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
@@ -367,7 +435,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                          animate={{ opacity: 1, height: 'auto' }}
                          className="w-full mt-12 pt-12 border-t-2 border-pink-100 flex flex-col items-center"
                         >
-                            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-serif">
+                            <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-rose-600 mb-6 font-great-vibes">
                                 Puzzle Solved! 🧩
                             </h2>
                             
@@ -397,7 +465,7 @@ export default function ValentineModal({ isOpen, onClose, card }: ValentineModal
                   )}
                   <div className="prose dark:prose-invert prose-pink max-w-none text-left whitespace-pre-wrap">
                     <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed font-sans">
-                      {isDay7 || isDay9 || isDay12 ? null : card.message}
+                      {isDay7 || isDay9 || isDay12 || isDay14 ? null : card.message}
                     </p>
                     
                     {accepted && isDay1 && (

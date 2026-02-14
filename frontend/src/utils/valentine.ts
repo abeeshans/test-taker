@@ -22,7 +22,7 @@ I really loved that birthday baby, thank you for the surprise that day 🥹❤�
   "2026-02-11": "Good afternoon my baby!! Sorry this message took much longer than usual to come out, but I promise your daily messages will become routinely in the morning again! Thanks for being there for me yesterday love. I felt super down after seeing my dad post-surgery and even though it still weighs on me, I feel extremely lucky that I can rely on you to lift my spirits back up. You're extremely sweet, and thank you for being my person. It's one thing to love someone, but to know that they love you back and that you can lean on them for support is an extremely comforting feeling. I'm so glad that you're that person for me. You're my anchor and I love you more than words can describe. I only hope that I can be that same person for you and give you a feeling of safety and comfort so that you will always know I'll be by your side.",
   "2026-02-12": "I miss going on the train with you! I know it's probably your least favorite part of Preston and it definitely wasn't the most glamarous part of when I was there either, but it was so nice to get to see you so comfortable next to me, even while doing something you otherwise hated so much. Those moments made me feel truly loved - to get to see the person I love the most feel safe and comfortable, just because I'm there. I hope you know I'll always be there for you and I hope I can always make the most difficult parts of your life manageable ❤️",
   "2026-02-13": "Hii my love!! \nJust a super short message today since tomorrow's the big day ❤️ I hope you know how much I love you and how full you make my heart baby! You're the best thing that's happened to me 🥹 I hope you have the best day ever today love!!",
-  "2026-02-14": "Happy Valentine's Day! I love you so much! ❤️"
+  "2026-02-14": "Happy Valentine's day my love! No matter how many hearts you captured, it couldn't match up to the amount of love I have for you (infinity). I love you soooo much and you're truly my favorite person on the planet! The cutest, happiest, and most loving girl I know, and I can't believe you're mine ❤️ Long distance makes it hard to celebrate these moments with you but I hope these past 14 days have been a small source of happiness that show you how much I love you.\n\nP.S. Tell thevi athai not to make you breakfast, I got you pancakes!"
 };
 
 export const getValentineCards = (): ValentineCard[] => {
@@ -47,11 +47,11 @@ export const checkUnlockStatus = (dateStr: string): 'locked' | 'unlocked' => {
   // Default: 12 AM GMT (UTC+0) -> 7 PM EST previous day
   let targetIso = `${dateStr}T00:00:00Z`;
 
-  // Special case for Feb 14: 7 AM EST = 12 PM UTC
+  // Special case for Feb 14 to match getTimeUntilUnlock logic
   if (dateStr === '2026-02-14') {
-    targetIso = `${dateStr}T12:00:00Z`;
+    targetIso = `${dateStr}T07:00:00Z`;
   }
-  
+
   const targetDate = new Date(targetIso);
   
   // If the target time has passed, it's unlocked
@@ -66,9 +66,9 @@ export const getTimeUntilUnlock = (dateStr: string): string => {
   const now = new Date();
   
   let targetIso = `${dateStr}T00:00:00Z`;
-  // Special case for Feb 14: 7 AM EST = 12 PM UTC
+  // Special case for Feb 14: 7 AM GMT = 2 AM EST
   if (dateStr === '2026-02-14') {
-    targetIso = `${dateStr}T12:00:00Z`;
+    targetIso = `${dateStr}T07:00:00Z`;
   }
 
   const targetDate = new Date(targetIso);
